@@ -4,3 +4,6 @@ build
 
 # Nanopb
 tools/nanopb/env
+
+# VS Code
+.vscode

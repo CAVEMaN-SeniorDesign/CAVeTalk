@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "cave_talk_types.h"
+
 #define CAVE_TALK_VERSION 1U
 
 #define CAVE_TALK_VERSION_INDEX 0U
@@ -11,7 +13,7 @@
 
 #define CAVE_TALK_HEADER_SIZE (CAVE_TALK_LENGTH_INDEX + 1U)
 
-#define CAVE_TALK_CRC_INDEX_0 (CAVE_TALK_LENGTH_INDEX + sizeof(CaveTalk_Length_t))
+#define CAVE_TALK_CRC_INDEX_0 0U
 #define CAVE_TALK_CRC_INDEX_1 (CAVE_TALK_CRC_INDEX_0 + 1)
 #define CAVE_TALK_CRC_INDEX_2 (CAVE_TALK_CRC_INDEX_0 + 2)
 #define CAVE_TALK_CRC_INDEX_3 (CAVE_TALK_CRC_INDEX_0 + 3)
@@ -19,7 +21,7 @@
 #define CAVE_TALK_BYTE_MASK        0xFFU
 #define CAVE_TALK_UINT16_MASK      0xFFFFU
 #define CAVE_TALK_BYTE_BIT_SHIFT   8U
-#define CAVE_TALK_UINT16_BIT_SHIFT (16U)
+#define CAVE_TALK_UINT16_BIT_SHIFT 16U
 
 /* TODO consider portability and sending CRC as byte array, remove functions if unused */
 static inline uint8_t CaveTalk_GetUpperByte(const uint16_t value);
@@ -27,12 +29,12 @@ static inline uint8_t CaveTalk_GetLowerByte(const uint16_t value);
 static inline uint16_t CaveTalk_GetUpperUint16(const uint32_t value);
 static inline uint16_t CaveTalk_GetLowerUint16(const uint32_t value);
 
-CaveTalk_LinkError_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
-                                    const CaveTalk_Id_t id,
-                                    const void *const data,
-                                    const CaveTalk_Length_t length)
+CaveTalk_Error_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
+                                const CaveTalk_Id_t id,
+                                const void *const data,
+                                const CaveTalk_Length_t length)
 {
-    CaveTalk_LinkError_t error = CAVE_TALK_LINK_ERROR_NULL;
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
     if ((NULL == handle) || (NULL == handle->send) || (NULL == data))
     {
@@ -52,13 +54,13 @@ CaveTalk_LinkError_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
         error = handle->send(header, sizeof(header));
 
         /* Send payload */
-        if (CAVE_TALK_LINK_ERROR_NONE == error)
+        if (CAVE_TALK_ERROR_NONE == error)
         {
             error = handle->send(data, length);
         }
 
         /* Send CRC */
-        if (CAVE_TALK_LINK_ERROR_NONE == error)
+        if (CAVE_TALK_ERROR_NONE == error)
         {
             error = handle->send(&crc, sizeof(crc));
         }
@@ -67,13 +69,13 @@ CaveTalk_LinkError_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
     return error;
 }
 
-CaveTalk_LinkError_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
-                                     CaveTalk_Id_t *const id,
-                                     void *const data,
-                                     const size_t size,
-                                     CaveTalk_Length_t *const length)
+CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
+                                 CaveTalk_Id_t *const id,
+                                 void *const data,
+                                 const size_t size,
+                                 CaveTalk_Length_t *const length)
 {
-    CaveTalk_LinkError_t error = CAVE_TALK_LINK_ERROR_NULL;
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
     if ((NULL == handle) ||
         (NULL == handle->receive) ||
@@ -88,7 +90,7 @@ CaveTalk_LinkError_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         *id     = 0U; /* TODO set to message ID none */
         *length = 0U;
 
-        error = CAVE_TALK_LINK_ERROR_NONE;
+        error = CAVE_TALK_ERROR_NONE;
     }
     else
     {
@@ -107,13 +109,13 @@ CaveTalk_LinkError_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         *length = header[CAVE_TALK_LENGTH_INDEX];
 
         /* Receive payload */
-        if ((CAVE_TALK_LINK_ERROR_NONE != error) || (CAVE_TALK_HEADER_SIZE != bytes_received))
+        if ((CAVE_TALK_ERROR_NONE != error) || (CAVE_TALK_HEADER_SIZE != bytes_received))
         {
-            error = CAVE_TALK_LINK_ERROR_INCOMPLETE;
+            error = CAVE_TALK_ERROR_INCOMPLETE;
         }
         else if (size < length)
         {
-            error = CAVE_TALK_LINK_ERROR_SIZE;
+            error = CAVE_TALK_ERROR_SIZE;
         }
         else
         {
@@ -121,9 +123,9 @@ CaveTalk_LinkError_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         }
 
         /* Receive CRC */
-        if ((CAVE_TALK_LINK_ERROR_NONE != error) || (length != bytes_received))
+        if ((CAVE_TALK_ERROR_NONE != error) || (length != bytes_received))
         {
-            error = CAVE_TALK_LINK_ERROR_INCOMPLETE;
+            error = CAVE_TALK_ERROR_INCOMPLETE;
         }
         else
         {
@@ -131,14 +133,14 @@ CaveTalk_LinkError_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         }
 
         /* Verify CRC */
-        if ((CAVE_TALK_LINK_ERROR_NONE != error) || (sizeof(crc) != bytes_received))
+        if ((CAVE_TALK_ERROR_NONE != error) || (sizeof(crc) != bytes_received))
         {
-            error = CAVE_TALK_LINK_ERROR_INCOMPLETE;
+            error = CAVE_TALK_ERROR_INCOMPLETE;
         }
         else
         {
             /* TODO check CRC */
-            error = CAVE_TALK_LINK_ERROR_NONE;
+            error = CAVE_TALK_ERROR_NONE;
         }
     }
 

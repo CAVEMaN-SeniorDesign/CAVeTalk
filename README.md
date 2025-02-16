@@ -38,7 +38,7 @@ When building the C version of this library and/or using this library on an embe
 
    `cd tools/nanopb`
 
-4. Run the `generate` script to generate the Protobuf payloads for C with `nanopb`
+4. Run the `generate` script to generate the Protobuf payloads for C with `nanopb`.  This step requires Python3 to be installed.
 
     `./generate`
 
@@ -65,3 +65,23 @@ When building the C++ version of this library, follow these steps to setup Proto
 5. Install `protobufs` in `external/protobufs/_build/protobuf-install`
 
    `cmake --build _build -t install`
+
+## Build
+
+Prerequisites
+- CMake >= 3.30
+- Ninja
+- C compiler that supports at least C11
+- C++ compiler that supports at least C++20
+- Python3
+
+1. Setup Protobufs for the version(s) of the library being built.  See [Protobufs](#protobufs).
+2. Configure CMake.
+
+   `cmake -B build -G Ninja`
+
+3. Build the project.
+
+   `cmake --build build`
+
+4. See the `docs` directory for how to perform static analysis and code formatting.
