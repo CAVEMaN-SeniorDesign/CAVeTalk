@@ -9,7 +9,7 @@ typedef struct
 {
     CaveTalk_Error_t (*send)(const void *const data, const size_t size);
     CaveTalk_Error_t (*receive)(void *const data, const size_t size, size_t *const bytes_received);
-    CaveTalk_Error_t (*available)(size_t *const bytes);
+    CaveTalk_Error_t (*available)(size_t *const bytes_available);
 } CaveTalk_LinkHandle_t;
 
 const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {

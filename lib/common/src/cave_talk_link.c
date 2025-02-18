@@ -86,62 +86,78 @@ CaveTalk_Error_t CaveTalk_Listen(const CaveTalk_LinkHandle_t *const handle,
         (NULL == length))
     {
     }
-    else if (handle->available < CAVE_TALK_HEADER_SIZE)
-    {
-        *id     = CAVE_TALK_ID_NONE;
-        *length = 0U;
-
-        error = CAVE_TALK_ERROR_NONE;
-    }
     else
     {
-        size_t         bytes_received = 0U;
-        uint8_t        header[CAVE_TALK_HEADER_SIZE];
-        CaveTalk_Crc_t crc = 0U;
+        size_t bytes_available = 0U;
 
-        *id     = CAVE_TALK_ID_NONE;
-        *length = 0U;
+        error = handle->available(&bytes_available);
 
-        /* TODO SD-183 determine error behavior */
-        /* TODO SD-184 check version */
-        /* Receive header */
-        error   = handle->receive(header, sizeof(header), &bytes_received);
-        *id     = header[CAVE_TALK_ID_INDEX];
-        *length = header[CAVE_TALK_LENGTH_INDEX];
-
-        /* Receive payload */
-        if ((CAVE_TALK_ERROR_NONE != error) || (CAVE_TALK_HEADER_SIZE != bytes_received))
+        if (CAVE_TALK_ERROR_NONE != error)
         {
-            error = CAVE_TALK_ERROR_INCOMPLETE;
         }
-        else if (size < length)
+        else if (bytes_available < CAVE_TALK_HEADER_SIZE)
         {
-            error = CAVE_TALK_ERROR_SIZE;
+            *id     = CAVE_TALK_ID_NONE;
+            *length = 0U;
         }
         else
         {
-            error = handle->receive(data, length, &bytes_received);
-        }
+            size_t         bytes_received = 0U;
+            uint8_t        header[CAVE_TALK_HEADER_SIZE];
+            CaveTalk_Crc_t crc = 0U;
 
-        /* Receive CRC */
-        if ((CAVE_TALK_ERROR_NONE != error) || (length != bytes_received))
-        {
-            error = CAVE_TALK_ERROR_INCOMPLETE;
-        }
-        else
-        {
-            error = handle->receive(&crc, sizeof(crc), &bytes_received);
-        }
+            *id     = CAVE_TALK_ID_NONE;
+            *length = 0U;
 
-        /* Verify CRC */
-        if ((CAVE_TALK_ERROR_NONE != error) || (sizeof(crc) != bytes_received))
-        {
-            error = CAVE_TALK_ERROR_INCOMPLETE;
-        }
-        else
-        {
-            /* TODO SD-164 check CRC */
-            error = CAVE_TALK_ERROR_NONE;
+            /* TODO SD-183 determine error behavior */
+            /* TODO SD-184 check version */
+            /* Receive header */
+            error   = handle->receive(header, sizeof(header), &bytes_received);
+            *id     = header[CAVE_TALK_ID_INDEX];
+            *length = header[CAVE_TALK_LENGTH_INDEX];
+
+            /* Receive payload */
+            if (CAVE_TALK_ERROR_NONE != error)
+            {
+            }
+            else if (CAVE_TALK_HEADER_SIZE != bytes_received)
+            {
+                error = CAVE_TALK_ERROR_INCOMPLETE;
+            }
+            else if (size < length)
+            {
+                error = CAVE_TALK_ERROR_SIZE;
+            }
+            else
+            {
+                error = handle->receive(data, length, &bytes_received);
+            }
+
+            /* Receive CRC */
+            if (CAVE_TALK_ERROR_NONE != error)
+            {
+            }
+            else if (length != bytes_received)
+            {
+                error = CAVE_TALK_ERROR_INCOMPLETE;
+            }
+            else
+            {
+                error = handle->receive(&crc, sizeof(crc), &bytes_received);
+            }
+
+            /* Verify CRC */
+            if (CAVE_TALK_ERROR_NONE != error)
+            {
+            }
+            else if (sizeof(crc) != bytes_received)
+            {
+                error = CAVE_TALK_ERROR_INCOMPLETE;
+            }
+            else
+            {
+                /* TODO SD-164 check CRC */
+            }
         }
     }
 
