@@ -12,16 +12,20 @@ typedef struct
     CaveTalk_Error_t (*available)(size_t *const bytes);
 } CaveTalk_LinkHandle_t;
 
+const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
+    .send = NULL, .receive = NULL, .available = NULL
+};
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-CaveTalk_Error_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
+CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
                                 const CaveTalk_Id_t id,
                                 const void *const data,
                                 const CaveTalk_Length_t length);
-CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
+CaveTalk_Error_t CaveTalk_Listen(const CaveTalk_LinkHandle_t *const handle,
                                  CaveTalk_Id_t *const id,
                                  void *const data,
                                  const size_t size,

@@ -18,7 +18,7 @@ runs:
         cmake --build _build --config Release
         cmake --build _build -t install
         cd ../../
-      shell: bash
+      shell: sh
     - name: Cache CMake files
       id: cache-cmake
       uses: actions/cache@v4
@@ -27,7 +27,12 @@ runs:
       with:
         path: ./build
         key: ${{ env.cache-name }}-${{ hashFiles('**/CMakeLists.txt', '**.cmake') }}
+    - name: Generate C message sources
+      run: |
+        chmod +x ./tools/nanopb/generate.sh
+        ./tools/nanopb/generate.sh
+      shell: sh
     - name: Generate CMake cache
       if: ${{ steps.cache-cmake.outputs.cache-hit != 'true' }}
       run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-      shell: bash
+      shell: sh

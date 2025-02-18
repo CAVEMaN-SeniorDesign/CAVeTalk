@@ -3,12 +3,12 @@
 #include <cstddef>
 #include <functional>
 
-#include "ids.pb.h"
-#include "ooga_booga.pb.h"
-#include "movement.pb.h"
 #include "camera_movement.pb.h"
+#include "ids.pb.h"
 #include "lights.pb.h"
 #include "mode.pb.h"
+#include "movement.pb.h"
+#include "ooga_booga.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -27,36 +27,39 @@ Listener::Listener(std::function<CaveTalk_Error_t(void *const data, const size_t
 
 CaveTalk_Error_t Listener::Listen(void)
 {
-    CaveTalk_Error_t  error  = CAVE_TALK_ERROR_NONE;
     CaveTalk_Id_t     id     = 0U;
-    CaveTalk_Length_t length = 0;
+    CaveTalk_Length_t length = 0U;
+    CaveTalk_Error_t  error  = CaveTalk_Listen(&link_handle_, &id, buffer_.data(), buffer_.size(), &length);
 
-
-    error = CaveTalk_Listen(&link_handle_, &id, buffer_.data(), buffer_.size(), &length);
-
-    switch (static_cast<Id>(id))
+    if (CAVE_TALK_ERROR_NONE == error)
     {
-    case ID_NONE:
-        error = CAVE_TALK_ERROR_ID;
-        break;
-    case ID_OOGA:
-        error = HandleOogaBooga(length);
-        break;
-    case ID_MOVEMENT:
-        error = HandleMovement(length);
-        break;
-    case ID_CAMERA_MOVEMENT:
-        error = HandleCameraMovement(length);
-        break;
-    case ID_LIGHTS:
-        error = HandleLights(length);
-        break;
-    case ID_MODE:
-        error = HandleMode(length);
-        break;
-    default:
-        error = CAVE_TALK_ERROR_ID;
-        break;
+        switch (static_cast<Id>(id))
+        {
+        case ID_NONE:
+            if (0U != length)
+            {
+                error = CAVE_TALK_ERROR_ID;
+            }
+            break;
+        case ID_OOGA:
+            error = HandleOogaBooga(length);
+            break;
+        case ID_MOVEMENT:
+            error = HandleMovement(length);
+            break;
+        case ID_CAMERA_MOVEMENT:
+            error = HandleCameraMovement(length);
+            break;
+        case ID_LIGHTS:
+            error = HandleLights(length);
+            break;
+        case ID_MODE:
+            error = HandleMode(length);
+            break;
+        default:
+            error = CAVE_TALK_ERROR_ID;
+            break;
+        }
     }
 
     return error;
@@ -192,7 +195,6 @@ CaveTalk_Error_t Talker::SpeakCameraMovement(const CaveTalk_Radian_t pan, const 
     camera_movement_message.SerializeToArray(message_buffer_.data(), message_buffer_.capacity());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CAMERA_MOVEMENT), message_buffer_.data(), length);
-
 }
 
 CaveTalk_Error_t Talker::SpeakLights(const bool headlights)
@@ -205,7 +207,6 @@ CaveTalk_Error_t Talker::SpeakLights(const bool headlights)
     lights_message.SerializeToArray(message_buffer_.data(), message_buffer_.capacity());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_LIGHTS), message_buffer_.data(), length);
-
 }
 
 CaveTalk_Error_t Talker::SpeakMode(const bool manual)
@@ -218,8 +219,6 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     mode_message.SerializeToArray(message_buffer_.data(), message_buffer_.capacity());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
-
-
 }
 
 } // namespace cave_talk

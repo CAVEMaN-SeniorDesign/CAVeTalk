@@ -6,6 +6,7 @@
 #include "cave_talk_types.h"
 
 #define CAVE_TALK_VERSION 1U
+#define CAVE_TALK_ID_NONE 0U /* See ids.proto */
 
 #define CAVE_TALK_VERSION_INDEX 0U
 #define CAVE_TALK_ID_INDEX      (CAVE_TALK_VERSION_INDEX + sizeof(CaveTalk_Version_t))
@@ -23,13 +24,13 @@
 #define CAVE_TALK_BYTE_BIT_SHIFT   8U
 #define CAVE_TALK_UINT16_BIT_SHIFT 16U
 
-/* TODO consider portability and sending CRC as byte array, remove functions if unused */
+/* TODO SD-164 consider portability and sending CRC as byte array, remove functions if unused */
 static inline uint8_t CaveTalk_GetUpperByte(const uint16_t value);
 static inline uint8_t CaveTalk_GetLowerByte(const uint16_t value);
 static inline uint16_t CaveTalk_GetUpperUint16(const uint32_t value);
 static inline uint16_t CaveTalk_GetLowerUint16(const uint32_t value);
 
-CaveTalk_Error_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
+CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
                                 const CaveTalk_Id_t id,
                                 const void *const data,
                                 const CaveTalk_Length_t length)
@@ -46,10 +47,10 @@ CaveTalk_Error_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
         header[CAVE_TALK_ID_INDEX]      = id;
         header[CAVE_TALK_LENGTH_INDEX]  = length;
 
-        /* TODO calculate CRC */
+        /* TODO SD-164 calculate CRC */
         CaveTalk_Crc_t crc = 0U;
 
-        /* TODO determine error behavior */
+        /* TODO SD-182 determine error behavior */
         /* Send header */
         error = handle->send(header, sizeof(header));
 
@@ -69,7 +70,7 @@ CaveTalk_Error_t CaveTalk_Speak(CaveTalk_LinkHandle_t *const handle,
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
+CaveTalk_Error_t CaveTalk_Listen(const CaveTalk_LinkHandle_t *const handle,
                                  CaveTalk_Id_t *const id,
                                  void *const data,
                                  const size_t size,
@@ -87,7 +88,7 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
     }
     else if (handle->available < CAVE_TALK_HEADER_SIZE)
     {
-        *id     = 0U; /* TODO set to message ID none */
+        *id     = CAVE_TALK_ID_NONE;
         *length = 0U;
 
         error = CAVE_TALK_ERROR_NONE;
@@ -98,11 +99,11 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         uint8_t        header[CAVE_TALK_HEADER_SIZE];
         CaveTalk_Crc_t crc = 0U;
 
-        *id     = 0U; /* TODO set to message ID none */
+        *id     = CAVE_TALK_ID_NONE;
         *length = 0U;
 
-        /* TODO determine error behavior */
-        /* TODO check version */
+        /* TODO SD-183 determine error behavior */
+        /* TODO SD-184 check version */
         /* Receive header */
         error   = handle->receive(header, sizeof(header), &bytes_received);
         *id     = header[CAVE_TALK_ID_INDEX];
@@ -139,7 +140,7 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         }
         else
         {
-            /* TODO check CRC */
+            /* TODO SD-164 check CRC */
             error = CAVE_TALK_ERROR_NONE;
         }
     }

@@ -14,6 +14,7 @@
 namespace cave_talk
 {
 
+
 const std::size_t kMaxPayloadSize = 255;
 
 class ListenerCallbacks
