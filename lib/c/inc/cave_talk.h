@@ -41,11 +41,20 @@ const CaveTalk_Handle_t kCaveTalk_HandleNull = {
     .listen_callbacks = kCaveTalk_ListenCallbacksNull,
 };
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle);
 CaveTalk_Error_t CaveTalk_SpeakOogaBooga(const CaveTalk_Handle_t *const handle, const cave_talk_Say ooga_booga);
 CaveTalk_Error_t CaveTalk_SpeakMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate);
 CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
 CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, const bool headlights);
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CAVE_TALK_H */

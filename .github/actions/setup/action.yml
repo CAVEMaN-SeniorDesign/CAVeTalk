@@ -34,5 +34,5 @@ runs:
       shell: sh
     - name: Generate CMake cache
       if: ${{ steps.cache-cmake.outputs.cache-hit != 'true' }}
-      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCAVETALK_BUILD_TESTS=ON
       shell: sh

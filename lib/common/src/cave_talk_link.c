@@ -124,20 +124,20 @@ CaveTalk_Error_t CaveTalk_Listen(const CaveTalk_LinkHandle_t *const handle,
             {
                 error = CAVE_TALK_ERROR_INCOMPLETE;
             }
-            else if (size < length)
+            else if (size < *length)
             {
                 error = CAVE_TALK_ERROR_SIZE;
             }
             else
             {
-                error = handle->receive(data, length, &bytes_received);
+                error = handle->receive(data, *length, &bytes_received);
             }
 
             /* Receive CRC */
             if (CAVE_TALK_ERROR_NONE != error)
             {
             }
-            else if (length != bytes_received)
+            else if (*length != bytes_received)
             {
                 error = CAVE_TALK_ERROR_INCOMPLETE;
             }

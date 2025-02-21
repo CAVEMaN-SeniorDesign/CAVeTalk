@@ -17,7 +17,7 @@ namespace cave_talk
 {
 
 Listener::Listener(std::function<CaveTalk_Error_t(void *const data, const size_t size, size_t *const bytes_received)> &receive,
-                   std::function<CaveTalk_Error_t(size_t *const bytes)> &available,
+                   std::function<CaveTalk_Error_t(size_t *const bytes_available)> &available,
                    std::shared_ptr<ListenerCallbacks> listener_callbacks) : listener_callbacks_(listener_callbacks)
 {
     link_handle_.send      = nullptr;

@@ -73,7 +73,8 @@ Prerequisites
 - Ninja
 - C compiler that supports at least C11
 - C++ compiler that supports at least C++20
-- Python3
+- Python3 >= 3.9 with python3-venv installed
+- Gcovr (optional)
 
 1. Setup Protobufs for the version(s) of the library being built.  See [Protobufs](#protobufs).
 
@@ -81,13 +82,21 @@ Prerequisites
 
 3. Configure CMake.
 
-   `cmake -B build -G Ninja`
+   `cmake -B build -G Ninja` or `cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCAVETALK_BUILD_TESTS=ON` to build with tests
 
-4. Build the project.
-
-   `cmake --build build`
-
-5. Run the static analysis and code formatting tools.
+4. Run the static analysis and code formatting tools.
 
    - Cppcheck: `cmake --build build -t cppcheck`
    - Uncrustify: `cmake --build build -t uncrustify`
+
+5. Build the project.
+
+   `cmake --build build`
+
+6. If the project was configured to build tests, run the tests.
+
+   `cmake --build build -t test`
+
+7. If the project was configured to build tests and Gcovr is installed, generate a coverage report.  The coverage report can be found in the `build` directory at `coverage.html`. 
+
+   `cmake --build build -t coverage-no-test` or `cmake --build build -t coverage` to run the tests and generate the coverage report in a single command
