@@ -101,10 +101,18 @@ Prerequisites
 
    `cmake --build build`
 
-6. If the project was configured to build tests, run the tests.
+6. Make the script to generate the CAVeTalk payloads for C and C++.
+
+   `chmod +x tools/export/export_files.sh`
+
+7. Run the `export` script to generate the CAVeTalk payloads for C and C++. The script will ask for a `<filepath>`. Remember or write down the `<filepath>`for later use. If nothing is entered, the files will export to `/usr/local`.
+
+    `./tools/export/export_files.sh`
+
+8. If the project was configured to build tests, run the tests.
 
    `cmake --build build -t test`
 
-7. If the project was configured to build tests and Gcovr is installed, generate a coverage report.  The coverage report can be found in the `build` directory at `coverage.html`. 
+9. If the project was configured to build tests and Gcovr is installed, generate a coverage report.  The coverage report can be found in the `build` directory at `coverage.html`. 
 
    `cmake --build build -t coverage-no-test` or `cmake --build build -t coverage` to run the tests and generate the coverage report in a single command
