@@ -12,7 +12,7 @@ typedef struct
     CaveTalk_Error_t (*available)(size_t *const bytes_available);
 } CaveTalk_LinkHandle_t;
 
-const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
+static const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
     .send = NULL, .receive = NULL, .available = NULL
 };
 
