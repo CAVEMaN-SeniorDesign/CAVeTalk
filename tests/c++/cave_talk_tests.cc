@@ -53,7 +53,7 @@ CaveTalk_Error_t Receive(void *const data, const size_t size, size_t *const byte
 
 CaveTalk_Error_t Available(size_t *const bytes_available)
 {
-    *bytes_available = ring_buffer.Capacity() - ring_buffer.Size();
+    *bytes_available = ring_buffer.Size();
 
     return CAVE_TALK_ERROR_NONE;
 }
