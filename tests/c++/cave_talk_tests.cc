@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <functional>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -24,6 +25,8 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
+        MOCK_METHOD(void, HearOdometry, ((const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t)), (override));
+        MOCK_METHOD(void, HearLog, (const CaveTalk_Message_t), (override));
 };
 
 
@@ -195,4 +198,108 @@ TEST(CaveTalkCppTests, SpeakListenMode){
     EXPECT_CALL(*mock_listen_callbacks.get(), HearMode(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
     
+}
+
+TEST(CaveTalkCppTests, SpeakListenOdometry)
+{
+    uint8_t data_receive[255U] = {0U};
+    CaveTalk_Id_t id = 0U;
+    CaveTalk_Length_t length = 0U;
+
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(0, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(0, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, 0, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, 0, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, 0, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, 0, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, 0, -100.25, 45, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, 0, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, 0, 45, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, 0, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 0, -.31, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 0, -.31, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, 0, -1, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, 0, -1, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, 0, .0000000007, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, 0, .0000000007, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, 0, 10000));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, 0, 10000)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 0));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 0)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+}
+
+TEST(CaveTalkCppTests, SpeakListenLog)
+{
+
+    uint8_t data_receive[255U] = {0U};
+    CaveTalk_Id_t id = 0U;
+    CaveTalk_Length_t length = 0U;
+
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    const std::string hw_works = "Hello World!";
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(const_cast<char*>(hw_works.c_str())));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(hw_works))).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    const char* ooga_booga_msg = "Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga!";
+    std::string ooga_booga_str(ooga_booga_msg);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(const_cast<char*>(ooga_booga_msg)));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(ooga_booga_str))).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+
 }

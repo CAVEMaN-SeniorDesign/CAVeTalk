@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package cave_talk;
+
+message Log {
+    string log_string = 1;
+}
