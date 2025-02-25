@@ -56,6 +56,9 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_MODE:
             error = HandleMode(length);
             break;
+        case ID_CONFIG:
+            error = HandleConfig(length);
+            break;
         default:
             error = CAVE_TALK_ERROR_ID;
             break;
@@ -152,6 +155,23 @@ CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleConfig(CaveTalk_Length_t length) const
+{
+    Config config_message;
+
+    if (!config_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const AllServos all_servos = config_message.all_servos();
+    const AllMotors all_motors = config_message.all_motors();
+
+    listener_callbacks_->HearConfig(all_servos, all_motors);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_.send      = send;
@@ -214,6 +234,18 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     mode_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfig(AllServos all_servos, AllMotors all_motors)
+{
+    Config config_message;
+    config_message.set_allocated_all_servos(&all_servos);
+    config_message.set_allocated_all_motors(&all_motors);
+
+    std::size_t length = config_message.ByteSizeLong();
+    config_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

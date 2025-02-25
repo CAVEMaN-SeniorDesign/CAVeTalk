@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "ooga_booga.pb.h"
+#include "config.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -16,6 +17,7 @@ typedef struct
     void (*hear_camera_movement)(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
     void (*hear_lights)(const bool headlights);
     void (*hear_mode)(const bool manual);
+    void (*hear_config)(cave_talk_AllServos all_servos, cave_talk_AllMotors all_motors);
 } CaveTalk_ListenCallbacks_t;
 
 typedef struct
@@ -32,6 +34,7 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_camera_movement = NULL,
     .hear_lights          = NULL,
     .hear_mode            = NULL,
+    .hear_config          = NULL,
 };
 
 const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -52,6 +55,7 @@ CaveTalk_Error_t CaveTalk_SpeakMovement(const CaveTalk_Handle_t *const handle, c
 CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
 CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, const bool headlights);
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
+CaveTalk_Error_t CaveTalk_SpeakConfig(const CaveTalk_Handle_t *const handle, cave_talk_AllServos all_servos, cave_talk_AllMotors all_motors);
 
 #ifdef __cplusplus
 }

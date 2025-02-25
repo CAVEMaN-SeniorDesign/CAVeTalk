@@ -1,4 +1,5 @@
 syntax = "proto3";
+//import "nanopb.proto";
 
 package cave_talk;
 
@@ -9,7 +10,6 @@ message Servo {
     double min_duty_cycle_microseconds = 4;
     double max_duty_cycle_microseconds = 5;
     double center_duty_cycle_microseconds = 6;
-
 }
 
 message Motor {

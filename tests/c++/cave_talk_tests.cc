@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
+#include "config.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
@@ -24,6 +25,7 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
+        MOCK_METHOD(void, HearConfig, ((cave_talk::AllServos), (cave_talk::AllMotors)), (override));
 };
 
 

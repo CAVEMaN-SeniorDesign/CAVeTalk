@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "ooga_booga.pb.h"
+#include "config.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -25,6 +26,7 @@ class ListenerCallbacks
         virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                     = 0;
         virtual void HearLights(const bool headlights)                                                                 = 0;
         virtual void HearMode(const bool manual)                                                                       = 0;
+        virtual void HearConfig(const AllServos all_servos, const AllMotors all_motors)                                = 0;
 };
 
 class Listener
@@ -45,6 +47,7 @@ class Listener
         CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfig(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, kMaxPayloadSize> buffer_;
@@ -63,6 +66,7 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakMode(const bool manual);
+        CaveTalk_Error_t SpeakConfig(AllServos all_servos, AllMotors all_motors);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
