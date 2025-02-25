@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/CAVeTalk-cTargets.cmake")
+
+check_required_components(CAVeTalk-c)
+
+include(CMakeFindDependencyMacro)

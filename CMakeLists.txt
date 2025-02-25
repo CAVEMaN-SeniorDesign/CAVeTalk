@@ -24,9 +24,11 @@ target_sources(${PROJECT_NAME}-common
     PRIVATE
         ${COMMON_SRCS}
 )
+include(GNUInstallDirs)
 target_include_directories(${PROJECT_NAME}-common
     PUBLIC
-        ${COMMON_INC_DIR}
+        "$<BUILD_INTERFACE:${COMMON_INC_DIR}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/common>"
 )
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME}-common
@@ -40,6 +42,40 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     )
 # Add flags for other compilers here
 endif()
+
+install(TARGETS ${PROJECT_NAME}-common
+    EXPORT ${PROJECT_NAME}-commonTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/common
+)
+
+install(FILES 
+    ${COMMON_INC_DIR}/cave_talk_link.h  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/common
+)
+
+install(FILES
+    ${COMMON_INC_DIR}/cave_talk_types.h  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/common
+)
+
+install(EXPORT ${PROJECT_NAME}-commonTargets
+    FILE ${PROJECT_NAME}-commonTargets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-common
+)
+
+# include the package config helpers and generate the file below
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/Config-common.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-commonConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-common
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-commonConfig.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-common
+)
 
 ################################################################################
 # Messages sources
@@ -81,15 +117,17 @@ target_sources(${PROJECT_NAME}-c
     PRIVATE
         ${C_SRCS}
 )
+include(GNUInstallDirs)
 target_include_directories(${PROJECT_NAME}-c
     PUBLIC
-        ${C_INC_DIR}
+        "$<BUILD_INTERFACE:${C_INC_DIR}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/c>"
 )
 target_link_libraries(${PROJECT_NAME}-c
     PRIVATE
-        ${PROJECT_NAME}-c_messages
+        "$<BUILD_INTERFACE:${PROJECT_NAME}-c_messages>"
     PUBLIC
-        ${PROJECT_NAME}-common
+         "$<BUILD_INTERFACE:${PROJECT_NAME}-common>"
 )
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME}-c
@@ -104,6 +142,35 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 # Add flags for other compilers here
 endif()
 
+install(TARGETS ${PROJECT_NAME}-c
+    EXPORT ${PROJECT_NAME}-cTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/c
+)
+
+install(FILES 
+    ${C_INC_DIR}/cave_talk.h  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/c)
+
+install(EXPORT ${PROJECT_NAME}-cTargets
+    FILE ${PROJECT_NAME}-cTargets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-c
+)
+
+# include the package config helpers and generate the file below
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/Config-c.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-cConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-c
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-cConfig.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-c
+)
+
 ################################################################################
 # C++ messages
 ################################################################################
@@ -113,7 +180,15 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/protobuf/third_party/abseil-cpp)
 find_package(utf8_range CONFIG REQUIRED HINTS ${PROTOBUF_INSTALL_DIR})
 find_package(Protobuf CONFIG REQUIRED HINTS ${PROTOBUF_INSTALL_DIR})
 set(CPP_MESSAGES_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-cpp_protos)
+#set(CPP_MESSAGES_OUT_EXTERN_DIR usr/local/c++/include)
 add_library(${PROJECT_NAME}-cpp_messages)
+#protobuf_generate(
+#	TARGET ${PROJECT_NAME}-cpp_messages
+#	LANGUAGE cpp
+#	PROTOS ${CAVE_TALK_MESSAGE_SRCS}
+#	IMPORT_DIRS ${CAVE_TALK_MESSAGES_DIR}
+#    PROTOC_OUT_DIR /usr/local/include/c++
+#)
 protobuf_generate(
 	TARGET ${PROJECT_NAME}-cpp_messages
 	LANGUAGE cpp
@@ -121,7 +196,7 @@ protobuf_generate(
 	IMPORT_DIRS ${CAVE_TALK_MESSAGES_DIR}
     PROTOC_OUT_DIR ${CPP_MESSAGES_OUT_DIR}
 )
-target_link_libraries(${PROJECT_NAME}-cpp_messages PRIVATE protobuf::libprotobuf)
+target_link_libraries(${PROJECT_NAME}-cpp_messages PUBLIC protobuf::libprotobuf)
 target_include_directories(${PROJECT_NAME}-cpp_messages
     PUBLIC
         ${PROTOBUF_INSTALL_DIR}/include
@@ -141,14 +216,16 @@ target_sources(${PROJECT_NAME}-cpp
     PRIVATE
         ${CPP_SRCS}
 )
+include(GNUInstallDirs)
 target_include_directories(${PROJECT_NAME}-cpp
     PUBLIC
-        ${CPP_INC_DIR}
+        "$<BUILD_INTERFACE:${CPP_INC_DIR}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/c++>"
 )
 target_link_libraries(${PROJECT_NAME}-cpp
     PUBLIC
-        ${PROJECT_NAME}-common
-        ${PROJECT_NAME}-cpp_messages
+        "$<BUILD_INTERFACE:${PROJECT_NAME}-common>"
+        "$<BUILD_INTERFACE:${PROJECT_NAME}-cpp_messages>"
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME}-cpp
@@ -162,6 +239,44 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     )
 # Add flags for other compilers here
 endif()
+
+install(TARGETS ${PROJECT_NAME}-cpp
+    EXPORT ${PROJECT_NAME}-cppTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/c++
+)
+
+install(FILES 
+    ${CPP_INC_DIR}/cave_talk.h  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/c++)
+
+install(EXPORT ${PROJECT_NAME}-cppTargets
+    FILE ${PROJECT_NAME}-cppTargets.cmake
+    NAMESPACE cave_talk::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-cpp
+)
+
+# include the package config helpers and generate the file below
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/Config-cpp.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-cppConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-cpp
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-cppConfig.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}-cpp
+)
+
+################################################################################
+# Create new environment path
+################################################################################
+# Create a list by replacing colon with semicolon
+string(REPLACE ":" ";" CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
+# Append to the newly created list
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_INSTALL_DIR}")
 
 ################################################################################
 # CI and tools
