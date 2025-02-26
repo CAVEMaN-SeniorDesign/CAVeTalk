@@ -32,7 +32,7 @@ typedef struct
     CaveTalk_ListenCallbacks_t listen_callbacks;
 } CaveTalk_Handle_t;
 
-const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
+static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_ooga_booga          = NULL,
     .hear_movement            = NULL,
     .hear_camera_movement     = NULL,
@@ -43,7 +43,7 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_config_motor        = NULL,
 };
 
-const CaveTalk_Handle_t kCaveTalk_HandleNull = {
+static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
     .link_handle      = kCaveTalk_LinkHandleNull,
     .buffer           = NULL,
     .buffer_size      = 0U,
