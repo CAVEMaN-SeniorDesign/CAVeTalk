@@ -9,6 +9,8 @@
 #include "mode.pb.h"
 #include "movement.pb.h"
 #include "ooga_booga.pb.h"
+#include "config_servo.pb.h"
+#include "config_motor.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -56,8 +58,11 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_MODE:
             error = HandleMode(length);
             break;
-        case ID_CONFIG:
-            error = HandleConfig(length);
+        case ID_CONFIG_SERVO:
+            error = HandleConfigServo(length);
+            break;
+        case ID_CONFIG_MOTOR:
+            error = HandleConfigMotor(length);
             break;
         default:
             error = CAVE_TALK_ERROR_ID;
@@ -155,19 +160,42 @@ CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfig(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigServo(CaveTalk_Length_t length) const
 {
-    Config config_message;
+    ConfigServo config_servo_message;
 
-    if (!config_message.ParseFromArray(buffer_.data(), length))
+    if (!config_servo_message.ParseFromArray(buffer_.data(), length))
     {
         return CAVE_TALK_ERROR_PARSE;
     }
 
-    const AllServos all_servos = config_message.all_servos();
-    const AllMotors all_motors = config_message.all_motors();
+    const Servo servo_wheel_0  = config_servo_message.servo_wheel_0();
+    const Servo servo_wheel_1  = config_servo_message.servo_wheel_1();
+    const Servo servo_wheel_2  = config_servo_message.servo_wheel_2();
+    const Servo servo_wheel_3  = config_servo_message.servo_wheel_3();
+    const Servo servo_cam_pan  = config_servo_message.servo_cam_pan();
+    const Servo servo_cam_tilt = config_servo_message.servo_cam_tilt();
 
-    listener_callbacks_->HearConfig(all_servos, all_motors);
+    listener_callbacks_->HearConfigServo(servo_wheel_0, servo_wheel_1, servo_wheel_2, servo_wheel_3, servo_cam_pan, servo_cam_tilt);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
+CaveTalk_Error_t Listener::HandleConfigMotor(CaveTalk_Length_t length) const
+{
+    ConfigMotor config_motor_message;
+
+    if (!config_motor_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const Motor motor_wheel_0 = config_motor_message.motor_wheel_0();
+    const Motor motor_wheel_1 = config_motor_message.motor_wheel_1();
+    const Motor motor_wheel_2 = config_motor_message.motor_wheel_2();
+    const Motor motor_wheel_3 = config_motor_message.motor_wheel_3();
+
+    listener_callbacks_->HearConfigMotor(motor_wheel_0, motor_wheel_1, motor_wheel_2, motor_wheel_3);
 
     return CAVE_TALK_ERROR_NONE;
 }
@@ -236,16 +264,34 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfig(AllServos all_servos, AllMotors all_motors)
+CaveTalk_Error_t Talker::SpeakConfigServo(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3, Servo servo_cam_pan, Servo servo_cam_tilt)
 {
-    Config config_message;
-    config_message.set_allocated_all_servos(&all_servos);
-    config_message.set_allocated_all_motors(&all_motors);
+    ConfigServo config_servo_message;
+    config_servo_message.set_allocated_servo_wheel_0(&servo_wheel_0);
+    config_servo_message.set_allocated_servo_wheel_1(&servo_wheel_1);
+    config_servo_message.set_allocated_servo_wheel_2(&servo_wheel_2);
+    config_servo_message.set_allocated_servo_wheel_3(&servo_wheel_3);
+    config_servo_message.set_allocated_servo_cam_pan(&servo_cam_pan);
+    config_servo_message.set_allocated_servo_cam_tilt(&servo_cam_tilt);
 
-    std::size_t length = config_message.ByteSizeLong();
-    config_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+    std::size_t length = config_servo_message.ByteSizeLong();
+    config_servo_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
-    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG), message_buffer_.data(), length);
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_SERVO), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)
+{
+    ConfigMotor config_motor_message;
+    config_motor_message.set_allocated_motor_wheel_0(&motor_wheel_0);
+    config_motor_message.set_allocated_motor_wheel_1(&motor_wheel_1);
+    config_motor_message.set_allocated_motor_wheel_2(&motor_wheel_2);
+    config_motor_message.set_allocated_motor_wheel_3(&motor_wheel_3);
+
+    std::size_t length = config_motor_message.ByteSizeLong();
+    config_motor_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_MOTOR), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

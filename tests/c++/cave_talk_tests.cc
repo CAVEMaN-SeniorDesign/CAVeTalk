@@ -5,7 +5,8 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
-#include "config.pb.h"
+#include "config_servo.pb.h"
+#include "config_motor.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
@@ -25,7 +26,8 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
-        MOCK_METHOD(void, HearConfig, ((cave_talk::AllServos), (cave_talk::AllMotors)), (override));
+        MOCK_METHOD(void, HearConfigServo, ((cave_talk::Servo),(cave_talk::Servo),(cave_talk::Servo),(cave_talk::Servo),(cave_talk::Servo),(cave_talk::Servo)), (override));
+        MOCK_METHOD(void, HearConfigMotor, ((cave_talk::Motor),(cave_talk::Motor),(cave_talk::Motor),(cave_talk::Motor)), (override));
 };
 
 
@@ -63,10 +65,6 @@ CaveTalk_Error_t Available(size_t *const bytes_available)
 
 TEST(CaveTalkCppTests, SpeakListenOogaBooga){
 
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
-
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
     cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
@@ -86,10 +84,6 @@ TEST(CaveTalkCppTests, SpeakListenOogaBooga){
 }
 
 TEST(CaveTalkCppTests, SpeakListenMovement){
-
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
@@ -123,10 +117,6 @@ TEST(CaveTalkCppTests, SpeakListenMovement){
 
 TEST(CaveTalkCppTests, SpeakListenCameraMovement){
 
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
-
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
     cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
@@ -153,10 +143,6 @@ TEST(CaveTalkCppTests, SpeakListenCameraMovement){
 
 TEST(CaveTalkCppTests, SpeakListenLights){
 
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
-
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
     cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
@@ -177,10 +163,6 @@ TEST(CaveTalkCppTests, SpeakListenLights){
 
 TEST(CaveTalkCppTests, SpeakListenMode){
 
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
-
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
     cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
@@ -197,4 +179,9 @@ TEST(CaveTalkCppTests, SpeakListenMode){
     EXPECT_CALL(*mock_listen_callbacks.get(), HearMode(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
     
+}
+
+TEST(CaveTalkCppTests, SpeakListenConfigServo)
+{
+
 }

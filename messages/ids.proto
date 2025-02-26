@@ -11,5 +11,7 @@ enum Id {
     ID_MODE = 5;
     ID_ODOMETRY = 6;
     ID_LOG = 7;
-    ID_CONFIG = 8;
+    ID_CONFIG_SERVO = 8;
+    ID_CONFIG_MOTOR = 9;
+    ID_CONFIG_ENCODER = 10;
 }

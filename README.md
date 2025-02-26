@@ -20,7 +20,9 @@ CAVEMAN controller message protocol
 | 0x05 | Mode            | Switches between Manual Driving Mode and Autonomous Driving Mode       |
 | 0x06 | Odometry        | Describes the 3 relative acceleration axes [m/s^2], 3 gyroscopic axes [rad/s], and 4 encoder values for each wheel [rad/s] |
 | 0x07 | Logging         | Send String Messages Between Devices |
-| 0x08 | Configuration   | Send Configuration Parameters Between Devices |
+| 0x08 | Configuration - Servos   | Send Servo Configuration Parameters Between Devices |
+| 0x09 | Configuration - Motors  | Send Motor Configuration Parameters Between Devices |
+| 0x0A | Configuration - Encoders   | Send Encoder Configuration Parameters Between Devices |
 
 3. Length refers to the length of the packet in bytes
 4. Payload refers to the main piece of information sent in the packet
