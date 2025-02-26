@@ -18,7 +18,8 @@ typedef struct
     void (*hear_camera_movement)(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
     void (*hear_lights)(const bool headlights);
     void (*hear_mode)(const bool manual);
-    void (*hear_config_servo)();
+    void (*hear_config_servo_wheels)();
+    void (*hear_config_servo_cams)();
     void (*hear_config_motor)();
 
 } CaveTalk_ListenCallbacks_t;
@@ -32,13 +33,14 @@ typedef struct
 } CaveTalk_Handle_t;
 
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
-    .hear_ooga_booga      = NULL,
-    .hear_movement        = NULL,
-    .hear_camera_movement = NULL,
-    .hear_lights          = NULL,
-    .hear_mode            = NULL,
-    .hear_config_servo    = NULL,
-    .hear_config_motor    = NULL,
+    .hear_ooga_booga          = NULL,
+    .hear_movement            = NULL,
+    .hear_camera_movement     = NULL,
+    .hear_lights              = NULL,
+    .hear_mode                = NULL,
+    .hear_config_servo_wheels = NULL,
+    .hear_config_servo_cams   = NULL,
+    .hear_config_motor        = NULL,
 };
 
 const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -59,8 +61,9 @@ CaveTalk_Error_t CaveTalk_SpeakMovement(const CaveTalk_Handle_t *const handle, c
 CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
 CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, const bool headlights);
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
-CaveTalk_Error_t CaveTalk_SpeakConfigServo(const CaveTalk_Handle_t *const handle);
-CaveTalk_Error_t CaveTalk_SpeakConfigMotor(const CaveTalk_Handle_t *const handle);
+CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_wheel_0, const cave_talk_Servo* servo_wheel_1, const cave_talk_Servo* servo_wheel_2, const cave_talk_Servo* servo_wheel_3);
+CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_cam_pan, const cave_talk_Servo* servo_cam_tilt);
+CaveTalk_Error_t CaveTalk_SpeakConfigMotor(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_wheel_0, const cave_talk_Servo* servo_wheel_1, const cave_talk_Servo* servo_wheel_2, const cave_talk_Servo* servo_wheel_3);
 
 #ifdef __cplusplus
 }

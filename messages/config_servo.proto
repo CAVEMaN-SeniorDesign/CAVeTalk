@@ -11,11 +11,14 @@ message Servo {
     double center_duty_cycle_microseconds = 6;
 }
 
-message ConfigServo {
+message ConfigServoWheels {
     Servo servo_wheel_0 = 1;
     Servo servo_wheel_1 = 2;
     Servo servo_wheel_2 = 3;
     Servo servo_wheel_3 = 4;
-    Servo servo_cam_pan = 5;
-    Servo servo_cam_tilt = 6;
+}
+
+message ConfigServoCams {
+    Servo servo_cam_pan = 1;
+    Servo servo_cam_tilt = 2;
 }

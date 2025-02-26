@@ -21,7 +21,8 @@ static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const h
 static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle);
 static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle);
 static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle);
-static CaveTalk_Error_t CaveTalk_HandleConfigServo(const CaveTalk_Handle_t *const handle);
+static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t *const handle);
+static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *const handle);
 static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *const handle);
 
 CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
@@ -66,8 +67,11 @@ CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
             case cave_talk_Id_ID_MODE:
                 error = CaveTalk_HandleMode(handle);
                 break;
-            case cave_talk_Id_ID_CONFIG_SERVO:
-                error = CaveTalk_HandleConfigServo(handle);
+            case cave_talk_Id_ID_CONFIG_SERVO_WHEELS:
+                error = CaveTalk_HandleConfigServoWheels(handle);
+                break;
+            case cave_talk_Id_ID_CONFIG_SERVO_CAMS:
+                error = CaveTalk_HandleConfigServoCams(handle);
                 break;
             case cave_talk_Id_ID_CONFIG_MOTOR:
                 error = CaveTalk_HandleConfigMotor(handle);
@@ -220,7 +224,7 @@ CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakConfigServo(const CaveTalk_Handle_t *const handle)
+CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_wheel_0, const cave_talk_Servo* servo_wheel_1, const cave_talk_Servo* servo_wheel_2, const cave_talk_Servo* servo_wheel_3)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -229,23 +233,89 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServo(const CaveTalk_Handle_t *const handle
     }
     else
     {
-        // pb_ostream_t     ostream        = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
-        // cave_talk_Config config_message = cave_talk_Config_init_zero;
+        pb_ostream_t                ostream                     = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoWheels config_servo_wheels_message = cave_talk_ConfigServoWheels_init_zero;
 
-        // config_message.all_servos = all_servos;
-        // config_message.all_motors = all_motors;
+        config_servo_wheels_message.servo_wheel_0 = *servo_wheel_0;
+        config_servo_wheels_message.servo_wheel_1 = *servo_wheel_1;
+        config_servo_wheels_message.servo_wheel_2 = *servo_wheel_2;
+        config_servo_wheels_message.servo_wheel_3 = *servo_wheel_3;
 
-        // config_message.has_all_servos = true;
-        // config_message.has_all_motors = true;
 
-        // if (!pb_encode(&ostream, cave_talk_Config_fields, &config_message))
-        // {
-        //     error = CAVE_TALK_ERROR_SIZE;
-        // }
-        // else
-        // {
-        //     error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_CONFIG, handle->buffer, ostream.bytes_written);
-        // }
+        if (!pb_encode(&ostream, cave_talk_ConfigServoWheels_fields, &config_servo_wheels_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_CONFIG_SERVO_WHEELS, handle->buffer, ostream.bytes_written);
+        }
+
+
+    }
+
+    return error;
+
+}
+
+CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_cam_pan, const cave_talk_Servo* servo_cam_tilt)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t              ostream                   = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoCams config_servo_cams_message = cave_talk_ConfigServoCams_init_zero;
+
+        config_servo_cams_message.servo_cam_pan  = *servo_cam_pan;
+        config_servo_cams_message.servo_cam_tilt = *servo_cam_tilt;
+
+
+        if (!pb_encode(&ostream, cave_talk_ConfigServoCams_fields, &config_servo_cams_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_CONFIG_SERVO_CAMS, handle->buffer, ostream.bytes_written);
+        }
+
+
+    }
+
+    return error;
+
+}
+
+CaveTalk_Error_t CaveTalk_SpeakConfigServoMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor* motor_wheel_0, const cave_talk_Motor* motor_wheel_1, const cave_talk_Motor* motor_wheel_2, const cave_talk_Motor* motor_wheel_3)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t          ostream              = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigMotor config_motor_message = cave_talk_ConfigMotor_init_zero;
+
+        config_motor_message.motor_wheel_0 = *motor_wheel_0;
+        config_motor_message.motor_wheel_1 = *motor_wheel_1;
+        config_motor_message.motor_wheel_2 = *motor_wheel_2;
+        config_motor_message.motor_wheel_3 = *motor_wheel_3;
+
+
+        if (!pb_encode(&ostream, cave_talk_ConfigMotor_fields, &config_motor_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_CONFIG_MOTOR, handle->buffer, ostream.bytes_written);
+        }
 
 
     }
@@ -384,7 +454,7 @@ static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handl
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleConfigServo(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t *const handle)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -394,16 +464,43 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServo(const CaveTalk_Handle_t *cons
     }
     else
     {
-        pb_istream_t          istream              = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
-        cave_talk_ConfigServo config_servo_message = cave_talk_ConfigServo_init_zero;
+        pb_istream_t                istream              = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoWheels config_servo_message = cave_talk_ConfigServoWheels_init_zero;
 
-        if (!pb_decode(&istream, cave_talk_ConfigServo_fields, &config_servo_message))
+        if (!pb_decode(&istream, cave_talk_ConfigServoWheels_fields, &config_servo_message))
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
-        else if (NULL != handle->listen_callbacks.hear_config_servo)
+        else if (NULL != handle->listen_callbacks.hear_config_servo_wheels)
         {
-            handle->listen_callbacks.hear_config_servo();
+            handle->listen_callbacks.hear_config_servo_wheels();
+        }
+    }
+
+    return error;
+
+}
+
+static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *const handle)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if ((NULL == handle) || (NULL == handle->buffer))
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        pb_istream_t              istream              = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoCams config_servo_message = cave_talk_ConfigServoCams_init_zero;
+
+        if (!pb_decode(&istream, cave_talk_ConfigServoCams_fields, &config_servo_message))
+        {
+            error = CAVE_TALK_ERROR_PARSE;
+        }
+        else if (NULL != handle->listen_callbacks.hear_config_servo_cams)
+        {
+            handle->listen_callbacks.hear_config_servo_cams();
         }
     }
 

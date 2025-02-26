@@ -21,14 +21,15 @@ const std::size_t kMaxPayloadSize = 255;
 class ListenerCallbacks
 {
     public:
-        virtual ~ListenerCallbacks()                                                                                                                                = 0;
-        virtual void HearOogaBooga(const Say ooga_booga)                                                                                                            = 0;
-        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)                                              = 0;
-        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                                  = 0;
-        virtual void HearLights(const bool headlights)                                                                                                              = 0;
-        virtual void HearMode(const bool manual)                                                                                                                    = 0;
-        virtual void HearConfigServo(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3, Servo servo_cam_pan, Servo servo_cam_tilt) = 0;
-        virtual void HearConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)                                            = 0;
+        virtual ~ListenerCallbacks()                                                                                           = 0;
+        virtual void HearOogaBooga(const Say ooga_booga)                                                                       = 0;
+        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)         = 0;
+        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                             = 0;
+        virtual void HearLights(const bool headlights)                                                                         = 0;
+        virtual void HearMode(const bool manual)                                                                               = 0;
+        virtual void HearConfigServoWheels(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3) = 0;
+        virtual void HearConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt)                                            = 0;
+        virtual void HearConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)       = 0;
 };
 
 class Listener
@@ -49,7 +50,8 @@ class Listener
         CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
-        CaveTalk_Error_t HandleConfigServo(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfigServoWheels(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfigServoCams(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigMotor(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
@@ -69,8 +71,9 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakMode(const bool manual);
-        CaveTalk_Error_t SpeakConfigServo(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3, Servo servo_cam_pan, Servo servo_cam_tilt);
-        CaveTalk_Error_t SpeakConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3);
+        CaveTalk_Error_t SpeakConfigServoWheels(Servo *servo_wheel_0, Servo* servo_wheel_1, Servo* servo_wheel_2, Servo* servo_wheel_3);
+        CaveTalk_Error_t SpeakConfigServoCams(Servo* servo_cam_pan, Servo* servo_cam_tilt);
+        CaveTalk_Error_t SpeakConfigMotor(Motor* motor_wheel_0, Motor* motor_wheel_1, Motor* motor_wheel_2, Motor* motor_wheel_3);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
