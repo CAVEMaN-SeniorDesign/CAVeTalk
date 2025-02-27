@@ -98,19 +98,19 @@ void HearMode(const bool manual)
     return;
 }
 
-void HearConfigServoWheels(cave_talk_Servo servo_wheel_0, cave_talk_Servo servo_wheel_1, cave_talk_Servo servo_wheel_2, cave_talk_Servo servo_wheel_3)
+void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3)
 {
     std::cout << "Just do a breakpoint here" << std::endl;
     return;
 }
 
-void HearConfigServoCams(cave_talk_Servo servo_cam_pan, cave_talk_Servo servo_cam_tilt)
+void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt)
 {
     std::cout << "Just do a breakpoint here" << std::endl;
     return;
 }
 
-void HearConfigServoMotors(cave_talk_Motor motor_wheel_0, cave_talk_Motor motor_wheel_1, cave_talk_Motor motor_wheel_2, cave_talk_Motor motor_wheel_3)
+void HearConfigServoMotors(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3)
 {
     std::cout << "Just do a breakpoint here" << std::endl;
     return;
@@ -245,7 +245,7 @@ TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
     (servo_test_zero).center_duty_cycle_microseconds = (1576);
 
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, servo_test_zero, servo_test_zero, servo_test_zero, servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
     //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
@@ -265,7 +265,7 @@ TEST(CaveTalkCTests, SpeakListenConfigServoCams)
     (servo_test_zero).max_duty_cycle_microseconds = (2560);
     (servo_test_zero).center_duty_cycle_microseconds = (1576);
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, servo_test_zero, servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
     //You would have an EXPECT_CALL here for HearConfigServoCams but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
@@ -284,7 +284,7 @@ TEST(CaveTalkCTests, SpeakListenConfigMotors)
     (motor_test_zero).min_duty_cycle_percentage = (540);
     (motor_test_zero).max_duty_cycle_percentage = (2560);
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, motor_test_zero, motor_test_zero, motor_test_zero, motor_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
     //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));

@@ -281,7 +281,7 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo servo_wheel_0, const Servo servo_wheel_1, const Servo servo_wheel_2, const Servo servo_wheel_3)
+CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)
 {
     ConfigServoWheels config_servo_wheels_message;
 
@@ -297,7 +297,7 @@ CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo servo_wheel_0, const
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_SERVO_WHEELS), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt)
+CaveTalk_Error_t Talker::SpeakConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)
 {
 
     ConfigServoCams config_servo_cams_message;
@@ -313,7 +313,7 @@ CaveTalk_Error_t Talker::SpeakConfigServoCams(Servo servo_cam_pan, Servo servo_c
 
 }
 
-CaveTalk_Error_t Talker::SpeakConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)
+CaveTalk_Error_t Talker::SpeakConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)
 {
     ConfigMotor config_motor_message;
 
