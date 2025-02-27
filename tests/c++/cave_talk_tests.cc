@@ -56,19 +56,11 @@ CaveTalk_Error_t Receive(void *const data, const size_t size, size_t *const byte
 }
 
 
-CaveTalk_Error_t Available(size_t *const bytes_available)
-{
-    *bytes_available = ring_buffer.Size();
-
-    return CAVE_TALK_ERROR_NONE;
-}
-
-
 TEST(CaveTalkCppTests, SpeakListenOogaBooga){
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -88,7 +80,7 @@ TEST(CaveTalkCppTests, SpeakListenMovement){
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -120,7 +112,7 @@ TEST(CaveTalkCppTests, SpeakListenCameraMovement){
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -146,7 +138,7 @@ TEST(CaveTalkCppTests, SpeakListenLights){
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -166,7 +158,7 @@ TEST(CaveTalkCppTests, SpeakListenMode){
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
