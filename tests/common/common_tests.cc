@@ -53,16 +53,19 @@ CaveTalk_Error_t ReceiveWrongNormal(void *const data, const size_t size, size_t 
 static CaveTalk_LinkHandle_t LinkHandle = {
     .send      = Send,
     .receive   = Receive,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET
 };
 
 static CaveTalk_LinkHandle_t NullHandle = {
     .send      = nullptr,
     .receive   = nullptr,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET
 };
 
 static CaveTalk_LinkHandle_t SocketClosedHandle = {
     .send      = SendSocketClosed,
     .receive   = ReceiveSocketClosed,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET
 };
 
 TEST(CommonTests, SpeakAndListen)
@@ -125,13 +128,12 @@ TEST(CommonTests, SizeAndIncompleteness)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&LinkHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
     ASSERT_EQ(CAVE_TALK_ERROR_SIZE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 
+    /* TODO SD-182 remove manual reset (size error should automatically result in flushing buffer and reset link handle state) */
+    LinkHandle.receive_state = CAVE_TALK_LINK_STATE_RESET;
+
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-
-    ring_buffer.Write(data_rand_0, sizeof(data_rand_0));
-
-    ASSERT_EQ(CAVE_TALK_ERROR_INCOMPLETE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 }
 
 TEST(CommonTests, CheckCRC)

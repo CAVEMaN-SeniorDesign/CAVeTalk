@@ -1,6 +1,5 @@
 #include "cave_talk_link.h"
 
-// #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -85,13 +84,14 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
                                  const size_t size,
                                  CaveTalk_Length_t *const length)
 {
-    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
     if ((NULL == handle) ||
         (NULL == id) ||
         (NULL == data) ||
         (NULL == length))
     {
+        error = CAVE_TALK_ERROR_NULL;
     }
     else
     {
@@ -108,6 +108,8 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
                 break;
             }
         }
+
+        /* TODO SD-182 drop packet on size error (flush remaining bytes to be received) */
     }
 
     return error;

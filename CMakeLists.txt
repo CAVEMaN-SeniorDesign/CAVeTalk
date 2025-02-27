@@ -36,7 +36,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     )
     target_link_options(${PROJECT_NAME}-common
         PRIVATE
-            --coverage
+            $<$<CONFIG:Debug>:--coverage>
     )
 # Add flags for other compilers here
 endif()
@@ -86,9 +86,8 @@ target_include_directories(${PROJECT_NAME}-c
         ${C_INC_DIR}
 )
 target_link_libraries(${PROJECT_NAME}-c
-    PRIVATE
-        ${PROJECT_NAME}-c_messages
     PUBLIC
+        ${PROJECT_NAME}-c_messages
         ${PROJECT_NAME}-common
 )
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -99,7 +98,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     )
     target_link_options(${PROJECT_NAME}-c
         PRIVATE
-            --coverage
+            $<$<CONFIG:Debug>:--coverage>
     )
 # Add flags for other compilers here
 endif()
@@ -158,7 +157,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     )
     target_link_options(${PROJECT_NAME}-cpp
         PRIVATE
-            --coverage
+            $<$<CONFIG:Debug>:--coverage>
     )
 # Add flags for other compilers here
 endif()
