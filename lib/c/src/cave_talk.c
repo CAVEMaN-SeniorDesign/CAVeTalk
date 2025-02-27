@@ -464,16 +464,16 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t
     }
     else
     {
-        pb_istream_t                istream              = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
-        cave_talk_ConfigServoWheels config_servo_message = cave_talk_ConfigServoWheels_init_zero;
+        pb_istream_t                istream                     = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoWheels config_servo_wheels_message = cave_talk_ConfigServoWheels_init_zero;
 
-        if (!pb_decode(&istream, cave_talk_ConfigServoWheels_fields, &config_servo_message))
+        if (!pb_decode(&istream, cave_talk_ConfigServoWheels_fields, &config_servo_wheels_message))
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
         else if (NULL != handle->listen_callbacks.hear_config_servo_wheels)
         {
-            handle->listen_callbacks.hear_config_servo_wheels();
+            handle->listen_callbacks.hear_config_servo_wheels(config_servo_wheels_message.servo_wheel_0, config_servo_wheels_message.servo_wheel_1, config_servo_wheels_message.servo_wheel_2, config_servo_wheels_message.servo_wheel_3);
         }
     }
 
@@ -491,16 +491,16 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *
     }
     else
     {
-        pb_istream_t              istream              = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
-        cave_talk_ConfigServoCams config_servo_message = cave_talk_ConfigServoCams_init_zero;
+        pb_istream_t              istream                   = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigServoCams config_servo_cams_message = cave_talk_ConfigServoCams_init_zero;
 
-        if (!pb_decode(&istream, cave_talk_ConfigServoCams_fields, &config_servo_message))
+        if (!pb_decode(&istream, cave_talk_ConfigServoCams_fields, &config_servo_cams_message))
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
         else if (NULL != handle->listen_callbacks.hear_config_servo_cams)
         {
-            handle->listen_callbacks.hear_config_servo_cams();
+            handle->listen_callbacks.hear_config_servo_cams(config_servo_cams_message.servo_cam_pan, config_servo_cams_message.servo_cam_tilt);
         }
     }
 
@@ -527,7 +527,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *cons
         }
         else if (NULL != handle->listen_callbacks.hear_config_motor)
         {
-            handle->listen_callbacks.hear_config_motor();
+            handle->listen_callbacks.hear_config_motor(config_motor_message.motor_wheel_0, config_motor_message.motor_wheel_1, config_motor_message.motor_wheel_2, config_motor_message.motor_wheel_3);
         }
     }
 

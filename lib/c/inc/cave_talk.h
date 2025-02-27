@@ -18,9 +18,9 @@ typedef struct
     void (*hear_camera_movement)(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
     void (*hear_lights)(const bool headlights);
     void (*hear_mode)(const bool manual);
-    void (*hear_config_servo_wheels)();
-    void (*hear_config_servo_cams)();
-    void (*hear_config_motor)();
+    void (*hear_config_servo_wheels)(cave_talk_Servo servo_wheel_0, cave_talk_Servo servo_wheel_1, cave_talk_Servo servo_wheel_2, cave_talk_Servo servo_wheel_3);
+    void (*hear_config_servo_cams)(cave_talk_Servo servo_cam_pan, cave_talk_Servo servo_cam_tilt);
+    void (*hear_config_motor)(cave_talk_Motor motor_wheel_0, cave_talk_Motor motor_wheel_1, cave_talk_Motor motor_wheel_2, cave_talk_Motor motor_wheel_3);
 
 } CaveTalk_ListenCallbacks_t;
 
