@@ -281,13 +281,14 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfigServoWheels(Servo *servo_wheel_0, Servo *servo_wheel_1, Servo *servo_wheel_2, Servo *servo_wheel_3)
+CaveTalk_Error_t Talker::SpeakConfigServoWheels(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3)
 {
     ConfigServoWheels config_servo_wheels_message;
-    config_servo_wheels_message.set_allocated_servo_wheel_0(servo_wheel_0);
-    config_servo_wheels_message.set_allocated_servo_wheel_1(servo_wheel_1);
-    config_servo_wheels_message.set_allocated_servo_wheel_2(servo_wheel_2);
-    config_servo_wheels_message.set_allocated_servo_wheel_3(servo_wheel_3);
+
+    config_servo_wheels_message.mutable_servo_wheel_0()->CopyFrom(servo_wheel_0);
+    config_servo_wheels_message.mutable_servo_wheel_1()->CopyFrom(servo_wheel_1);
+    config_servo_wheels_message.mutable_servo_wheel_2()->CopyFrom(servo_wheel_2);
+    config_servo_wheels_message.mutable_servo_wheel_3()->CopyFrom(servo_wheel_3);
 
 
     std::size_t length = config_servo_wheels_message.ByteSizeLong();
@@ -296,12 +297,14 @@ CaveTalk_Error_t Talker::SpeakConfigServoWheels(Servo *servo_wheel_0, Servo *ser
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_SERVO_WHEELS), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfigServoCams(Servo *servo_cam_pan, Servo *servo_cam_tilt)
+CaveTalk_Error_t Talker::SpeakConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt)
 {
 
     ConfigServoCams config_servo_cams_message;
-    config_servo_cams_message.set_allocated_servo_cam_pan(servo_cam_pan);
-    config_servo_cams_message.set_allocated_servo_cam_tilt(servo_cam_tilt);
+
+    config_servo_cams_message.mutable_servo_cam_pan()->CopyFrom(servo_cam_pan);
+    config_servo_cams_message.mutable_servo_cam_tilt()->CopyFrom(servo_cam_tilt);
+
 
     std::size_t length = config_servo_cams_message.ByteSizeLong();
     config_servo_cams_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
@@ -310,13 +313,14 @@ CaveTalk_Error_t Talker::SpeakConfigServoCams(Servo *servo_cam_pan, Servo *servo
 
 }
 
-CaveTalk_Error_t Talker::SpeakConfigMotor(Motor *motor_wheel_0, Motor *motor_wheel_1, Motor *motor_wheel_2, Motor *motor_wheel_3)
+CaveTalk_Error_t Talker::SpeakConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)
 {
     ConfigMotor config_motor_message;
-    config_motor_message.set_allocated_motor_wheel_0(motor_wheel_0);
-    config_motor_message.set_allocated_motor_wheel_1(motor_wheel_1);
-    config_motor_message.set_allocated_motor_wheel_2(motor_wheel_2);
-    config_motor_message.set_allocated_motor_wheel_3(motor_wheel_3);
+
+    config_motor_message.mutable_motor_wheel_0()->CopyFrom(motor_wheel_0);
+    config_motor_message.mutable_motor_wheel_1()->CopyFrom(motor_wheel_1);
+    config_motor_message.mutable_motor_wheel_2()->CopyFrom(motor_wheel_2);
+    config_motor_message.mutable_motor_wheel_3()->CopyFrom(motor_wheel_3);
 
     std::size_t length = config_motor_message.ByteSizeLong();
     config_motor_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());

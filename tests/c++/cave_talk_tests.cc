@@ -183,39 +183,15 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
 
     ring_buffer.Clear();
 
-    cave_talk::Servo *servo_test_zero = new cave_talk::Servo();
-    servo_test_zero->set_min_angle_radian(0.2);
-    servo_test_zero->set_max_angle_radian(180.5);
-    servo_test_zero->set_center_angle_radian(94.3);
-    servo_test_zero->set_min_duty_cycle_microseconds(540);
-    servo_test_zero->set_max_duty_cycle_microseconds(2560);
-    servo_test_zero->set_center_duty_cycle_microseconds(1576);
+    cave_talk::Servo servo_test_zero;
+    servo_test_zero.set_min_angle_radian(0.2);
+    servo_test_zero.set_max_angle_radian(180.5);
+    servo_test_zero.set_center_angle_radian(94.3);
+    servo_test_zero.set_min_duty_cycle_microseconds(540);
+    servo_test_zero.set_max_duty_cycle_microseconds(2560);
+    servo_test_zero.set_center_duty_cycle_microseconds(1576);
 
-    cave_talk::Servo *servo_test_one = new cave_talk::Servo();
-    servo_test_one->set_min_angle_radian(0.2);
-    servo_test_one->set_max_angle_radian(180.5);
-    servo_test_one->set_center_angle_radian(94.3);
-    servo_test_one->set_min_duty_cycle_microseconds(540);
-    servo_test_one->set_max_duty_cycle_microseconds(2560);
-    servo_test_one->set_center_duty_cycle_microseconds(1576);
-
-    cave_talk::Servo *servo_test_two = new cave_talk::Servo();
-    servo_test_two->set_min_angle_radian(0.2);
-    servo_test_two->set_max_angle_radian(180.5);
-    servo_test_two->set_center_angle_radian(94.3);
-    servo_test_two->set_min_duty_cycle_microseconds(540);
-    servo_test_two->set_max_duty_cycle_microseconds(2560);
-    servo_test_two->set_center_duty_cycle_microseconds(1576);
-
-    cave_talk::Servo *servo_test_thr = new cave_talk::Servo();
-    servo_test_thr->set_min_angle_radian(0.2);
-    servo_test_thr->set_max_angle_radian(180.5);
-    servo_test_thr->set_center_angle_radian(94.3);
-    servo_test_thr->set_min_duty_cycle_microseconds(540);
-    servo_test_thr->set_max_duty_cycle_microseconds(2560);
-    servo_test_thr->set_center_duty_cycle_microseconds(1576);
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoWheels(servo_test_zero, servo_test_one, servo_test_two, servo_test_thr));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoWheels(servo_test_zero, servo_test_zero, servo_test_zero, servo_test_zero));
     //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
@@ -231,24 +207,17 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoCams)
 
     ring_buffer.Clear();
 
-    cave_talk::Servo *servo_test_zero = new cave_talk::Servo();
-    servo_test_zero->set_min_angle_radian(0.2);
-    servo_test_zero->set_max_angle_radian(180.5);
-    servo_test_zero->set_center_angle_radian(94.3);
-    servo_test_zero->set_min_duty_cycle_microseconds(540);
-    servo_test_zero->set_max_duty_cycle_microseconds(2560);
-    servo_test_zero->set_center_duty_cycle_microseconds(1576);
-
-    cave_talk::Servo *servo_test_one = new cave_talk::Servo();
-    servo_test_one->set_min_angle_radian(0.2);
-    servo_test_one->set_max_angle_radian(180.5);
-    servo_test_one->set_center_angle_radian(94.3);
-    servo_test_one->set_min_duty_cycle_microseconds(540);
-    servo_test_one->set_max_duty_cycle_microseconds(2560);
-    servo_test_one->set_center_duty_cycle_microseconds(1576);
+    cave_talk::Servo servo_test_zero;
+    servo_test_zero.set_min_angle_radian(0.2);
+    servo_test_zero.set_max_angle_radian(180.5);
+    servo_test_zero.set_center_angle_radian(94.3);
+    servo_test_zero.set_min_duty_cycle_microseconds(540);
+    servo_test_zero.set_max_duty_cycle_microseconds(2560);
+    servo_test_zero.set_center_duty_cycle_microseconds(1576);
 
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoCams(servo_test_zero, servo_test_one));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoCams(servo_test_zero, servo_test_zero));
     //You would have an EXPECT_CALL here for HearConfigServoCams but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
@@ -264,35 +233,14 @@ TEST(CaveTalkCppTests, SpeakListenConfigMotors)
 
     ring_buffer.Clear();
 
-    cave_talk::Motor *motor_test_zero = new cave_talk::Motor();
-    motor_test_zero->set_pwm_carrier_freq_hz(2500);
-    motor_test_zero->set_min_speed_loaded_meters_per_second(0.3);
-    motor_test_zero->set_max_speed_loaded_meters_per_second(2.34);
-    motor_test_zero->set_min_duty_cycle_percentage(540);
-    motor_test_zero->set_max_duty_cycle_percentage(2560);
+    cave_talk::Motor motor_test_zero;
+    motor_test_zero.set_pwm_carrier_freq_hz(2500);
+    motor_test_zero.set_min_speed_loaded_meters_per_second(0.3);
+    motor_test_zero.set_max_speed_loaded_meters_per_second(2.34);
+    motor_test_zero.set_min_duty_cycle_percentage(540);
+    motor_test_zero.set_max_duty_cycle_percentage(2560);
 
-    cave_talk::Motor *motor_test_one = new cave_talk::Motor();
-    motor_test_one->set_pwm_carrier_freq_hz(2500);
-    motor_test_one->set_min_speed_loaded_meters_per_second(0.3);
-    motor_test_one->set_max_speed_loaded_meters_per_second(2.34);
-    motor_test_one->set_min_duty_cycle_percentage(540);
-    motor_test_one->set_max_duty_cycle_percentage(2560);
-
-    cave_talk::Motor *motor_test_two = new cave_talk::Motor();
-    motor_test_two->set_pwm_carrier_freq_hz(2500);
-    motor_test_two->set_min_speed_loaded_meters_per_second(0.3);
-    motor_test_two->set_max_speed_loaded_meters_per_second(2.34);
-    motor_test_two->set_min_duty_cycle_percentage(540);
-    motor_test_two->set_max_duty_cycle_percentage(2560);
-
-    cave_talk::Motor *motor_test_thr = new cave_talk::Motor();
-    motor_test_thr->set_pwm_carrier_freq_hz(2500);
-    motor_test_thr->set_min_speed_loaded_meters_per_second(0.3);
-    motor_test_thr->set_max_speed_loaded_meters_per_second(2.34);
-    motor_test_thr->set_min_duty_cycle_percentage(540);
-    motor_test_thr->set_max_duty_cycle_percentage(2560);
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigMotor(motor_test_zero, motor_test_one, motor_test_two, motor_test_thr));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigMotor(motor_test_zero, motor_test_zero, motor_test_zero, motor_test_zero));
     //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());

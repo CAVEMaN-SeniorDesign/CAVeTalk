@@ -70,9 +70,9 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakMode(const bool manual);
-        CaveTalk_Error_t SpeakConfigServoWheels(Servo *servo_wheel_0, Servo* servo_wheel_1, Servo* servo_wheel_2, Servo* servo_wheel_3);
-        CaveTalk_Error_t SpeakConfigServoCams(Servo* servo_cam_pan, Servo* servo_cam_tilt);
-        CaveTalk_Error_t SpeakConfigMotor(Motor* motor_wheel_0, Motor* motor_wheel_1, Motor* motor_wheel_2, Motor* motor_wheel_3);
+        CaveTalk_Error_t SpeakConfigServoWheels(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3);
+        CaveTalk_Error_t SpeakConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt);
+        CaveTalk_Error_t SpeakConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
