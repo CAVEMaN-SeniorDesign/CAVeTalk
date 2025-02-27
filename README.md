@@ -18,6 +18,9 @@ CAVEMAN controller message protocol
 | 0x03 | Camera Movement | Describes the Camera Pan [radians] and Tilt Servo Angles [radians]     |
 | 0x04 | Lights          | Toggles the Onboard Headlights                                         |
 | 0x05 | Mode            | Switches between Manual Driving Mode and Autonomous Driving Mode       |
+| 0x06 | Odometry        | Describes the 3 relative acceleration axes [m/s^2], 3 gyroscopic axes [rad/s], and 4 encoder values for each wheel [rad/s] |
+| 0x07 | Logging         | Send String Messages Between Devices |
+| 0x08 | Configuration   | Send Configuration Parameters Between Devices |
 
 3. Length refers to the length of the packet in bytes
 4. Payload refers to the main piece of information sent in the packet
@@ -32,7 +35,11 @@ When building the C version of this library and/or using this library on an embe
 
 1. Initialize and update submodules
 
-   `git submodule update --init --recursive`
+   `git submodule update --init --recursive `
+
+   - Use this command to see the progress of each submodule pull
+
+      `git submodule update --init --recursive --progress`
 
 2. Make the script to generate the Protobuf payloads for C with `nanopb` executable.
 
@@ -49,6 +56,10 @@ When building the C++ version of this library, follow these steps to setup Proto
 1. Initialize and update submodules
 
    `git submodule update --init --recursive`
+
+   - Use this command to see the progress of each submodule pull
+
+      `git submodule update --init --recursive --progress`
 
 2. Navigate to the `protobuf` directory
 

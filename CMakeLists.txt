@@ -60,6 +60,9 @@ add_library(${PROJECT_NAME}-c_messages)
 target_sources(${PROJECT_NAME}-c_messages
     PRIVATE
         ${CAVE_TALK_C_MESSAGE_SRCS}
+        ${C_MESSAGES_OUT_DIR}/pb_common.c
+        ${C_MESSAGES_OUT_DIR}/pb_decode.c
+        ${C_MESSAGES_OUT_DIR}/pb_encode.c
 )
 target_include_directories(${PROJECT_NAME}-c_messages
     PUBLIC
@@ -83,9 +86,8 @@ target_include_directories(${PROJECT_NAME}-c
         ${C_INC_DIR}
 )
 target_link_libraries(${PROJECT_NAME}-c
-    PRIVATE
-        ${PROJECT_NAME}-c_messages
     PUBLIC
+        ${PROJECT_NAME}-c_messages
         ${PROJECT_NAME}-common
 )
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -143,10 +145,9 @@ target_include_directories(${PROJECT_NAME}-cpp
         ${CPP_INC_DIR}
 )
 target_link_libraries(${PROJECT_NAME}-cpp
-    PRIVATE
-        ${PROJECT_NAME}-cpp_messages
     PUBLIC
         ${PROJECT_NAME}-common
+        ${PROJECT_NAME}-cpp_messages
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${PROJECT_NAME}-cpp

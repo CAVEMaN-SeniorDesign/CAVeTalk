@@ -14,11 +14,11 @@
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 
-static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle);
-static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle);
-static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle);
-static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle);
-static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle);
+static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 
 CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
 {
@@ -48,19 +48,19 @@ CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
                 }
                 break;
             case cave_talk_Id_ID_OOGA:
-                error = CaveTalk_HandleOogaBooga(handle);
+                error = CaveTalk_HandleOogaBooga(handle, length);
                 break;
             case cave_talk_Id_ID_MOVEMENT:
-                error = CaveTalk_HandleMovement(handle);
+                error = CaveTalk_HandleMovement(handle, length);
                 break;
             case cave_talk_Id_ID_CAMERA_MOVEMENT:
-                error = CaveTalk_HandleCameraMovement(handle);
+                error = CaveTalk_HandleCameraMovement(handle, length);
                 break;
             case cave_talk_Id_ID_LIGHTS:
-                error = CaveTalk_HandleLights(handle);
+                error = CaveTalk_HandleLights(handle, length);
                 break;
             case cave_talk_Id_ID_MODE:
-                error = CaveTalk_HandleMode(handle);
+                error = CaveTalk_HandleMode(handle, length);
                 break;
             default:
                 error = CAVE_TALK_ERROR_ID;
@@ -209,7 +209,7 @@ CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -219,7 +219,7 @@ static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const 
     }
     else
     {
-        pb_istream_t        istream            = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_istream_t        istream            = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_OogaBooga ooga_booga_message = cave_talk_OogaBooga_init_zero;
 
         if (!pb_decode(&istream, cave_talk_OogaBooga_fields, &ooga_booga_message))
@@ -235,7 +235,7 @@ static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const 
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -245,7 +245,7 @@ static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const h
     }
     else
     {
-        pb_istream_t       istream          = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_istream_t       istream          = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_Movement movement_message = cave_talk_Movement_init_zero;
 
         if (!pb_decode(&istream, cave_talk_Movement_fields, &movement_message))
@@ -261,7 +261,7 @@ static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const h
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -271,7 +271,7 @@ static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *c
     }
     else
     {
-        pb_istream_t             istream                 = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_istream_t             istream                 = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_CameraMovement camera_movement_message = cave_talk_CameraMovement_init_zero;
 
         if (!pb_decode(&istream, cave_talk_CameraMovement_fields, &camera_movement_message))
@@ -287,7 +287,7 @@ static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *c
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -297,7 +297,7 @@ static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const han
     }
     else
     {
-        pb_istream_t     istream        = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_istream_t     istream        = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_Lights lights_message = cave_talk_Lights_init_zero;
 
         if (!pb_decode(&istream, cave_talk_Lights_fields, &lights_message))
@@ -313,7 +313,7 @@ static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const han
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle)
+static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -323,7 +323,7 @@ static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handl
     }
     else
     {
-        pb_istream_t   istream      = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_istream_t   istream      = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_Mode mode_message = cave_talk_Mode_init_zero;
 
         if (!pb_decode(&istream, cave_talk_Mode_fields, &mode_message))

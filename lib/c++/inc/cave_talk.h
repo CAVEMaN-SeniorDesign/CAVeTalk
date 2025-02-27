@@ -14,7 +14,6 @@
 namespace cave_talk
 {
 
-
 const std::size_t kMaxPayloadSize = 255;
 
 class ListenerCallbacks
@@ -31,8 +30,8 @@ class ListenerCallbacks
 class Listener
 {
     public:
-        Listener(std::function<CaveTalk_Error_t(void *const data, const size_t size, size_t *const bytes_received)> &receive,
-                 std::function<CaveTalk_Error_t(size_t *const bytes_available)> &available,
+        Listener(CaveTalk_Error_t (*receive)(void *const data, const size_t size, size_t *const bytes_received),
+                 CaveTalk_Error_t (*available)(size_t *const bytes_available),
                  std::shared_ptr<ListenerCallbacks> listener_callbacks);
         Listener(Listener &listener)                  = delete;
         Listener(Listener &&listener)                 = delete;
@@ -41,11 +40,11 @@ class Listener
         CaveTalk_Error_t Listen(void);
 
     private:
-        CaveTalk_Error_t HandleOogaBooga(const CaveTalk_Length_t length);
-        CaveTalk_Error_t HandleMovement(const CaveTalk_Length_t length);
-        CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length);
-        CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length);
-        CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length);
+        CaveTalk_Error_t HandleOogaBooga(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleMovement(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, kMaxPayloadSize> buffer_;
@@ -54,7 +53,7 @@ class Listener
 class Talker
 {
     public:
-        explicit Talker(std::function<CaveTalk_Error_t(const void *const data, const size_t size)> &send);
+        explicit Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size));
         Talker(Talker &talker)                  = delete;
         Talker(Talker &&talker)                 = delete;
         Talker &operator=(const Talker &talker) = delete;
@@ -67,7 +66,7 @@ class Talker
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
-        std::vector<uint8_t> message_buffer_;
+        std::array<uint8_t, kMaxPayloadSize> message_buffer_;
 };
 
 } // namespace cave_talk
