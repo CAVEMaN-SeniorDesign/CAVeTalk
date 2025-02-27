@@ -14,11 +14,11 @@
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 
-static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length);
-static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length);
-static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length);
-static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length);
-static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 
 CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
 {
@@ -209,7 +209,7 @@ CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length)
+static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -235,7 +235,7 @@ static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const 
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length)
+static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -261,7 +261,7 @@ static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const h
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length)
+static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -287,7 +287,7 @@ static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *c
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length)
+static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -313,7 +313,7 @@ static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const han
     return error;
 }
 
-static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, CaveTalk_Length_t length)
+static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
