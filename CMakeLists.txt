@@ -66,7 +66,6 @@ target_sources(${PROJECT_NAME}-c_messages
 )
 target_include_directories(${PROJECT_NAME}-c_messages
     PUBLIC
-        ${PROTOBUF_INSTALL_DIR}/include
         ${C_MESSAGES_OUT_DIR}
 )
 
