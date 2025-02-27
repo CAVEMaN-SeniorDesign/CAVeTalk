@@ -35,13 +35,6 @@ CaveTalk_Error_t Receive(void *const data, const size_t size, size_t *const byte
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Available(size_t *const bytes_available)
-{
-    *bytes_available = ring_buffer.Size();
-
-    return CAVE_TALK_ERROR_NONE;
-}
-
 CaveTalk_Error_t SendSocketClosed(const void *const data, const size_t size)
 {    
     return CAVE_TALK_ERROR_SOCKET_CLOSED;
@@ -52,39 +45,24 @@ CaveTalk_Error_t ReceiveSocketClosed(void *const data, const size_t size, size_t
     return CAVE_TALK_ERROR_SOCKET_CLOSED;
 }
 
-CaveTalk_Error_t AvailableSocketClosed(size_t *const bytes_available)
-{
-    return CAVE_TALK_ERROR_SOCKET_CLOSED;
-
-}
-
 CaveTalk_Error_t ReceiveWrongNormal(void *const data, const size_t size, size_t *const bytes_received)
 {
     return CAVE_TALK_ERROR_NONE;
 }
 
-static const CaveTalk_LinkHandle_t kLinkHandle = {
+static CaveTalk_LinkHandle_t LinkHandle = {
     .send      = Send,
     .receive   = Receive,
-    .available = Available,
 };
 
-static const CaveTalk_LinkHandle_t kNullHandle = {
+static CaveTalk_LinkHandle_t NullHandle = {
     .send      = nullptr,
     .receive   = nullptr,
-    .available = nullptr,
 };
 
-static const CaveTalk_LinkHandle_t kSocketClosedHandle = {
+static CaveTalk_LinkHandle_t SocketClosedHandle = {
     .send      = SendSocketClosed,
     .receive   = ReceiveSocketClosed,
-    .available = AvailableSocketClosed,
-};
-
-static const CaveTalk_LinkHandle_t kAvailHandle = {
-    .send      = SendSocketClosed,
-    .receive   = ReceiveWrongNormal,
-    .available = Available,
 };
 
 TEST(CommonTests, SpeakAndListen)
@@ -96,8 +74,8 @@ TEST(CommonTests, SpeakAndListen)
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&kLinkHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&kLinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&LinkHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
     ASSERT_EQ(0x0F, id);
     ASSERT_EQ(sizeof(data_send), length);
     ASSERT_THAT(data_receive, testing::ElementsAreArray(data_send));
@@ -111,15 +89,14 @@ TEST(CommonTests, NullErrors)
     CaveTalk_Length_t length = 0U;
 
     ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Speak(nullptr, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Speak(&kNullHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Speak(&kLinkHandle, 0x0F, nullptr, sizeof(data_send)));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Speak(&NullHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Speak(&LinkHandle, 0x0F, nullptr, sizeof(data_send)));
 
     ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(nullptr, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&kNullHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&kLinkHandle, nullptr, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&kLinkHandle, &id, nullptr, sizeof(data_receive), &length));
-    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&kLinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), nullptr));
-
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&NullHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&LinkHandle, nullptr, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&LinkHandle, &id, nullptr, sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), nullptr));
 }
 
 TEST(CommonTests, SRAClosed)
@@ -132,9 +109,8 @@ TEST(CommonTests, SRAClosed)
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_SOCKET_CLOSED, CaveTalk_Speak(&kSocketClosedHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
-    ASSERT_EQ(CAVE_TALK_ERROR_SOCKET_CLOSED, CaveTalk_Listen(&kSocketClosedHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-
+    ASSERT_EQ(CAVE_TALK_ERROR_SOCKET_CLOSED, CaveTalk_Speak(&SocketClosedHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
+    ASSERT_EQ(CAVE_TALK_ERROR_SOCKET_CLOSED, CaveTalk_Listen(&SocketClosedHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 }
 
 TEST(CommonTests, SizeAndIncompleteness)
@@ -146,23 +122,16 @@ TEST(CommonTests, SizeAndIncompleteness)
     CaveTalk_Id_t id = 0U;
     CaveTalk_Length_t length = 0U;
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&kLinkHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
-    ASSERT_EQ(CAVE_TALK_ERROR_SIZE, CaveTalk_Listen(&kLinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&LinkHandle, 0x0F, static_cast<void *>(data_send), sizeof(data_send)));
+    ASSERT_EQ(CAVE_TALK_ERROR_SIZE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&kLinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-
-
-    ring_buffer.Write(data_rand_0, sizeof(data_rand_0));
-
-    ASSERT_EQ(CAVE_TALK_ERROR_INCOMPLETE, CaveTalk_Listen(&kLinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 
     ring_buffer.Write(data_rand_0, sizeof(data_rand_0));
 
-    ASSERT_EQ(CAVE_TALK_ERROR_INCOMPLETE, CaveTalk_Listen(&kAvailHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
-
-
+    ASSERT_EQ(CAVE_TALK_ERROR_INCOMPLETE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 }
 
 TEST(CommonTests, CheckCRC)
