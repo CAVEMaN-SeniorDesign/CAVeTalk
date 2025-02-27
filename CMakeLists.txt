@@ -60,6 +60,9 @@ add_library(${PROJECT_NAME}-c_messages)
 target_sources(${PROJECT_NAME}-c_messages
     PRIVATE
         ${CAVE_TALK_C_MESSAGE_SRCS}
+        ${C_MESSAGES_OUT_DIR}/pb_common.c
+        ${C_MESSAGES_OUT_DIR}/pb_decode.c
+        ${C_MESSAGES_OUT_DIR}/pb_encode.c
 )
 target_include_directories(${PROJECT_NAME}-c_messages
     PUBLIC
