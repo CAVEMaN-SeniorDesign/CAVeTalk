@@ -8,6 +8,7 @@
 #include "mode.pb.h"
 #include "movement.pb.h"
 #include "ooga_booga.pb.h"
+#include "odometry.pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
 
@@ -19,6 +20,7 @@ static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const h
 static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle);
 static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle);
 static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle);
+static CaveTalk_Error_t CaveTalk_HandleOdometry(const CaveTalk_Handle_t *const handle);
 
 CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
 {
@@ -61,6 +63,9 @@ CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
                 break;
             case cave_talk_Id_ID_MODE:
                 error = CaveTalk_HandleMode(handle);
+                break;
+            case cave_talk_Id_ID_ODOMETRY:
+                error = CaveTalk_HandleOdometry(handle);
                 break;
             default:
                 error = CAVE_TALK_ERROR_ID;
@@ -209,6 +214,53 @@ CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const
     return error;
 }
 
+CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle,
+                                        const CaveTalk_MetersPerSecondSquared_t x_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t y_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t z_accel,
+                                        const CaveTalk_RadiansPerSecond_t roll,
+                                        const CaveTalk_RadiansPerSecond_t pitch,
+                                        const CaveTalk_RadiansPerSecond_t yaw,
+                                        const CaveTalk_RadiansPerSecond_t wheel_0_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_1_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_2_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_3_rate)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t       ostream          = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_Odometry odometry_message = cave_talk_Odometry_init_zero;
+
+        odometry_message.x_accel_meters_per_second_squared = x_accel;
+        odometry_message.y_accel_meters_per_second_squared = y_accel;
+        odometry_message.z_accel_meters_per_second_squared = z_accel;
+        odometry_message.roll_radians_per_second           = roll;
+        odometry_message.pitch_radians_per_second          = pitch;
+        odometry_message.yaw_radians_per_second            = yaw;
+        odometry_message.wheel_0_rate_radians_per_second   = wheel_0_rate;
+        odometry_message.wheel_1_rate_radians_per_second   = wheel_1_rate;
+        odometry_message.wheel_2_rate_radians_per_second   = wheel_2_rate;
+        odometry_message.wheel_3_rate_radians_per_second   = wheel_3_rate;
+
+
+        if (!pb_encode(&ostream, cave_talk_Odometry_fields, &odometry_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_ODOMETRY, handle->buffer, ostream.bytes_written);
+        }
+    }
+
+    return error;
+}
+
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -333,6 +385,41 @@ static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handl
         else if (NULL != handle->listen_callbacks.hear_mode)
         {
             handle->listen_callbacks.hear_mode(mode_message.manual);
+        }
+    }
+
+    return error;
+}
+
+static CaveTalk_Error_t CaveTalk_HandleOdometry(const CaveTalk_Handle_t *const handle)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if ((NULL == handle) || (NULL == handle->buffer))
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        pb_istream_t       istream          = pb_istream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_Odometry odometry_message = cave_talk_Odometry_init_zero;
+
+        if (!pb_decode(&istream, cave_talk_Odometry_fields, &odometry_message))
+        {
+            error = CAVE_TALK_ERROR_PARSE;
+        }
+        else if (NULL != handle->listen_callbacks.hear_odometry)
+        {
+            handle->listen_callbacks.hear_odometry(odometry_message.x_accel_meters_per_second_squared,
+                                                   odometry_message.y_accel_meters_per_second_squared,
+                                                   odometry_message.z_accel_meters_per_second_squared,
+                                                   odometry_message.roll_radians_per_second,
+                                                   odometry_message.pitch_radians_per_second,
+                                                   odometry_message.yaw_radians_per_second,
+                                                   odometry_message.wheel_0_rate_radians_per_second,
+                                                   odometry_message.wheel_1_rate_radians_per_second,
+                                                   odometry_message.wheel_2_rate_radians_per_second,
+                                                   odometry_message.wheel_3_rate_radians_per_second);
         }
     }
 

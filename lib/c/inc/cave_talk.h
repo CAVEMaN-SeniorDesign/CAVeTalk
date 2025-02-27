@@ -16,6 +16,16 @@ typedef struct
     void (*hear_camera_movement)(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
     void (*hear_lights)(const bool headlights);
     void (*hear_mode)(const bool manual);
+    void (*hear_odometry)(  const CaveTalk_MetersPerSecondSquared_t x_accel,
+                            const CaveTalk_MetersPerSecondSquared_t y_accel,
+                            const CaveTalk_MetersPerSecondSquared_t z_accel,
+                            const CaveTalk_RadiansPerSecond_t roll,
+                            const CaveTalk_RadiansPerSecond_t pitch,
+                            const CaveTalk_RadiansPerSecond_t yaw,
+                            const CaveTalk_RadiansPerSecond_t wheel_0_rate,
+                            const CaveTalk_RadiansPerSecond_t wheel_1_rate,
+                            const CaveTalk_RadiansPerSecond_t wheel_2_rate,
+                            const CaveTalk_RadiansPerSecond_t wheel_3_rate);
 } CaveTalk_ListenCallbacks_t;
 
 typedef struct
@@ -32,6 +42,7 @@ static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_camera_movement = NULL,
     .hear_lights          = NULL,
     .hear_mode            = NULL,
+    .hear_odometry        = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -52,6 +63,17 @@ CaveTalk_Error_t CaveTalk_SpeakMovement(const CaveTalk_Handle_t *const handle, c
 CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
 CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, const bool headlights);
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
+CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle,
+                                        const CaveTalk_MetersPerSecondSquared_t x_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t y_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t z_accel,
+                                        const CaveTalk_RadiansPerSecond_t roll,
+                                        const CaveTalk_RadiansPerSecond_t pitch,
+                                        const CaveTalk_RadiansPerSecond_t yaw,
+                                        const CaveTalk_RadiansPerSecond_t wheel_0_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_1_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_2_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_3_rate);
 
 #ifdef __cplusplus
 }

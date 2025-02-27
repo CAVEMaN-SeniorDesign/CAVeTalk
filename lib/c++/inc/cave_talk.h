@@ -25,6 +25,16 @@ class ListenerCallbacks
         virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                     = 0;
         virtual void HearLights(const bool headlights)                                                                 = 0;
         virtual void HearMode(const bool manual)                                                                       = 0;
+        virtual void HearOdometry(const CaveTalk_MetersPerSecondSquared_t x_accel,
+                                  const CaveTalk_MetersPerSecondSquared_t y_accel,
+                                  const CaveTalk_MetersPerSecondSquared_t z_accel,
+                                  const CaveTalk_RadiansPerSecond_t roll,
+                                  const CaveTalk_RadiansPerSecond_t pitch,
+                                  const CaveTalk_RadiansPerSecond_t yaw,
+                                  const CaveTalk_RadiansPerSecond_t wheel_0_rate,
+                                  const CaveTalk_RadiansPerSecond_t wheel_1_rate,
+                                  const CaveTalk_RadiansPerSecond_t wheel_2_rate,
+                                  const CaveTalk_RadiansPerSecond_t wheel_3_rate) = 0;
 };
 
 class Listener
@@ -45,6 +55,7 @@ class Listener
         CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleOdometry(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, kMaxPayloadSize> buffer_;
@@ -63,6 +74,16 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakMode(const bool manual);
+        CaveTalk_Error_t SpeakOdometry( const CaveTalk_MetersPerSecondSquared_t x_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t y_accel,
+                                        const CaveTalk_MetersPerSecondSquared_t z_accel,
+                                        const CaveTalk_RadiansPerSecond_t roll,
+                                        const CaveTalk_RadiansPerSecond_t pitch,
+                                        const CaveTalk_RadiansPerSecond_t yaw,
+                                        const CaveTalk_RadiansPerSecond_t wheel_0_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_1_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_2_rate,
+                                        const CaveTalk_RadiansPerSecond_t wheel_3_rate);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
