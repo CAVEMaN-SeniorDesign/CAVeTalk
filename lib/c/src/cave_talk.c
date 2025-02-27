@@ -20,14 +20,13 @@ static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *c
 static CaveTalk_Error_t CaveTalk_HandleLights(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 
-CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle)
+CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
     if ((NULL == handle) ||
         (NULL == handle->buffer) ||
-        (NULL == handle->link_handle.receive) ||
-        (NULL == handle->link_handle.available))
+        (NULL == handle->link_handle.receive))
     {
     }
     else

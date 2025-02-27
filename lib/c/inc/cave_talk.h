@@ -46,7 +46,7 @@ extern "C"
 {
 #endif
 
-CaveTalk_Error_t CaveTalk_Hear(const CaveTalk_Handle_t *const handle);
+CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle);
 CaveTalk_Error_t CaveTalk_SpeakOogaBooga(const CaveTalk_Handle_t *const handle, const cave_talk_Say ooga_booga);
 CaveTalk_Error_t CaveTalk_SpeakMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate);
 CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);

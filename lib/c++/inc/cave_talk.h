@@ -31,7 +31,6 @@ class Listener
 {
     public:
         Listener(CaveTalk_Error_t (*receive)(void *const data, const size_t size, size_t *const bytes_received),
-                 CaveTalk_Error_t (*available)(size_t *const bytes_available),
                  std::shared_ptr<ListenerCallbacks> listener_callbacks);
         Listener(Listener &listener)                  = delete;
         Listener(Listener &&listener)                 = delete;
