@@ -37,18 +37,10 @@ CaveTalk_Error_t Receive(void *const data, const size_t size, size_t *const byte
     return CAVE_TALK_ERROR_NONE;
 }
 
-
-CaveTalk_Error_t Available(size_t *const bytes_available)
-{
-    *bytes_available = ring_buffer.Capacity() - ring_buffer.Size();
-
-    return CAVE_TALK_ERROR_NONE;
-}
-
-static const CaveTalk_LinkHandle_t kCaveTalk_CTests_LinkHandle = {
+static CaveTalk_LinkHandle_t kCaveTalk_CTests_LinkHandle = {
     .send = Send,
     .receive = Receive,
-    .available = Available,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET,
 };
 
 uint8_t buffer[255U] = {0U};
@@ -134,7 +126,7 @@ class MockListenerCallbacks : public ListenCallbacksInterface
         MOCK_METHOD(void, HearMode, (const bool), (override));
 };
 
-const CaveTalk_Handle_t kCaveTalk_Handle = {
+static CaveTalk_Handle_t CaveTalk_Handle = {
     .link_handle = kCaveTalk_CTests_LinkHandle,
     .buffer = buffer,
     .buffer_size = 255U,
@@ -146,13 +138,13 @@ TEST(CaveTalkCTests, SpeakListenOogaBooga){
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&kCaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&kCaveTalk_Handle, cave_talk_Say_SAY_OOGA));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_OOGA));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 
 }
@@ -161,13 +153,13 @@ TEST(CaveTalkCTests, SpeakListenMovement)
 {
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&kCaveTalk_Handle, 2.7982, 3.14982));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 2.7982, 3.14982));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&kCaveTalk_Handle, 1.99923, .00784));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 1.99923, .00784));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }
 
@@ -176,13 +168,13 @@ TEST(CaveTalkCTests, SpeakListenCameraMovement)
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&kCaveTalk_Handle, 2.7982, 3.14982));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 2.7982, 3.14982));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&kCaveTalk_Handle, 1.99923, .00784));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 1.99923, .00784));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }
 
@@ -191,13 +183,13 @@ TEST(CaveTalkCTests, SpeakListenLights)
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&kCaveTalk_Handle, true));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&kCaveTalk_Handle, false));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, false));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }
 
@@ -206,12 +198,12 @@ TEST(CaveTalkCTests, SpeakListenMode)
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&kCaveTalk_Handle, true));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&kCaveTalk_Handle, false));
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&kCaveTalk_Handle));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }
