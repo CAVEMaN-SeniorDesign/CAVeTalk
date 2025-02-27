@@ -21,15 +21,15 @@ const std::size_t kMaxPayloadSize = 255;
 class ListenerCallbacks
 {
     public:
-        virtual ~ListenerCallbacks()                                                                                           = 0;
-        virtual void HearOogaBooga(const Say ooga_booga)                                                                       = 0;
-        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)         = 0;
-        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                             = 0;
-        virtual void HearLights(const bool headlights)                                                                         = 0;
-        virtual void HearMode(const bool manual)                                                                               = 0;
+        virtual ~ListenerCallbacks()                                                                                                                   = 0;
+        virtual void HearOogaBooga(const Say ooga_booga)                                                                                               = 0;
+        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)                                 = 0;
+        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                     = 0;
+        virtual void HearLights(const bool headlights)                                                                                                 = 0;
+        virtual void HearMode(const bool manual)                                                                                                       = 0;
         virtual void HearConfigServoWheels(const Servo servo_wheel_0, const Servo servo_wheel_1, const Servo servo_wheel_2, const Servo servo_wheel_3) = 0;
-        virtual void HearConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt)                                            = 0;
-        virtual void HearConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)       = 0;
+        virtual void HearConfigServoCams(Servo servo_cam_pan, Servo servo_cam_tilt)                                                                    = 0;
+        virtual void HearConfigMotor(Motor motor_wheel_0, Motor motor_wheel_1, Motor motor_wheel_2, Motor motor_wheel_3)                               = 0;
 };
 
 class Listener
