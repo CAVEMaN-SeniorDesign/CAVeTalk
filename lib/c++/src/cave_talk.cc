@@ -281,7 +281,7 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakConfigServoWheels(Servo servo_wheel_0, Servo servo_wheel_1, Servo servo_wheel_2, Servo servo_wheel_3)
+CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo servo_wheel_0, const Servo servo_wheel_1, const Servo servo_wheel_2, const Servo servo_wheel_3)
 {
     ConfigServoWheels config_servo_wheels_message;
 
