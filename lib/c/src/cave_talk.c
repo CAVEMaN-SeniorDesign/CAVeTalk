@@ -68,13 +68,13 @@ CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
                 error = CaveTalk_HandleMode(handle, length);
                 break;
             case cave_talk_Id_ID_CONFIG_SERVO_WHEELS:
-                error = CaveTalk_HandleConfigServoWheels(handle);
+                error = CaveTalk_HandleConfigServoWheels(handle, length);
                 break;
             case cave_talk_Id_ID_CONFIG_SERVO_CAMS:
-                error = CaveTalk_HandleConfigServoCams(handle);
+                error = CaveTalk_HandleConfigServoCams(handle, length);
                 break;
             case cave_talk_Id_ID_CONFIG_MOTOR:
-                error = CaveTalk_HandleConfigMotor(handle);
+                error = CaveTalk_HandleConfigMotor(handle, length);
                 break;
 
             default:
@@ -237,10 +237,33 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const 
         pb_ostream_t                ostream                     = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
         cave_talk_ConfigServoWheels config_servo_wheels_message = cave_talk_ConfigServoWheels_init_zero;
 
-        config_servo_wheels_message.servo_wheel_0 = *servo_wheel_0;
-        config_servo_wheels_message.servo_wheel_1 = *servo_wheel_1;
-        config_servo_wheels_message.servo_wheel_2 = *servo_wheel_2;
-        config_servo_wheels_message.servo_wheel_3 = *servo_wheel_3;
+
+        if (servo_wheel_0 != NULL)
+        {
+            config_servo_wheels_message.servo_wheel_0     = *servo_wheel_0;
+            config_servo_wheels_message.has_servo_wheel_0 = true;
+        }
+
+
+        if (servo_wheel_1 != NULL)
+        {
+            config_servo_wheels_message.servo_wheel_1     = *servo_wheel_1;
+            config_servo_wheels_message.has_servo_wheel_1 = true;
+        }
+
+
+        if (servo_wheel_2 != NULL)
+        {
+            config_servo_wheels_message.servo_wheel_2     = *servo_wheel_2;
+            config_servo_wheels_message.has_servo_wheel_2 = true;
+        }
+
+
+        if (servo_wheel_3 != NULL)
+        {
+            config_servo_wheels_message.servo_wheel_3     = *servo_wheel_3;
+            config_servo_wheels_message.has_servo_wheel_3 = true;
+        }
 
 
         if (!pb_encode(&ostream, cave_talk_ConfigServoWheels_fields, &config_servo_wheels_message))
@@ -271,8 +294,18 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const ha
         pb_ostream_t              ostream                   = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
         cave_talk_ConfigServoCams config_servo_cams_message = cave_talk_ConfigServoCams_init_zero;
 
-        config_servo_cams_message.servo_cam_pan  = *servo_cam_pan;
-        config_servo_cams_message.servo_cam_tilt = *servo_cam_tilt;
+
+        if (servo_cam_pan != NULL)
+        {
+            config_servo_cams_message.servo_cam_pan     = *servo_cam_pan;
+            config_servo_cams_message.has_servo_cam_pan = true;
+        }
+
+        if (servo_cam_tilt != NULL)
+        {
+            config_servo_cams_message.servo_cam_tilt     = *servo_cam_tilt;
+            config_servo_cams_message.has_servo_cam_tilt = true;
+        }
 
 
         if (!pb_encode(&ostream, cave_talk_ConfigServoCams_fields, &config_servo_cams_message))
@@ -291,7 +324,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const ha
 
 }
 
-CaveTalk_Error_t CaveTalk_SpeakConfigServoMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor* motor_wheel_0, const cave_talk_Motor* motor_wheel_1, const cave_talk_Motor* motor_wheel_2, const cave_talk_Motor* motor_wheel_3)
+CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor* motor_wheel_0, const cave_talk_Motor* motor_wheel_1, const cave_talk_Motor* motor_wheel_2, const cave_talk_Motor* motor_wheel_3)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -300,16 +333,35 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoMotors(const CaveTalk_Handle_t *const 
     }
     else
     {
-        pb_ostream_t          ostream              = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
-        cave_talk_ConfigMotor config_motor_message = cave_talk_ConfigMotor_init_zero;
+        pb_ostream_t          ostream               = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigMotor config_motors_message = cave_talk_ConfigMotor_init_zero;
 
-        config_motor_message.motor_wheel_0 = *motor_wheel_0;
-        config_motor_message.motor_wheel_1 = *motor_wheel_1;
-        config_motor_message.motor_wheel_2 = *motor_wheel_2;
-        config_motor_message.motor_wheel_3 = *motor_wheel_3;
+        if (motor_wheel_0 != NULL)
+        {
+            config_motors_message.motor_wheel_0     = *motor_wheel_0;
+            config_motors_message.has_motor_wheel_0 = true;
+        }
+
+        if (motor_wheel_1 != NULL)
+        {
+            config_motors_message.motor_wheel_1     = *motor_wheel_1;
+            config_motors_message.has_motor_wheel_1 = true;
+        }
+
+        if (motor_wheel_2 != NULL)
+        {
+            config_motors_message.motor_wheel_2     = *motor_wheel_2;
+            config_motors_message.has_motor_wheel_2 = true;
+        }
+
+        if (motor_wheel_3 != NULL)
+        {
+            config_motors_message.motor_wheel_3     = *motor_wheel_3;
+            config_motors_message.has_motor_wheel_3 = true;
+        }
 
 
-        if (!pb_encode(&ostream, cave_talk_ConfigMotor_fields, &config_motor_message))
+        if (!pb_encode(&ostream, cave_talk_ConfigMotor_fields, &config_motors_message))
         {
             error = CAVE_TALK_ERROR_SIZE;
         }
@@ -528,9 +580,9 @@ static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *cons
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
-        else if (NULL != handle->listen_callbacks.hear_config_motor)
+        else if (NULL != handle->listen_callbacks.hear_config_motors)
         {
-            handle->listen_callbacks.hear_config_motor(config_motor_message.motor_wheel_0, config_motor_message.motor_wheel_1, config_motor_message.motor_wheel_2, config_motor_message.motor_wheel_3);
+            handle->listen_callbacks.hear_config_motors(config_motor_message.motor_wheel_0, config_motor_message.motor_wheel_1, config_motor_message.motor_wheel_2, config_motor_message.motor_wheel_3);
         }
     }
 

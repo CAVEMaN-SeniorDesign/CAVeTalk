@@ -179,7 +179,7 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -227,7 +227,7 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoCams)
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
@@ -260,7 +260,7 @@ TEST(CaveTalkCppTests, SpeakListenConfigMotors)
 
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 

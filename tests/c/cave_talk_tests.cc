@@ -4,6 +4,8 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
+#include "config_servo.pb.h"
+#include "config_motor.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
@@ -96,12 +98,33 @@ void HearMode(const bool manual)
     return;
 }
 
+void HearConfigServoWheels(cave_talk_Servo servo_wheel_0, cave_talk_Servo servo_wheel_1, cave_talk_Servo servo_wheel_2, cave_talk_Servo servo_wheel_3)
+{
+    std::cout << "Just do a breakpoint here" << std::endl;
+    return;
+}
+
+void HearConfigServoCams(cave_talk_Servo servo_cam_pan, cave_talk_Servo servo_cam_tilt)
+{
+    std::cout << "Just do a breakpoint here" << std::endl;
+    return;
+}
+
+void HearConfigServoMotors(cave_talk_Motor motor_wheel_0, cave_talk_Motor motor_wheel_1, cave_talk_Motor motor_wheel_2, cave_talk_Motor motor_wheel_3)
+{
+    std::cout << "Just do a breakpoint here" << std::endl;
+    return;
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga      = HearOogaBooga,
     .hear_movement        = HearMovement,
     .hear_camera_movement = HearCameraMovement,
     .hear_lights          = HearLights,
     .hear_mode            = HearMode,
+    .hear_config_servo_wheels = HearConfigServoWheels,
+    .hear_config_servo_cams = HearConfigServoCams,
+    .hear_config_motors = HearConfigServoMotors,
 };
 
 
@@ -204,6 +227,119 @@ TEST(CaveTalkCTests, SpeakListenMode)
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
+{
+
+    ring_buffer.Clear();
+
+    cave_talk_Servo *servo_test_zero = new cave_talk_Servo;
+    (*servo_test_zero).min_angle_radian = (0.2);
+    (*servo_test_zero).max_angle_radian = (180.5);
+    (*servo_test_zero).center_angle_radian = (94.3);
+    (*servo_test_zero).min_duty_cycle_microseconds = (540);
+    (*servo_test_zero).max_duty_cycle_microseconds = (2560);
+    (*servo_test_zero).center_duty_cycle_microseconds = (1576);
+
+    cave_talk_Servo *servo_test_one = new cave_talk_Servo;
+    (*servo_test_one).min_angle_radian = (0.2);
+    (*servo_test_one).max_angle_radian = (180.5);
+    (*servo_test_one).center_angle_radian = (94.3);
+    (*servo_test_one).min_duty_cycle_microseconds = (540);
+    (*servo_test_one).max_duty_cycle_microseconds = (2560);
+    (*servo_test_one).center_duty_cycle_microseconds = (1576);
+
+    cave_talk_Servo *servo_test_two = new cave_talk_Servo;
+    (*servo_test_two).min_angle_radian = (0.2);
+    (*servo_test_two).max_angle_radian = (180.5);
+    (*servo_test_two).center_angle_radian = (94.3);
+    (*servo_test_two).min_duty_cycle_microseconds = (540);
+    (*servo_test_two).max_duty_cycle_microseconds = (2560);
+    (*servo_test_two).center_duty_cycle_microseconds = (1576);
+
+    cave_talk_Servo *servo_test_thr = new cave_talk_Servo;
+    (*servo_test_thr).min_angle_radian = (0.2);
+    (*servo_test_thr).max_angle_radian = (180.5);
+    (*servo_test_thr).center_angle_radian = (94.3);
+    (*servo_test_thr).min_duty_cycle_microseconds = (540);
+    (*servo_test_thr).max_duty_cycle_microseconds = (2560);
+    (*servo_test_thr).center_duty_cycle_microseconds = (1576);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, servo_test_zero, servo_test_one, servo_test_two, servo_test_thr));
+    //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class Servo
+    // enter debug mode and you can see that it is called with the correct params
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigServoCams)
+{
+
+    ring_buffer.Clear();
+
+    cave_talk_Servo *servo_test_zero = new cave_talk_Servo;
+    (*servo_test_zero).min_angle_radian = (0.2);
+    (*servo_test_zero).max_angle_radian = (180.5);
+    (*servo_test_zero).center_angle_radian = (94.3);
+    (*servo_test_zero).min_duty_cycle_microseconds = (540);
+    (*servo_test_zero).max_duty_cycle_microseconds = (2560);
+    (*servo_test_zero).center_duty_cycle_microseconds = (1576);
+
+    cave_talk_Servo *servo_test_one = new cave_talk_Servo;
+    (*servo_test_one).min_angle_radian = (0.2);
+    (*servo_test_one).max_angle_radian = (180.5);
+    (*servo_test_one).center_angle_radian = (94.3);
+    (*servo_test_one).min_duty_cycle_microseconds = (540);
+    (*servo_test_one).max_duty_cycle_microseconds = (2560);
+    (*servo_test_one).center_duty_cycle_microseconds = (1576);
+
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, servo_test_zero, servo_test_one));
+    //You would have an EXPECT_CALL here for HearConfigServoCams but there is no operator== for class Servo
+    // enter debug mode and you can see that it is called with the correct params
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigMotors)
+{
+
+    ring_buffer.Clear();
+
+    cave_talk_Motor *motor_test_zero = new cave_talk_Motor();
+    (*motor_test_zero).pwm_carrier_freq_hz = (2500);
+    (*motor_test_zero).min_speed_loaded_meters_per_second = (0.3);
+    (*motor_test_zero).max_speed_loaded_meters_per_second = (2.34);
+    (*motor_test_zero).min_duty_cycle_percentage = (540);
+    (*motor_test_zero).max_duty_cycle_percentage = (2560);
+
+    cave_talk_Motor *motor_test_one = new cave_talk_Motor();
+    (*motor_test_one).pwm_carrier_freq_hz = (2500);
+    (*motor_test_one).min_speed_loaded_meters_per_second = (0.3);
+    (*motor_test_one).max_speed_loaded_meters_per_second = (2.34);
+    (*motor_test_one).min_duty_cycle_percentage = (540);
+    (*motor_test_one).max_duty_cycle_percentage = (2560);
+
+    cave_talk_Motor *motor_test_two = new cave_talk_Motor();
+    (*motor_test_two).pwm_carrier_freq_hz = (2500);
+    (*motor_test_two).min_speed_loaded_meters_per_second = (0.3);
+    (*motor_test_two).max_speed_loaded_meters_per_second = (2.34);
+    (*motor_test_two).min_duty_cycle_percentage = (540);
+    (*motor_test_two).max_duty_cycle_percentage = (2560);
+
+    cave_talk_Motor *motor_test_thr = new cave_talk_Motor();
+    (*motor_test_thr).pwm_carrier_freq_hz = (2500);
+    (*motor_test_thr).min_speed_loaded_meters_per_second = (0.3);
+    (*motor_test_thr).max_speed_loaded_meters_per_second = (2.34);
+    (*motor_test_thr).min_duty_cycle_percentage = (540);
+    (*motor_test_thr).max_duty_cycle_percentage = (2560);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, motor_test_zero, motor_test_one, motor_test_two, motor_test_thr));
+    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
+    // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }

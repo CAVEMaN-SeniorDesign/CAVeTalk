@@ -20,7 +20,7 @@ typedef struct
     void (*hear_mode)(const bool manual);
     void (*hear_config_servo_wheels)(cave_talk_Servo servo_wheel_0, cave_talk_Servo servo_wheel_1, cave_talk_Servo servo_wheel_2, cave_talk_Servo servo_wheel_3);
     void (*hear_config_servo_cams)(cave_talk_Servo servo_cam_pan, cave_talk_Servo servo_cam_tilt);
-    void (*hear_config_motor)(cave_talk_Motor motor_wheel_0, cave_talk_Motor motor_wheel_1, cave_talk_Motor motor_wheel_2, cave_talk_Motor motor_wheel_3);
+    void (*hear_config_motors)(cave_talk_Motor motor_wheel_0, cave_talk_Motor motor_wheel_1, cave_talk_Motor motor_wheel_2, cave_talk_Motor motor_wheel_3);
 
 } CaveTalk_ListenCallbacks_t;
 
@@ -40,7 +40,7 @@ static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_mode                = NULL,
     .hear_config_servo_wheels = NULL,
     .hear_config_servo_cams   = NULL,
-    .hear_config_motor        = NULL,
+    .hear_config_motors       = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -63,7 +63,7 @@ CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, con
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
 CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_wheel_0, const cave_talk_Servo* servo_wheel_1, const cave_talk_Servo* servo_wheel_2, const cave_talk_Servo* servo_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_cam_pan, const cave_talk_Servo* servo_cam_tilt);
-CaveTalk_Error_t CaveTalk_SpeakConfigMotor(const CaveTalk_Handle_t *const handle, const cave_talk_Servo* servo_wheel_0, const cave_talk_Servo* servo_wheel_1, const cave_talk_Servo* servo_wheel_2, const cave_talk_Servo* servo_wheel_3);
+CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor* motor_wheel_0, const cave_talk_Motor* motor_wheel_1, const cave_talk_Motor* motor_wheel_2, const cave_talk_Motor* motor_wheel_3);
 
 #ifdef __cplusplus
 }
