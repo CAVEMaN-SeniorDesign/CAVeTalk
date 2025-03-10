@@ -10,4 +10,9 @@ enum Id {
     ID_LIGHTS = 4;
     ID_MODE = 5;
     ID_ODOMETRY = 6;
+    ID_LOG = 7;
+    ID_CONFIG_SERVO_WHEELS = 8;
+    ID_CONFIG_SERVO_CAMS = 9;
+    ID_CONFIG_MOTOR = 10;
+    ID_CONFIG_ENCODER = 11;
 }
