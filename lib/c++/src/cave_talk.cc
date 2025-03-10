@@ -173,36 +173,20 @@ CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
 
     if (!odometry_message.ParseFromArray(buffer_.data(), length))
     {
-      return CAVE_TALK_ERROR_PARSE;
+        return CAVE_TALK_ERROR_PARSE;
     }
-  
-  const CaveTalk_MetersPerSecondSquared_t x_accel      = odometry_message.x_accel_meters_per_second_squared();
-    const CaveTalk_MetersPerSecondSquared_t y_accel      = odometry_message.y_accel_meters_per_second_squared();
-    const CaveTalk_MetersPerSecondSquared_t z_accel      = odometry_message.z_accel_meters_per_second_squared();
-    const CaveTalk_RadiansPerSecond_t       roll         = odometry_message.roll_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       pitch        = odometry_message.pitch_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       yaw          = odometry_message.yaw_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       wheel_0_rate = odometry_message.wheel_0_rate_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       wheel_1_rate = odometry_message.wheel_1_rate_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       wheel_2_rate = odometry_message.wheel_2_rate_radians_per_second();
-    const CaveTalk_RadiansPerSecond_t       wheel_3_rate = odometry_message.wheel_3_rate_radians_per_second();
 
-    listener_callbacks_->HearOdometry(
-        x_accel,
-        y_accel,
-        z_accel,
-        roll,
-        pitch,
-        yaw,
-        wheel_0_rate,
-        wheel_1_rate,
-        wheel_2_rate,
-        wheel_3_rate
-        );
+    const Imu     IMU             = odometry_message.imu();
+    const Encoder encoder_wheel_0 = odometry_message.encoder_wheel_0();
+    const Encoder encoder_wheel_1 = odometry_message.encoder_wheel_1();
+    const Encoder encoder_wheel_2 = odometry_message.encoder_wheel_2();
+    const Encoder encoder_wheel_3 = odometry_message.encoder_wheel_3();
+
+    listener_callbacks_->HearOdometry(IMU, encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3);
 
     return CAVE_TALK_ERROR_NONE;
 }
-      
+
 
 CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) const
 {
@@ -325,36 +309,22 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 }
 
 
-CaveTalk_Error_t Talker::SpeakOdometry(   const CaveTalk_MetersPerSecondSquared_t x_accel,
-                                          const CaveTalk_MetersPerSecondSquared_t y_accel,
-                                          const CaveTalk_MetersPerSecondSquared_t z_accel,
-                                          const CaveTalk_RadiansPerSecond_t roll,
-                                          const CaveTalk_RadiansPerSecond_t pitch,
-                                          const CaveTalk_RadiansPerSecond_t yaw,
-                                          const CaveTalk_RadiansPerSecond_t wheel_0_rate,
-                                          const CaveTalk_RadiansPerSecond_t wheel_1_rate,
-                                          const CaveTalk_RadiansPerSecond_t wheel_2_rate,
-                                          const CaveTalk_RadiansPerSecond_t wheel_3_rate)
+CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)
 {
     Odometry odometry_message;
-    odometry_message.set_x_accel_meters_per_second_squared(x_accel);
-    odometry_message.set_y_accel_meters_per_second_squared(y_accel);
-    odometry_message.set_z_accel_meters_per_second_squared(z_accel);
-    odometry_message.set_roll_radians_per_second(roll);
-    odometry_message.set_pitch_radians_per_second(pitch);
-    odometry_message.set_yaw_radians_per_second(yaw);
-    odometry_message.set_wheel_0_rate_radians_per_second(wheel_0_rate);
-    odometry_message.set_wheel_1_rate_radians_per_second(wheel_1_rate);
-    odometry_message.set_wheel_2_rate_radians_per_second(wheel_2_rate);
-    odometry_message.set_wheel_3_rate_radians_per_second(wheel_3_rate);
+    odometry_message.mutable_imu()->CopyFrom(IMU);
+    odometry_message.mutable_encoder_wheel_0()->CopyFrom(encoder_wheel_0);
+    odometry_message.mutable_encoder_wheel_1()->CopyFrom(encoder_wheel_1);
+    odometry_message.mutable_encoder_wheel_2()->CopyFrom(encoder_wheel_2);
+    odometry_message.mutable_encoder_wheel_3()->CopyFrom(encoder_wheel_3);
 
     size_t length = odometry_message.ByteSizeLong();
     odometry_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_ODOMETRY), message_buffer_.data(), length);
 }
-  
-  
+
+
 CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)
 {
     ConfigServoWheels config_servo_wheels_message;

@@ -7,6 +7,7 @@
 #include "ooga_booga.pb.h"
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
+#include "odometry.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
@@ -26,7 +27,7 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
-        MOCK_METHOD(void, HearOdometry, ((const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_MetersPerSecondSquared_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t),(const CaveTalk_RadiansPerSecond_t)), (override));
+        MOCK_METHOD(void, HearOdometry, ((const cave_talk::Imu&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&)), (override));
         MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigMotor, ((const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&)), (override));
@@ -179,77 +180,37 @@ TEST(CaveTalkCppTests, SpeakListenMode){
 
 TEST(CaveTalkCppTests, SpeakListenOdometry)
 {
-    uint8_t data_receive[255U] = {0U};
-    CaveTalk_Id_t id = 0U;
-    CaveTalk_Length_t length = 0U;
-
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
     cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, Available, mock_listen_callbacks);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(0, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(0, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
+    cave_talk::Accelerometer accel;
+    accel.set_x_meters_per_second_squared(.0043);
+    accel.set_y_meters_per_second_squared(.142);
+    accel.set_z_meters_per_second_squared(5.2983);
+    
+    cave_talk::Gyroscope gyro;
+    gyro.set_pitch_radians_per_second(2.813);
+    gyro.set_roll_radians_per_second(7.31342453);
+    gyro.set_yaw_radians_per_second(9.34232352);
+
+    cave_talk::Imu IMU;
+    IMU.mutable_accel()->CopyFrom(accel);
+    IMU.mutable_gyro()->CopyFrom(gyro);
+
+
+    cave_talk::Encoder encoder_0;
+    encoder_0.set_rate_radians_per_second(3.141592652);
+    encoder_0.set_total_pulses(100000);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(IMU, encoder_0, encoder_0, encoder_0, encoder_0));
+    //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class IMU or Encoder
+    // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, 0, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, 0, -1, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, 0, -1, -100.25, 45, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, 0, -1, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, 0, -100.25, 45, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, 0, -100.25, 45, -.31, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, 0, 45, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, 0, 45, -.31, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 0, -.31, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 0, -.31, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, 0, -1, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, 0, -1, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, 0, .0000000007, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, 0, .0000000007, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, 0, 10000));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, 0, 10000)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 0));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearOdometry(20, -1.4, -1, -1, -100.25, 45, -.31, -1, .0000000007, 0)).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-  
 }
+
 
 
 TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
@@ -319,7 +280,7 @@ TEST(CaveTalkCppTests, SpeakListenConfigMotors)
     motor_test_zero.set_max_duty_cycle_percentage(2560);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigMotor(motor_test_zero, motor_test_zero, motor_test_zero, motor_test_zero));
-    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
+    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Motor
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 
