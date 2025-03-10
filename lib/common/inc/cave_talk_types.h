@@ -10,6 +10,7 @@ typedef uint8_t  CaveTalk_Id_t;
 typedef uint8_t  CaveTalk_Length_t;
 typedef uint32_t CaveTalk_Crc_t;
 typedef double   CaveTalk_MetersPerSecond_t;
+typedef double   CaveTalk_MetersPerSecondSquared_t;
 typedef double   CaveTalk_Radian_t;
 typedef double   CaveTalk_RadiansPerSecond_t;
 
