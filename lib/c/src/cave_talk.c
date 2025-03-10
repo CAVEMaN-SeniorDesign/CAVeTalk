@@ -5,6 +5,7 @@
 #include "camera_movement.pb.h"
 #include "ids.pb.h"
 #include "lights.pb.h"
+#include "log.pb.h"
 #include "mode.pb.h"
 #include "movement.pb.h"
 #include "ooga_booga.pb.h"
@@ -16,7 +17,6 @@
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 
-
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleCameraMovement(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
@@ -25,6 +25,8 @@ static CaveTalk_Error_t CaveTalk_HandleMode(const CaveTalk_Handle_t *const handl
 static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+
 
 CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
 {
@@ -73,10 +75,12 @@ CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
             case cave_talk_Id_ID_CONFIG_SERVO_CAMS:
                 error = CaveTalk_HandleConfigServoCams(handle, length);
                 break;
+            case cave_talk_Id_ID_LOG:
+                error = CaveTalk_HandleLog(handle);
+                break;
             case cave_talk_Id_ID_CONFIG_MOTOR:
                 error = CaveTalk_HandleConfigMotor(handle, length);
                 break;
-
             default:
                 error = CAVE_TALK_ERROR_ID;
                 break;
@@ -226,6 +230,7 @@ CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const
 
 
 CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3)
+
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -234,6 +239,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const 
     }
     else
     {
+
         pb_ostream_t                ostream                     = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
         cave_talk_ConfigServoWheels config_servo_wheels_message = cave_talk_ConfigServoWheels_init_zero;
 
@@ -375,7 +381,6 @@ CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handl
 
 
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
-
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
@@ -529,7 +534,6 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t
     }
 
     return error;
-
 }
 
 static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)

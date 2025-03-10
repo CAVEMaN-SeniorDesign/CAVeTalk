@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <functional>
+#include <string>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -26,6 +27,7 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
+        MOCK_METHOD(void, HearLog, (const CaveTalk_Message_t), (override));
         MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigMotor, ((const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&)), (override));
@@ -173,6 +175,7 @@ TEST(CaveTalkCppTests, SpeakListenMode){
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
     
 }
+
 
 TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
 {

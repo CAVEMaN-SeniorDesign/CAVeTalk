@@ -9,9 +9,9 @@
 #include "mode.pb.h"
 #include "movement.pb.h"
 #include "ooga_booga.pb.h"
+#include "log.pb.h"
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
-
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 
@@ -56,6 +56,9 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_MODE:
             error = HandleMode(length);
+            break;
+        case ID_LOG:
+            error = HandleLog(length);
             break;
         case ID_CONFIG_SERVO_WHEELS:
             error = HandleConfigServoWheels(length);
@@ -161,6 +164,7 @@ CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
 
     return CAVE_TALK_ERROR_NONE;
 }
+
 
 CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) const
 {
@@ -280,6 +284,18 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
+
+CaveTalk_Error_t Talker::SpeakLog(const CaveTalk_Message_t log_text)
+{
+    Log log_message;
+    log_message.set_log_string(log_text);
+
+    std::size_t length = log_message.ByteSizeLong();
+    log_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_LOG), message_buffer_.data(), length);
+}
+
 
 CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)
 {
