@@ -2,16 +2,32 @@ syntax = "proto3";
 
 package cave_talk;
 
+message Accelerometer {
+    double x_meters_per_second_squared = 1;
+    double y_meters_per_second_squared = 2;
+    double z_meters_per_second_squared = 3;
+}
+
+message Gyroscope {
+    double roll_radians_per_second = 1;
+    double pitch_radians_per_second = 2;
+    double yaw_radians_per_second = 3;
+}
+
+message Imu {
+    Accelerometer accel = 1;
+    Gyroscope gyro = 2;
+}
+
+message Encoder {
+    int64 total_pulses = 1;
+    double rate_radians_per_second = 2;
+}
+
 message Odometry {
-    double x_accel_meters_per_second_squared = 1;
-    double y_accel_meters_per_second_squared = 2;
-    double z_accel_meters_per_second_squared = 3;
-    double roll_radians_per_second = 4;
-    double pitch_radians_per_second = 5;
-    double yaw_radians_per_second = 6;
-    
-    double wheel_0_rate_radians_per_second = 7;
-    double wheel_1_rate_radians_per_second = 8;
-    double wheel_2_rate_radians_per_second = 9;
-    double wheel_3_rate_radians_per_second = 10;
+    Imu Imu = 1;
+    Encoder encoder_wheel_0 = 2;
+    Encoder encoder_wheel_1 = 3;
+    Encoder encoder_wheel_2 = 4;
+    Encoder encoder_wheel_3 = 5;
 }

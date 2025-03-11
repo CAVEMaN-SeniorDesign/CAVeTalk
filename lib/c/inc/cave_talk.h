@@ -7,6 +7,7 @@
 #include "ooga_booga.pb.h"
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
+#include "odometry.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -19,6 +20,7 @@ typedef struct
     void (*hear_lights)(const bool headlights);
     void (*hear_mode)(const bool manual);
     void (*hear_log)(const CaveTalk_Message_t log_text);
+    void (*hear_odometry)(const cave_talk_Imu *const IMU, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3);
     void (*hear_config_servo_wheels)(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3);
     void (*hear_config_servo_cams)(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt);
     void (*hear_config_motors)(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
@@ -33,12 +35,14 @@ typedef struct
     CaveTalk_ListenCallbacks_t listen_callbacks;
 } CaveTalk_Handle_t;
 
+
 static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_ooga_booga          = NULL,
     .hear_movement            = NULL,
     .hear_camera_movement     = NULL,
     .hear_lights              = NULL,
     .hear_mode                = NULL,
+    .hear_odometry            = NULL,
     .hear_config_servo_wheels = NULL,
     .hear_config_servo_cams   = NULL,
     .hear_config_motors       = NULL,
@@ -63,6 +67,7 @@ CaveTalk_Error_t CaveTalk_SpeakCameraMovement(const CaveTalk_Handle_t *const han
 CaveTalk_Error_t CaveTalk_SpeakLights(const CaveTalk_Handle_t *const handle, const bool headlights);
 CaveTalk_Error_t CaveTalk_SpeakMode(const CaveTalk_Handle_t *const handle, const bool manual);
 CaveTalk_Error_t CaveTalk_SpeakLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Message_t log_text);
+CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, const cave_talk_Imu *const IMU, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const handle, const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt);
 CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
