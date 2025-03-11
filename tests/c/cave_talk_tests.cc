@@ -116,12 +116,19 @@ void HearConfigServoMotors(const cave_talk_Motor *const motor_wheel_0, const cav
     return;
 }
 
+void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
+{
+    std::cout << "Just do a breakpoint here" << std::endl;
+    return;
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga      = HearOogaBooga,
     .hear_movement        = HearMovement,
     .hear_camera_movement = HearCameraMovement,
     .hear_lights          = HearLights,
     .hear_mode            = HearMode,
+    .hear_odometry = HearOdometry,
     .hear_config_servo_wheels = HearConfigServoWheels,
     .hear_config_servo_cams = HearConfigServoCams,
     .hear_config_motors = HearConfigServoMotors,
@@ -227,6 +234,34 @@ TEST(CaveTalkCTests, SpeakListenMode)
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenOdometry)
+{
+
+    ring_buffer.Clear();
+
+    cave_talk_Imu imu = cave_talk_Imu();
+    imu.has_accel = true;
+    imu.accel.x_meters_per_second_squared = .00004;
+    imu.accel.y_meters_per_second_squared = .03004;
+    imu.accel.z_meters_per_second_squared = 152352.2038492;
+    
+    imu.has_gyro = true;
+    imu.gyro.pitch_radians_per_second = 17029348.57032894;
+    imu.gyro.roll_radians_per_second = 123.00000000000001;
+    imu.gyro.yaw_radians_per_second = 82482.1111111111111;
+
+    cave_talk_Encoder encoder_test = cave_talk_Encoder();
+    encoder_test.rate_radians_per_second = 6.1412341231;
+    encoder_test.total_pulses = 999921;
+
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
+    //You would have an EXPECT_CALL here for HearOdometry but there is no operator== for Imu & Encoder
+    // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
 }

@@ -9,6 +9,7 @@
 #include "mode.pb.h"
 #include "movement.pb.h"
 #include "ooga_booga.pb.h"
+#include "odometry.pb.h"
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
 
@@ -56,6 +57,9 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_MODE:
             error = HandleMode(length);
+            break;
+        case ID_ODOMETRY:
+            error = HandleOdometry(length);
             break;
         case ID_CONFIG_SERVO_WHEELS:
             error = HandleConfigServoWheels(length);
@@ -162,6 +166,28 @@ CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
+{
+
+    Odometry odometry_message;
+
+    if (!odometry_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const Imu     IMU             = odometry_message.imu();
+    const Encoder encoder_wheel_0 = odometry_message.encoder_wheel_0();
+    const Encoder encoder_wheel_1 = odometry_message.encoder_wheel_1();
+    const Encoder encoder_wheel_2 = odometry_message.encoder_wheel_2();
+    const Encoder encoder_wheel_3 = odometry_message.encoder_wheel_3();
+
+    listener_callbacks_->HearOdometry(IMU, encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
+
 CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) const
 {
     ConfigServoWheels config_servo_wheels_message;
@@ -189,6 +215,7 @@ CaveTalk_Error_t Listener::HandleConfigServoCams(CaveTalk_Length_t length) const
     {
         return CAVE_TALK_ERROR_PARSE;
     }
+
 
     const Servo servo_cam_pan  = config_servo_cams_message.servo_cam_pan();
     const Servo servo_cam_tilt = config_servo_cams_message.servo_cam_tilt();
@@ -280,6 +307,23 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
+
+
+CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)
+{
+    Odometry odometry_message;
+    odometry_message.mutable_imu()->CopyFrom(IMU);
+    odometry_message.mutable_encoder_wheel_0()->CopyFrom(encoder_wheel_0);
+    odometry_message.mutable_encoder_wheel_1()->CopyFrom(encoder_wheel_1);
+    odometry_message.mutable_encoder_wheel_2()->CopyFrom(encoder_wheel_2);
+    odometry_message.mutable_encoder_wheel_3()->CopyFrom(encoder_wheel_3);
+
+    size_t length = odometry_message.ByteSizeLong();
+    odometry_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_ODOMETRY), message_buffer_.data(), length);
+}
+
 
 CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)
 {
