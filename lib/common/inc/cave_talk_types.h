@@ -13,12 +13,8 @@ typedef double   CaveTalk_MetersPerSecond_t;
 typedef double   CaveTalk_MetersPerSecondSquared_t;
 typedef double   CaveTalk_Radian_t;
 typedef double   CaveTalk_RadiansPerSecond_t;
-<<<<<<< HEAD
 typedef char*    CaveTalk_Message_t;
-=======
-typedef char*    CaveTalk_Log_t;
-typedef char*    CaveTalk_Config_t;
->>>>>>> d31f0bd (SD-217 this will not build yet)
+
 
 typedef enum
 {

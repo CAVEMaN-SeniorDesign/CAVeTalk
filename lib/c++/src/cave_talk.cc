@@ -58,10 +58,11 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_MODE:
             error = HandleMode(length);
             break;
-        case ID_LOG:
-            error = HandleLog(length);
         case ID_ODOMETRY:
             error = HandleOdometry(length);
+            break;
+        case ID_LOG:
+            error = HandleLog(length);
             break;
         case ID_CONFIG_SERVO_WHEELS:
             error = HandleConfigServoWheels(length);
@@ -166,6 +167,23 @@ CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
     listener_callbacks_->HearMode(manual);
 
     return CAVE_TALK_ERROR_NONE;
+}
+
+CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
+{
+    Log log_message;
+
+    if (!log_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const CaveTalk_Message_t log = const_cast<CaveTalk_Message_t>((log_message.log_string()).c_str());
+
+    listener_callbacks_->HearLog(log);
+
+    return CAVE_TALK_ERROR_NONE;
+
 }
 
 
@@ -312,10 +330,10 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 }
 
 
-CaveTalk_Error_t Talker::SpeakLog(const CaveTalk_Message_t log_text)
+CaveTalk_Error_t Talker::SpeakLog(const CaveTalk_Message_t &log)
 {
     Log log_message;
-    log_message.set_log_string(log_text);
+    log_message.set_log_string(log);
 
     std::size_t length = log_message.ByteSizeLong();
     log_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
