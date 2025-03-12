@@ -18,8 +18,6 @@
 namespace cave_talk
 {
 
-const std::size_t kMaxPayloadSize = 255;
-
 class ListenerCallbacks
 {
     public:
@@ -61,7 +59,7 @@ class Listener
         CaveTalk_Error_t HandleConfigMotor(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
-        std::array<uint8_t, kMaxPayloadSize> buffer_;
+        std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
 };
 
 class Talker
@@ -85,7 +83,7 @@ class Talker
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
-        std::array<uint8_t, kMaxPayloadSize> message_buffer_;
+        std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> message_buffer_;
 };
 
 } // namespace cave_talk

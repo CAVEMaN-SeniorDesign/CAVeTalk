@@ -30,9 +30,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *
 static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
-
-// static bool pb_log_encode_string(pb_ostream_t *stream, const pb_field_t *field, void * const *arg);
-// static bool pb_log_decode_string(pb_istream_t *stream, const pb_field_t *field, void **arg);
+static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg);
 
 CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
 {
@@ -616,7 +614,6 @@ static CaveTalk_Error_t CaveTalk_HandleOdometry(const CaveTalk_Handle_t *const h
 
 static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
-
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
     if ((NULL == handle) || (NULL == handle->buffer))
@@ -625,40 +622,18 @@ static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle
     }
     else
     {
+        pb_istream_t  istream     = pb_istream_from_buffer(handle->buffer, length);
+        cave_talk_Log log_message = cave_talk_Log_init_zero;
 
-        pb_istream_t istream = pb_istream_from_buffer(handle->buffer, length);
+        log_message.log_string.funcs.decode = CaveTalk_DecodeString;
 
-        // !pb_decode(&istream, cave_talk_Log_fields, &log_message);
-
-        // cave_talk_Log log_message;
-        // log_message.log_string.arg = "";
-        // log_message.log_string.funcs.decode = &pb_log_decode_string;
-
-        uint8_t log[255] = {
-            0U
-        };
-
-        // uint32_t size;
-        // size_t alloc_size;
-
-        // if (!pb_decode_varint32(&istream, &size))
-        //     return false;
-
-        // if (size == (uint32_t)-1)
-        //     return false;
-
-        // alloc_size = (size_t)(size + 1);
-
-        // if (alloc_size < size)
-        //     return false;
-
-        if (!pb_read(&istream, log, istream.bytes_left))
+        if ((!pb_decode(&istream, cave_talk_Log_fields, &log_message)) || (NULL == log_message.log_string.arg))
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
         else if (NULL != handle->listen_callbacks.hear_log)
         {
-            handle->listen_callbacks.hear_log((char *)log);
+            handle->listen_callbacks.hear_log((const char *const)log_message.log_string.arg);
         }
     }
 
@@ -745,37 +720,6 @@ static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *cons
     return error;
 }
 
-// static bool pb_log_encode_string(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
-// {
-//     if(field->data_size <= 0)
-//         return false;
-
-//     return pb_encode_string(stream, (uint8_t*)(((cave_talk_Log*)arg)->log_string.arg), strlen(((cave_talk_Log*)arg)->log_string.arg)+1);
-// }
-
-// static bool pb_log_decode_string(pb_istream_t *stream, const pb_field_t *field, void **arg)
-// {
-//     uint32_t size;
-//     size_t alloc_size;
-
-//     if (!pb_decode_varint32(stream, &size))
-//         return false;
-
-//     if (size == (uint32_t)-1)
-//         return false;
-
-//     alloc_size = (size_t)(size + 1);
-
-//     if (alloc_size < size)
-//         return false;
-
-//     if (alloc_size > field->data_size)
-//         PB_RETURN_ERROR(stream, "string overflow");
-
-//     return pb_read(stream, ((cave_talk_Log*)arg)->log_string.arg, alloc_size);
-
-// }
-
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg)
 {
     bool        encoded = false;
@@ -787,4 +731,31 @@ static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field,
     }
 
     return encoded;
+}
+
+static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg)
+{
+    CAVE_TALK_UNUSED(field);
+
+    bool decoded = false;
+
+    if (NULL == arg)
+    {
+    }
+    else
+    {
+        static char log_buffer[CAVE_TALK_MAX_PAYLOAD_SIZE] = {
+            0U
+        };
+
+        *arg = NULL;
+
+        if ((stream->bytes_left <= (sizeof(log_buffer) - 1)) && (pb_read(stream, (unsigned char *)log_buffer, stream->bytes_left)))
+        {
+            *arg    = (void *)log_buffer;
+            decoded = true;
+        }
+    }
+
+    return decoded;
 }
