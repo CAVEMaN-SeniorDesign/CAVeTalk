@@ -28,7 +28,7 @@ class ListenerCallbacks
         virtual void HearLights(const bool headlights)                                                                                                                            = 0;
         virtual void HearMode(const bool manual)                                                                                                                                  = 0;
         virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3) = 0;
-        virtual void HearLog(const char *const &log)                                                                                                                              = 0;
+        virtual void HearLog(const char *const log)                                                                                                                              = 0;
         virtual void HearConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)                        = 0;
         virtual void HearConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)                                                                                 = 0;
         virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                              = 0;

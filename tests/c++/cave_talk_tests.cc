@@ -28,7 +28,7 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
-        MOCK_METHOD(void, HearLog, (const char *const &), (override));
+        MOCK_METHOD(void, HearLog, (const char *const), (override));
         MOCK_METHOD(void, HearOdometry, ((const cave_talk::Imu&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&)), (override));
         MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
