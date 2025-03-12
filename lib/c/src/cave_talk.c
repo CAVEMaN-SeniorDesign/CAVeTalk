@@ -13,7 +13,6 @@
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
 #include "pb_decode.h"
-#include "pb_decode.c"
 #include "pb_encode.h"
 
 #include "cave_talk_link.h"
