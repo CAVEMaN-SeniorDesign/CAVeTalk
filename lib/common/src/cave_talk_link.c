@@ -38,7 +38,6 @@ static inline uint8_t CaveTalk_GetLowerByte(const uint16_t value);
 static inline uint16_t CaveTalk_GetUpperUint16(const uint32_t value);
 static inline uint16_t CaveTalk_GetLowerUint16(const uint32_t value);
 
-static inline void CaveTalk_FlushBuffer(size_t remainingBytes, const CaveTalk_LinkHandle_t *const handle);
 
 CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
                                 const CaveTalk_Id_t id,
@@ -189,11 +188,19 @@ static CaveTalk_Error_t CaveTalk_ReceiveHeader(CaveTalk_LinkHandle_t *const hand
 
             if (CAVE_TALK_HEADER_SIZE == handle->bytes_received)
             {
-                /* TODO SD-184 check version */
-                handle->receive_state  = CAVE_TALK_LINK_STATE_PAYLOAD;
-                handle->receive_id     = *(uint8_t *)((uint8_t *)data + CAVE_TALK_ID_INDEX);
-                handle->receive_length = *(uint8_t *)((uint8_t *)data + CAVE_TALK_LENGTH_INDEX);
-                handle->bytes_received = 0U;
+
+                if (CAVE_TALK_VERSION != *(uint8_t *)((uint8_t *)data + CAVE_TALK_VERSION_INDEX))
+                {
+                    error = CAVE_TALK_ERROR_VERSION;
+                }
+                else
+                {
+                    handle->receive_state  = CAVE_TALK_LINK_STATE_PAYLOAD;
+                    handle->receive_id     = *(uint8_t *)((uint8_t *)data + CAVE_TALK_ID_INDEX);
+                    handle->receive_length = *(uint8_t *)((uint8_t *)data + CAVE_TALK_LENGTH_INDEX);
+                    handle->bytes_received = 0U;
+                }
+
             }
         }
     }
@@ -278,30 +285,4 @@ static inline uint16_t CaveTalk_GetUpperUint16(const uint32_t value)
 static inline uint16_t CaveTalk_GetLowerUint16(const uint32_t value)
 {
     return (uint16_t)(value & CAVE_TALK_UINT16_MASK);
-}
-
-static inline void CaveTalk_FlushBuffer(size_t leftoverBytes, const CaveTalk_LinkHandle_t *const handle)
-{
-    size_t           remainingBytes  = 0;
-    size_t           byte_thrown     = 0U;
-    uint8_t          throwout_buffer = 0U;
-    CaveTalk_Error_t throwout_error  = handle->available(&remainingBytes);
-
-    if (remainingBytes > leftoverBytes)
-    {
-        remainingBytes = leftoverBytes;
-    }
-
-    while ((remainingBytes > 0) && (CAVE_TALK_ERROR_NONE == throwout_error))
-    {
-        throwout_error  = handle->receive(&throwout_buffer, sizeof(throwout_buffer), &byte_thrown);
-        remainingBytes -= byte_thrown;
-
-        if (byte_thrown == 0)
-        {
-            break;
-        }
-    }
-
-    return;
 }
