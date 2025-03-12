@@ -38,7 +38,6 @@ static inline uint8_t CaveTalk_GetLowerByte(const uint16_t value);
 static inline uint16_t CaveTalk_GetUpperUint16(const uint32_t value);
 static inline uint16_t CaveTalk_GetLowerUint16(const uint32_t value);
 
-
 CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
                                 const CaveTalk_Id_t id,
                                 const void *const data,
@@ -84,9 +83,7 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
                                  const size_t size,
                                  CaveTalk_Length_t *const length)
 {
-
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
-
 
     if ((NULL == handle) ||
         (NULL == id) ||
@@ -183,24 +180,21 @@ static CaveTalk_Error_t CaveTalk_ReceiveHeader(CaveTalk_LinkHandle_t *const hand
 
         if (CAVE_TALK_ERROR_NONE == error)
         {
-
             handle->bytes_received += bytes_received;
 
-            if (CAVE_TALK_HEADER_SIZE == handle->bytes_received)
+            if (CAVE_TALK_HEADER_SIZE != handle->bytes_received)
             {
-
-                if (CAVE_TALK_VERSION != *(uint8_t *)((uint8_t *)data + CAVE_TALK_VERSION_INDEX))
-                {
-                    error = CAVE_TALK_ERROR_VERSION;
-                }
-                else
-                {
-                    handle->receive_state  = CAVE_TALK_LINK_STATE_PAYLOAD;
-                    handle->receive_id     = *(uint8_t *)((uint8_t *)data + CAVE_TALK_ID_INDEX);
-                    handle->receive_length = *(uint8_t *)((uint8_t *)data + CAVE_TALK_LENGTH_INDEX);
-                    handle->bytes_received = 0U;
-                }
-
+            }
+            else if (CAVE_TALK_VERSION != *(uint8_t *)((uint8_t *)data + CAVE_TALK_VERSION_INDEX))
+            {
+                error = CAVE_TALK_ERROR_VERSION;
+            }
+            else
+            {
+                handle->receive_state  = CAVE_TALK_LINK_STATE_PAYLOAD;
+                handle->receive_id     = *(uint8_t *)((uint8_t *)data + CAVE_TALK_ID_INDEX);
+                handle->receive_length = *(uint8_t *)((uint8_t *)data + CAVE_TALK_LENGTH_INDEX);
+                handle->bytes_received = 0U;
             }
         }
     }
