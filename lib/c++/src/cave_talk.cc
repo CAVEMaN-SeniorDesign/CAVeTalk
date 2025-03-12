@@ -183,9 +183,7 @@ CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
     listener_callbacks_->HearLog(log);
 
     return CAVE_TALK_ERROR_NONE;
-
 }
-
 
 CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
 {
@@ -207,7 +205,6 @@ CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
 
     return CAVE_TALK_ERROR_NONE;
 }
-
 
 CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) const
 {
@@ -236,7 +233,6 @@ CaveTalk_Error_t Listener::HandleConfigServoCams(CaveTalk_Length_t length) const
     {
         return CAVE_TALK_ERROR_PARSE;
     }
-
 
     const Servo servo_cam_pan  = config_servo_cams_message.servo_cam_pan();
     const Servo servo_cam_tilt = config_servo_cams_message.servo_cam_tilt();
@@ -329,7 +325,6 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
 }
 
-
 CaveTalk_Error_t Talker::SpeakLog(const char *const log)
 {
     Log log_message;
@@ -340,7 +335,6 @@ CaveTalk_Error_t Talker::SpeakLog(const char *const log)
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_LOG), message_buffer_.data(), length);
 }
-
 
 CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)
 {
@@ -355,9 +349,7 @@ CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wh
     odometry_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_ODOMETRY), message_buffer_.data(), length);
-
 }
-
 
 CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)
 {
@@ -367,7 +359,6 @@ CaveTalk_Error_t Talker::SpeakConfigServoWheels(const Servo &servo_wheel_0, cons
     config_servo_wheels_message.mutable_servo_wheel_1()->CopyFrom(servo_wheel_1);
     config_servo_wheels_message.mutable_servo_wheel_2()->CopyFrom(servo_wheel_2);
     config_servo_wheels_message.mutable_servo_wheel_3()->CopyFrom(servo_wheel_3);
-
 
     std::size_t length = config_servo_wheels_message.ByteSizeLong();
     config_servo_wheels_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
@@ -383,12 +374,10 @@ CaveTalk_Error_t Talker::SpeakConfigServoCams(const Servo &servo_cam_pan, const 
     config_servo_cams_message.mutable_servo_cam_pan()->CopyFrom(servo_cam_pan);
     config_servo_cams_message.mutable_servo_cam_tilt()->CopyFrom(servo_cam_tilt);
 
-
     std::size_t length = config_servo_cams_message.ByteSizeLong();
     config_servo_cams_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_SERVO_CAMS), message_buffer_.data(), length);
-
 }
 
 CaveTalk_Error_t Talker::SpeakConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)
