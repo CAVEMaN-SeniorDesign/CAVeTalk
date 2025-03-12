@@ -30,6 +30,9 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *
 static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 
+// static bool pb_log_encode_string(pb_ostream_t *stream, const pb_field_t *field, void * const *arg);
+// static bool pb_log_decode_string(pb_istream_t *stream, const pb_field_t *field, void **arg);
+
 
 CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
 {
@@ -292,7 +295,7 @@ CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, c
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Message_t log)
+CaveTalk_Error_t CaveTalk_SpeakLog(const CaveTalk_Handle_t *const handle, char * log)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -302,9 +305,11 @@ CaveTalk_Error_t CaveTalk_SpeakLog(const CaveTalk_Handle_t *const handle, const 
     else
     {
         pb_ostream_t ostream = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
-        // cave_talk_Log log_message = cave_talk_Log_init_zero;
 
+        // cave_talk_Log log_message = cave_talk_Log_init_zero;
         // log_message.log_string.arg = log;
+        // log_message.log_string.funcs.encode = &pb_log_encode_string;
+        // !pb_encode(&ostream, cave_talk_Log_fields, &log_message);
 
         if (!pb_encode_string(&ostream, (uint8_t *)log, strlen(log) + 1))
         {
@@ -636,20 +641,40 @@ static CaveTalk_Error_t CaveTalk_HandleLog(const CaveTalk_Handle_t *const handle
     else
     {
 
-        pb_istream_t  istream = pb_istream_from_buffer(handle->buffer, length);
-        cave_talk_Log log_message;
-        // CaveTalk_Message_t log = "";
-        pb_field_iter_t field = {
-            cave_talk_Log_fields, (void *)&log_message, 0, 0, 0, 0, 0, 255, length + 1, 0, NULL, handle->buffer, NULL, NULL
+        pb_istream_t istream = pb_istream_from_buffer(handle->buffer, length);
+
+        // !pb_decode(&istream, cave_talk_Log_fields, &log_message);
+
+        // cave_talk_Log log_message;
+        // log_message.log_string.arg = "";
+        // log_message.log_string.funcs.decode = &pb_log_decode_string;
+
+        uint8_t log[255] = {
+            0U
         };
 
-        if (!pb_dec_string(&istream, &field))
+        // uint32_t size;
+        // size_t alloc_size;
+
+        // if (!pb_decode_varint32(&istream, &size))
+        //     return false;
+
+        // if (size == (uint32_t)-1)
+        //     return false;
+
+        // alloc_size = (size_t)(size + 1);
+
+        // if (alloc_size < size)
+        //     return false;
+
+
+        if (!pb_read(&istream, log, istream.bytes_left))
         {
             error = CAVE_TALK_ERROR_PARSE;
         }
         else if (NULL != handle->listen_callbacks.hear_log)
         {
-            handle->listen_callbacks.hear_log(field.pData);
+            handle->listen_callbacks.hear_log((char*)log);
 
         }
     }
@@ -739,3 +764,35 @@ static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *cons
 
     return error;
 }
+
+
+// static bool pb_log_encode_string(pb_ostream_t *stream, const pb_field_t *field, void * const *arg)
+// {
+//     if(field->data_size <= 0)
+//         return false;
+
+//     return pb_encode_string(stream, (uint8_t*)(((cave_talk_Log*)arg)->log_string.arg), strlen(((cave_talk_Log*)arg)->log_string.arg)+1);
+// }
+
+// static bool pb_log_decode_string(pb_istream_t *stream, const pb_field_t *field, void **arg)
+// {
+//     uint32_t size;
+//     size_t alloc_size;
+
+//     if (!pb_decode_varint32(stream, &size))
+//         return false;
+
+//     if (size == (uint32_t)-1)
+//         return false;
+
+//     alloc_size = (size_t)(size + 1);
+
+//     if (alloc_size < size)
+//         return false;
+
+//     if (alloc_size > field->data_size)
+//         PB_RETURN_ERROR(stream, "string overflow");
+
+//     return pb_read(stream, ((cave_talk_Log*)arg)->log_string.arg, alloc_size);
+
+// }

@@ -122,7 +122,7 @@ void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const
     return;
 }
 
-void HearLog(const CaveTalk_Message_t log)
+void HearLog(const char *const log)
 {
     std::cout << std::string(log) << std::endl;
     return;
@@ -277,7 +277,7 @@ TEST(CaveTalkCTests, SpeakListenLog)
 {
     ring_buffer.Clear();
 
-    const CaveTalk_Message_t hw = "Hello World! 12401928347";
+    char *const hw = "Hello World! 12401928347";
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
     //Expect Call

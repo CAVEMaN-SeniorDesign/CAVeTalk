@@ -13,8 +13,6 @@ typedef double   CaveTalk_MetersPerSecond_t;
 typedef double   CaveTalk_MetersPerSecondSquared_t;
 typedef double   CaveTalk_Radian_t;
 typedef double   CaveTalk_RadiansPerSecond_t;
-typedef char*    CaveTalk_Message_t;
-
 
 typedef enum
 {

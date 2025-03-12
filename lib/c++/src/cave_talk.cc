@@ -178,7 +178,7 @@ CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
         return CAVE_TALK_ERROR_PARSE;
     }
 
-    const CaveTalk_Message_t log = const_cast<CaveTalk_Message_t>((log_message.log_string()).c_str());
+    const char *const log = (log_message.log_string()).c_str();
 
     listener_callbacks_->HearLog(log);
 
@@ -330,7 +330,7 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 }
 
 
-CaveTalk_Error_t Talker::SpeakLog(const CaveTalk_Message_t &log)
+CaveTalk_Error_t Talker::SpeakLog(const char *const &log)
 {
     Log log_message;
     log_message.set_log_string(log);
