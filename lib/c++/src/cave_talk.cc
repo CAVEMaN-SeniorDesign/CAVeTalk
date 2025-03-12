@@ -330,7 +330,7 @@ CaveTalk_Error_t Talker::SpeakMode(const bool manual)
 }
 
 
-CaveTalk_Error_t Talker::SpeakLog(const char *const &log)
+CaveTalk_Error_t Talker::SpeakLog(const char *const log)
 {
     Log log_message;
     log_message.set_log_string(log);
