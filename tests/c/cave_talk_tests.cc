@@ -142,15 +142,6 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
 };
 
 
-
-// const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksStructInterface = {
-//     .hear_ooga_booga = ListenCallbacksInterface::HearOogaBooga,
-//     .hear_movement = ListenCallbacksInterface::HearMovement,
-//     .hear_camera_movement = ListenCallbacksInterface::HearCameraMovement,
-//     .hear_lights = ListenCallbacksInterface::HearLights,
-//     .hear_mode = ListenCallbacksInterface::HearMode,
-// };
-
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
 
 class MockListenerCallbacks : public ListenCallbacksInterface
