@@ -10,14 +10,13 @@
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
 #include "odometry.pb.h"
+#include "log.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 
 namespace cave_talk
 {
-
-const std::size_t kMaxPayloadSize = 255;
 
 class ListenerCallbacks
 {
@@ -28,10 +27,11 @@ class ListenerCallbacks
         virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                                                = 0;
         virtual void HearLights(const bool headlights)                                                                                                                            = 0;
         virtual void HearMode(const bool manual)                                                                                                                                  = 0;
+        virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3) = 0;
+        virtual void HearLog(const char *const log)                                                                                                                               = 0;
         virtual void HearConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)                        = 0;
         virtual void HearConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)                                                                                 = 0;
         virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                              = 0;
-        virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3) = 0;
 };
 
 class Listener
@@ -51,13 +51,14 @@ class Listener
         CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleLog(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleOdometry(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigServoWheels(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigServoCams(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigMotor(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
-        std::array<uint8_t, kMaxPayloadSize> buffer_;
+        std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
 };
 
 class Talker
@@ -73,6 +74,7 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakMode(const bool manual);
+        CaveTalk_Error_t SpeakLog(const char *const log);
         CaveTalk_Error_t SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3);
         CaveTalk_Error_t SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3);
         CaveTalk_Error_t SpeakConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt);
@@ -80,7 +82,7 @@ class Talker
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
-        std::array<uint8_t, kMaxPayloadSize> message_buffer_;
+        std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> message_buffer_;
 };
 
 } // namespace cave_talk

@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define CAVE_TALK_UNUSED(arg) (void)(arg)
+#define CAVE_TALK_MAX_PAYLOAD_SIZE 255U
 
 typedef uint8_t  CaveTalk_Version_t;
 typedef uint8_t  CaveTalk_Id_t;

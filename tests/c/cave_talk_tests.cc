@@ -122,6 +122,12 @@ void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const
     return;
 }
 
+void HearLog(const char *const log)
+{
+    std::cout << std::string(log) << std::endl;
+    return;
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga      = HearOogaBooga,
     .hear_movement        = HearMovement,
@@ -129,20 +135,12 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_lights          = HearLights,
     .hear_mode            = HearMode,
     .hear_odometry = HearOdometry,
+    .hear_log = HearLog,
     .hear_config_servo_wheels = HearConfigServoWheels,
     .hear_config_servo_cams = HearConfigServoCams,
     .hear_config_motors = HearConfigServoMotors,
 };
 
-
-
-// const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksStructInterface = {
-//     .hear_ooga_booga = ListenCallbacksInterface::HearOogaBooga,
-//     .hear_movement = ListenCallbacksInterface::HearMovement,
-//     .hear_camera_movement = ListenCallbacksInterface::HearCameraMovement,
-//     .hear_lights = ListenCallbacksInterface::HearLights,
-//     .hear_mode = ListenCallbacksInterface::HearMode,
-// };
 
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
 
@@ -263,6 +261,20 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     //You would have an EXPECT_CALL here for HearOdometry but there is no operator== for Imu & Encoder
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenLog)
+{
+    ring_buffer.Clear();
+
+    char *const hw = "Hello World! 12401928347";
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
+    //Expect Call
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+
 
 }
 

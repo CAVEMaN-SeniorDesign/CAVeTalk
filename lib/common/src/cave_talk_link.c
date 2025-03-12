@@ -177,7 +177,7 @@ static CaveTalk_Error_t CaveTalk_ReceiveHeader(CaveTalk_LinkHandle_t *const hand
     else
     {
         size_t bytes_received = 0U;
-        error = handle->receive(((uint8_t*)data + handle->bytes_received), (CAVE_TALK_HEADER_SIZE - handle->bytes_received), &bytes_received);
+        error = handle->receive(((uint8_t *)data + handle->bytes_received), (CAVE_TALK_HEADER_SIZE - handle->bytes_received), &bytes_received);
 
         if (CAVE_TALK_ERROR_NONE == error)
         {
@@ -211,7 +211,7 @@ static CaveTalk_Error_t CaveTalk_ReceivePayload(CaveTalk_LinkHandle_t *const han
     else
     {
         size_t bytes_received = 0U;
-        error = handle->receive(((uint8_t*)data + handle->bytes_received), (handle->receive_length - handle->bytes_received), &bytes_received);
+        error = handle->receive(((uint8_t *)data + handle->bytes_received), (handle->receive_length - handle->bytes_received), &bytes_received);
 
         if (CAVE_TALK_ERROR_NONE == error)
         {
@@ -238,7 +238,7 @@ static CaveTalk_Error_t CaveTalk_ReceiveCrc(CaveTalk_LinkHandle_t *const handle)
     else
     {
         size_t bytes_received = 0U;
-        error = handle->receive(((uint8_t*)&handle->crc + handle->bytes_received), (sizeof(CaveTalk_Crc_t) - handle->bytes_received), &bytes_received);
+        error = handle->receive(((uint8_t *)&handle->crc + handle->bytes_received), (sizeof(CaveTalk_Crc_t) - handle->bytes_received), &bytes_received);
 
         if (CAVE_TALK_ERROR_NONE == error)
         {
