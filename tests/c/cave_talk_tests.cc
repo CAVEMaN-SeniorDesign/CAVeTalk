@@ -98,6 +98,18 @@ void HearMode(const bool manual)
     return;
 }
 
+void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
+{
+    std::cout << "Just do a breakpoint here" << std::endl;
+    return;
+}
+
+void HearLog(const char *const log)
+{
+    std::cout << std::string(log) << std::endl;
+    return;
+}
+
 void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3)
 {
     std::cout << "Just do a breakpoint here" << std::endl;
@@ -116,17 +128,13 @@ void HearConfigServoMotors(const cave_talk_Motor *const motor_wheel_0, const cav
     return;
 }
 
-void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
+void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3)
 {
     std::cout << "Just do a breakpoint here" << std::endl;
     return;
 }
 
-void HearLog(const char *const log)
-{
-    std::cout << std::string(log) << std::endl;
-    return;
-}
+
 
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga      = HearOogaBooga,
@@ -139,6 +147,7 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_servo_wheels = HearConfigServoWheels,
     .hear_config_servo_cams = HearConfigServoCams,
     .hear_config_motors = HearConfigServoMotors,
+    .hear_config_encoders = HearConfigEncoder,
 };
 
 
@@ -268,7 +277,7 @@ TEST(CaveTalkCTests, SpeakListenLog)
 {
     ring_buffer.Clear();
 
-    char *const hw = "Hello World! 12401928347";
+    char hw[] = "Hello World! 12401928347";
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
     //Expect Call
@@ -332,6 +341,24 @@ TEST(CaveTalkCTests, SpeakListenConfigMotors)
     (motor_test_zero).max_duty_cycle_percentage = (2560);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
+    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
+    // enter debug mode and you can see that it is called with the correct params
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigEncoder)
+{
+
+    ring_buffer.Clear();
+
+    cave_talk_ConfigEncoder config_encoder_test = cave_talk_ConfigEncoder();
+    config_encoder_test.smoothing_factor = (.005);
+    config_encoder_test.mode = (cave_talk_EncoderMode::cave_talk_EncoderMode_BSP_ENCODER_USER_MODE_PULSES_PER_ROTATON);
+    config_encoder_test.pulses_per_period = (6.2304);
+    config_encoder_test.radians_per_pulse = (3.000000001);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
     //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));

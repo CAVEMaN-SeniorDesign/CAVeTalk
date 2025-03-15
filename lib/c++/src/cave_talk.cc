@@ -4,17 +4,18 @@
 #include <functional>
 
 #include "camera_movement.pb.h"
-#include "ids.pb.h"
-#include "lights.pb.h"
-#include "mode.pb.h"
-#include "movement.pb.h"
-#include "ooga_booga.pb.h"
-#include "log.pb.h"
-#include "odometry.pb.h"
-#include "config_servo.pb.h"
-#include "config_motor.pb.h"
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
+#include "config_encoder.pb.h"
+#include "config_motor.pb.h"
+#include "config_servo.pb.h"
+#include "ids.pb.h"
+#include "lights.pb.h"
+#include "log.pb.h"
+#include "mode.pb.h"
+#include "movement.pb.h"
+#include "odometry.pb.h"
+#include "ooga_booga.pb.h"
 
 namespace cave_talk
 {
@@ -72,6 +73,9 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_CONFIG_MOTOR:
             error = HandleConfigMotor(length);
+            break;
+        case ID_CONFIG_ENCODER:
+            error = HandleConfigEncoder(length);
             break;
         default:
             error = CAVE_TALK_ERROR_ID;
@@ -261,6 +265,25 @@ CaveTalk_Error_t Listener::HandleConfigMotor(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleConfigEncoder(CaveTalk_Length_t length) const
+{
+    ConfigEncoders config_encoder_message;
+
+    if (!config_encoder_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const ConfigEncoder encoder_wheel_0 = config_encoder_message.encoder_wheel_0();
+    const ConfigEncoder encoder_wheel_1 = config_encoder_message.encoder_wheel_1();
+    const ConfigEncoder encoder_wheel_2 = config_encoder_message.encoder_wheel_2();
+    const ConfigEncoder encoder_wheel_3 = config_encoder_message.encoder_wheel_3();
+
+    listener_callbacks_->HearConfigEncoder(encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_         = kCaveTalk_LinkHandleNull;
@@ -393,6 +416,21 @@ CaveTalk_Error_t Talker::SpeakConfigMotor(const Motor &motor_wheel_0, const Moto
     config_motor_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_MOTOR), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3)
+{
+    ConfigEncoders config_encoder_message;
+
+    config_encoder_message.mutable_encoder_wheel_0()->CopyFrom(encoder_wheel_0);
+    config_encoder_message.mutable_encoder_wheel_1()->CopyFrom(encoder_wheel_1);
+    config_encoder_message.mutable_encoder_wheel_2()->CopyFrom(encoder_wheel_2);
+    config_encoder_message.mutable_encoder_wheel_3()->CopyFrom(encoder_wheel_3);
+
+    std::size_t length = config_encoder_message.ByteSizeLong();
+    config_encoder_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_ENCODER), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

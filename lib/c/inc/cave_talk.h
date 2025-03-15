@@ -5,9 +5,10 @@
 #include <stdint.h>
 
 #include "ooga_booga.pb.h"
+#include "odometry.pb.h"
 #include "config_servo.pb.h"
 #include "config_motor.pb.h"
-#include "odometry.pb.h"
+#include "config_encoder.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -24,6 +25,7 @@ typedef struct
     void (*hear_config_servo_wheels)(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3);
     void (*hear_config_servo_cams)(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt);
     void (*hear_config_motors)(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
+    void (*hear_config_encoders)(const cave_talk_ConfigEncoder *const encoder_wheel_0,  const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3);
 
 } CaveTalk_ListenCallbacks_t;
 
@@ -46,6 +48,7 @@ static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_config_servo_wheels = NULL,
     .hear_config_servo_cams   = NULL,
     .hear_config_motors       = NULL,
+    .hear_config_encoders     = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -71,6 +74,7 @@ CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, c
 CaveTalk_Error_t CaveTalk_SpeakConfigServoWheels(const CaveTalk_Handle_t *const handle, const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const handle, const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt);
 CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
+CaveTalk_Error_t CaveTalk_SpeakConfigEncoders(const CaveTalk_Handle_t *const handle, const cave_talk_ConfigEncoder *const encoder_wheel_0,  const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3);
 
 #ifdef __cplusplus
 }
