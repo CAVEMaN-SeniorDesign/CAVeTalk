@@ -189,7 +189,7 @@ TEST(CaveTalkCppTests, SpeakListenLog)
 
     ring_buffer.Clear();
 
-    const char *const hw = "Hello World!";
+    const char hw[] = "Hello World!";
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(hw));
     EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(std::string(hw)))).Times(1);

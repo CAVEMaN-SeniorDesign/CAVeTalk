@@ -58,7 +58,6 @@ CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
         /* TODO SD-164 calculate CRC */
         CaveTalk_Crc_t crc = 0U;
 
-        /* TODO SD-182 determine error behavior */
         /* Send header */
         error = handle->send(header, sizeof(header));
 
@@ -183,9 +182,15 @@ static CaveTalk_Error_t CaveTalk_ReceiveHeader(CaveTalk_LinkHandle_t *const hand
         {
             handle->bytes_received += bytes_received;
 
-            if (CAVE_TALK_HEADER_SIZE == handle->bytes_received)
+            if (CAVE_TALK_HEADER_SIZE != handle->bytes_received)
             {
-                /* TODO SD-184 check version */
+            }
+            else if (CAVE_TALK_VERSION != *(uint8_t *)((uint8_t *)data + CAVE_TALK_VERSION_INDEX))
+            {
+                error = CAVE_TALK_ERROR_VERSION;
+            }
+            else
+            {
                 handle->receive_state  = CAVE_TALK_LINK_STATE_PAYLOAD;
                 handle->receive_id     = *(uint8_t *)((uint8_t *)data + CAVE_TALK_ID_INDEX);
                 handle->receive_length = *(uint8_t *)((uint8_t *)data + CAVE_TALK_LENGTH_INDEX);
