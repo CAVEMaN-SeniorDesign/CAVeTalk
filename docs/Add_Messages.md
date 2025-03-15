@@ -65,9 +65,11 @@ It'd be best to initialize the new protobuf message using the build directions i
 #### `cave_talk.h`
 ---
 
-- Add a function pointer callback to `CaveTalk_ListenCallbacks_t`
+- If the function establishes a new typedef struct, include the message's `.pb.h` header file 
+- Add a function pointer callback to `CaveTalk_ListenCallbacks_t` struct
     - Output: `void`
     - Input: `output params`
+- Add callback field for `kCaveTalk_ListenCallbacksNull`
 - Add a `CaveTalk_Speak______` function
     - Output: `CaveTalk_Error_t`
     - Input: `"handle" ptr`, `output params`
@@ -93,6 +95,7 @@ It'd be best to initialize the new protobuf message using the build directions i
 #### `cave_talk.h`
 ---
 
+- If the message adds a new Class for a message field, add the message's `.pb.h` file
 - Add ListenerCallback virtual function for message
     - Output: `void`
     - Input: `output params`

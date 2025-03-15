@@ -33,6 +33,7 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigMotor, ((const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&)), (override));
+        MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk::ConfigEncoder&),(const cave_talk::ConfigEncoder&),(const cave_talk::ConfigEncoder&),(const cave_talk::ConfigEncoder&)), (override));
 
 };
 
@@ -308,6 +309,29 @@ TEST(CaveTalkCppTests, SpeakListenConfigMotors)
     motor_test_zero.set_max_duty_cycle_percentage(2560);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigMotor(motor_test_zero, motor_test_zero, motor_test_zero, motor_test_zero));
+    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Motor
+    // enter debug mode and you can see that it is called with the correct params
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+
+}
+
+TEST(CaveTalkCppTests, SpeakListenConfigEncoder)
+{
+
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    cave_talk::ConfigEncoder config_encoder_test;
+    config_encoder_test.set_smoothing_factor(.005);
+    config_encoder_test.set_mode(cave_talk::EncoderMode::BSP_ENCODER_USER_MODE_PULSES_PER_ROTATON);
+    config_encoder_test.set_pulses_per_period(6.2304);
+    config_encoder_test.set_radians_per_pulse(3.000000001);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigEncoder(config_encoder_test, config_encoder_test, config_encoder_test, config_encoder_test));
     //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Motor
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
