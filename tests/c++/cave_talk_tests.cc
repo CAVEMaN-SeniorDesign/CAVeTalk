@@ -28,8 +28,8 @@ class MockListenerCallbacks : public cave_talk::ListenerCallbacks
         MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
         MOCK_METHOD(void, HearLights, (const bool), (override));
         MOCK_METHOD(void, HearMode, (const bool), (override));
-        MOCK_METHOD(void, HearLog, (const char *const), (override));
         MOCK_METHOD(void, HearOdometry, ((const cave_talk::Imu&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&), (const cave_talk::Encoder&)), (override));
+        MOCK_METHOD(void, HearLog, (const char *const), (override));
         MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk::Servo&),(const cave_talk::Servo&)), (override));
         MOCK_METHOD(void, HearConfigMotor, ((const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&),(const cave_talk::Motor&)), (override));
@@ -180,33 +180,6 @@ TEST(CaveTalkCppTests, SpeakListenMode){
     
 }
 
-TEST(CaveTalkCppTests, SpeakListenLog)
-{
-
-    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
-    cave_talk::Talker roverMouth(Send);
-    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
-
-    ring_buffer.Clear();
-
-    const char hw[] = "Hello World!";
-
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(hw));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(std::string(hw)))).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-    ring_buffer.Clear();
-
-    const char *const ooga_booga_msg = "Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga!";
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(ooga_booga_msg));
-    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(std::string(ooga_booga_msg)))).Times(1);
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
-
-
-}
-
-
-
 TEST(CaveTalkCppTests, SpeakListenOdometry)
 {
     std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
@@ -240,7 +213,29 @@ TEST(CaveTalkCppTests, SpeakListenOdometry)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
 
+TEST(CaveTalkCppTests, SpeakListenLog)
+{
 
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    const char hw[] = "Hello World!";
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(hw));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(std::string(hw)))).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    const char ooga_booga_msg[] = "Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga!";
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakLog(ooga_booga_msg));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearLog(testing::Eq(std::string(ooga_booga_msg)))).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+    
+}
 
 TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
 {
