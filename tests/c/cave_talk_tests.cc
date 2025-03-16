@@ -170,9 +170,8 @@ static CaveTalk_Handle_t CaveTalk_Handle = {
     .listen_callbacks = kCaveTalk_ListenCallbacksInterface,
 };
 
-TEST(CaveTalkCTests, SpeakListenOogaBooga){
-
-
+TEST(CaveTalkCTests, SpeakListenOogaBooga)
+{
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
@@ -183,7 +182,23 @@ TEST(CaveTalkCTests, SpeakListenOogaBooga){
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_OOGA));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
 
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_OOGA));
+    CaveTalk_Handle.listen_callbacks.hear_ooga_booga = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOogaBooga(NULL, cave_talk_Say_SAY_BOOGA));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenMovement)
@@ -198,6 +213,24 @@ TEST(CaveTalkCTests, SpeakListenMovement)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 1.99923, .00784));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 1.99923, .00784));
+    CaveTalk_Handle.listen_callbacks.hear_movement = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMovement(&CaveTalk_Handle, 0, 0));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMovement(&CaveTalk_Handle, 0, 0));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMovement(NULL, 0, 0));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenCameraMovement)
@@ -213,6 +246,23 @@ TEST(CaveTalkCTests, SpeakListenCameraMovement)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 1.99923, .00784));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 1.99923, .00784));
+    CaveTalk_Handle.listen_callbacks.hear_camera_movement = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 0, 0));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 0, 0));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakCameraMovement(NULL, 0, 0));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenLights)
@@ -228,6 +278,23 @@ TEST(CaveTalkCTests, SpeakListenLights)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, false));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, true));
+    CaveTalk_Handle.listen_callbacks.hear_lights = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLights(&CaveTalk_Handle, true));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLights(&CaveTalk_Handle, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLights(NULL, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenMode)
@@ -243,6 +310,23 @@ TEST(CaveTalkCTests, SpeakListenMode)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
+    CaveTalk_Handle.listen_callbacks.hear_mode = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakMode(NULL, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenOdometry)
@@ -271,6 +355,23 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
+    CaveTalk_Handle.listen_callbacks.hear_odometry = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakOdometry(NULL, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenLog)
@@ -283,13 +384,27 @@ TEST(CaveTalkCTests, SpeakListenLog)
     //Expect Call
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
 
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
+    CaveTalk_Handle.listen_callbacks.hear_log = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakLog(NULL, hw));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Servo servo_test_zero = cave_talk_Servo();
@@ -300,17 +415,32 @@ TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
     (servo_test_zero).max_duty_cycle_microseconds = (2560);
     (servo_test_zero).center_duty_cycle_microseconds = (1576);
 
-
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
     //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
+    CaveTalk_Handle.listen_callbacks.hear_config_servo_wheels = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoWheels(NULL, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigServoCams)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Servo servo_test_zero = cave_talk_Servo();
@@ -326,6 +456,23 @@ TEST(CaveTalkCTests, SpeakListenConfigServoCams)
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
+    CaveTalk_Handle.listen_callbacks.hear_config_servo_cams = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigServoCams(NULL, &servo_test_zero, &servo_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigMotors)
@@ -341,10 +488,27 @@ TEST(CaveTalkCTests, SpeakListenConfigMotors)
     (motor_test_zero).max_duty_cycle_percentage = (2560);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
-    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
+    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Motor
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
+    CaveTalk_Handle.listen_callbacks.hear_config_motors = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigMotors(NULL, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+    ring_buffer.Clear();
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigEncoder)
@@ -359,8 +523,27 @@ TEST(CaveTalkCTests, SpeakListenConfigEncoder)
     config_encoder_test.radians_per_pulse = (3.000000001);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
-    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
+    //You would have an EXPECT_CALL here for HearConfigEncoder but there is no operator== for class Servo
     // enter debug mode and you can see that it is called with the correct params
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
+    CaveTalk_Handle.listen_callbacks.hear_config_encoders = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    CaveTalk_Handle.link_handle.send = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
+
+    CaveTalk_Handle.buffer = NULL;
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(&CaveTalk_Handle));
+
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_SpeakConfigEncoders(NULL, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Hear(NULL));
+
+
+    ring_buffer.Clear();
 }
