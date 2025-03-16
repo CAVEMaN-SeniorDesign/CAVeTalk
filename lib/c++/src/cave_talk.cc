@@ -69,7 +69,7 @@ CaveTalk_Error_t Listener::Listen(void)
             error = HandleConfigServoWheels(length);
             break;
         case ID_CONFIG_SERVO_CAMS:
-            error = HandleConfigServoWheels(length);
+            error = HandleConfigServoCams(length);
             break;
         case ID_CONFIG_MOTOR:
             error = HandleConfigMotor(length);
