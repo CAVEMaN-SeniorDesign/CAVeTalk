@@ -150,9 +150,6 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_encoders = HearConfigEncoder,
 };
 
-
-ListenCallbacksInterface::~ListenCallbacksInterface() = default;
-
 class MockListenerCallbacks : public ListenCallbacksInterface
 {
     public:
