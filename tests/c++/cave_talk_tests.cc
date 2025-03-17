@@ -18,8 +18,6 @@
 static const std::size_t kMaxMessageLength = 255U;
 static RingBuffer<uint8_t, kMaxMessageLength> ring_buffer;
 
-cave_talk::ListenerCallbacks::~ListenerCallbacks() = default;
-
 class MockListenerCallbacks : public cave_talk::ListenerCallbacks
 {
     public:
