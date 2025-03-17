@@ -20,6 +20,8 @@
 namespace cave_talk
 {
 
+ListenerCallbacks::~ListenerCallbacks() = default;
+
 Listener::Listener(CaveTalk_Error_t (*receive)(void *const data, const size_t size, size_t *const bytes_received),
                    std::shared_ptr<ListenerCallbacks> listener_callbacks) : listener_callbacks_(listener_callbacks)
 {
