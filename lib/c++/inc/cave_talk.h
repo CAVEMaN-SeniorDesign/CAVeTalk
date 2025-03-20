@@ -27,7 +27,7 @@ class ListenerCallbacks
         virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)                                                                         = 0;
         virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                                                             = 0;
         virtual void HearLights(const bool headlights)                                                                                                                                         = 0;
-        virtual void HearMode(const bool manual)                                                                                                                                               = 0;
+        virtual void HearArm(const bool arm)                                                                                                                                                   = 0;
         virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)              = 0;
         virtual void HearLog(const char *const log)                                                                                                                                            = 0;
         virtual void HearConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)                                     = 0;
@@ -52,7 +52,7 @@ class Listener
         CaveTalk_Error_t HandleMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleCameraMovement(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLights(const CaveTalk_Length_t length) const;
-        CaveTalk_Error_t HandleMode(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleArm(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleOdometry(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleLog(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigServoWheels(const CaveTalk_Length_t length) const;
@@ -76,7 +76,7 @@ class Talker
         CaveTalk_Error_t SpeakMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate);
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
-        CaveTalk_Error_t SpeakMode(const bool manual);
+        CaveTalk_Error_t SpeakArm(const bool arm);
         CaveTalk_Error_t SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3);
         CaveTalk_Error_t SpeakLog(const char *const log);
         CaveTalk_Error_t SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3);
