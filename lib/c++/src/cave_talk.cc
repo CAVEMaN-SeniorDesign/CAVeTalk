@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 
+#include "arm.pb.h"
 #include "camera_movement.pb.h"
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -12,7 +13,6 @@
 #include "ids.pb.h"
 #include "lights.pb.h"
 #include "log.pb.h"
-#include "mode.pb.h"
 #include "movement.pb.h"
 #include "odometry.pb.h"
 #include "ooga_booga.pb.h"
@@ -58,8 +58,8 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_LIGHTS:
             error = HandleLights(length);
             break;
-        case ID_MODE:
-            error = HandleMode(length);
+        case ID_ARM:
+            error = HandleArm(length);
             break;
         case ID_ODOMETRY:
             error = HandleOdometry(length);
@@ -158,19 +158,18 @@ CaveTalk_Error_t Listener::HandleLights(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleMode(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleArm(CaveTalk_Length_t length) const
 {
+    Arm arm_message;
 
-    Mode mode_message;
-
-    if (!mode_message.ParseFromArray(buffer_.data(), length))
+    if (!arm_message.ParseFromArray(buffer_.data(), length))
     {
         return CAVE_TALK_ERROR_PARSE;
     }
 
-    const bool manual = mode_message.manual();
+    const bool arm = arm_message.arm();
 
-    listener_callbacks_->HearMode(manual);
+    listener_callbacks_->HearArm(arm);
 
     return CAVE_TALK_ERROR_NONE;
 }
@@ -339,15 +338,15 @@ CaveTalk_Error_t Talker::SpeakLights(const bool headlights)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_LIGHTS), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakMode(const bool manual)
+CaveTalk_Error_t Talker::SpeakArm(const bool arm)
 {
-    Mode mode_message;
-    mode_message.set_manual(manual);
+    Arm arm_message;
+    arm_message.set_arm(arm);
 
-    std::size_t length = mode_message.ByteSizeLong();
-    mode_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+    std::size_t length = arm_message.ByteSizeLong();
+    arm_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
-    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_MODE), message_buffer_.data(), length);
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_ARM), message_buffer_.data(), length);
 }
 
 CaveTalk_Error_t Talker::SpeakLog(const char *const log)

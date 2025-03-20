@@ -12,12 +12,11 @@
 #include "cave_talk_types.h"
 #include "ring_buffer.h"
 
-
 static const std::size_t kMaxMessageLength = 255U;
 static RingBuffer<uint8_t, kMaxMessageLength> ring_buffer;
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
-{    
+{
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
     if (size > ring_buffer.Capacity() - ring_buffer.Size())
@@ -90,7 +89,6 @@ void TestServoObject(const cave_talk_Servo &a, const cave_talk_Servo &b)
     ASSERT_EQ(a.min_duty_cycle_microseconds, b.min_duty_cycle_microseconds);
     ASSERT_EQ(a.max_duty_cycle_microseconds, b.max_duty_cycle_microseconds);
     ASSERT_EQ(a.center_duty_cycle_microseconds, b.center_duty_cycle_microseconds);
-
 }
 
 void TestMotorObject(const cave_talk_Motor &a, const cave_talk_Motor &b)
@@ -105,45 +103,44 @@ void TestMotorObject(const cave_talk_Motor &a, const cave_talk_Motor &b)
 void TestConfigEncoderObject(const cave_talk_ConfigEncoder &a, const cave_talk_ConfigEncoder &b)
 {
     ASSERT_EQ(a.smoothing_factor, b.smoothing_factor);
-    ASSERT_EQ(a.radians_per_pulse, b. radians_per_pulse);
+    ASSERT_EQ(a.radians_per_pulse, b.radians_per_pulse);
     ASSERT_EQ(a.pulses_per_period, b.pulses_per_period);
     ASSERT_EQ(a.mode, b.mode);
 }
 
 class ListenCallbacksInterface
 {
-    public:
-        virtual ~ListenCallbacksInterface()                                                                                   = 0;
-        virtual void HearOogaBooga(const cave_talk_Say ooga_booga)                                                               = 0;
-        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate) = 0;
-        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                     = 0;
-        virtual void HearLights(const bool headlights)                                                                 = 0;
-        virtual void HearMode(const bool manual)  = 0;
-        virtual void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3) = 0;
-        virtual void HearLog(const char *const log) = 0;
-        virtual void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3) = 0;
-        virtual void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt) = 0;
-        virtual void HearConfigMotor(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3) = 0;
-        virtual void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3) = 0;
+public:
+    virtual ~ListenCallbacksInterface() = 0;
+    virtual void HearOogaBooga(const cave_talk_Say ooga_booga) = 0;
+    virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate) = 0;
+    virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt) = 0;
+    virtual void HearLights(const bool headlights) = 0;
+    virtual void HearArm(const bool arm) = 0;
+    virtual void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3) = 0;
+    virtual void HearLog(const char *const log) = 0;
+    virtual void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3) = 0;
+    virtual void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt) = 0;
+    virtual void HearConfigMotor(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3) = 0;
+    virtual void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3) = 0;
 };
 
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
 
 class MockListenCallbacks : public ListenCallbacksInterface
 {
-    public:
-        MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
-        MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
-        MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
-        MOCK_METHOD(void, HearLights, (const bool), (override));
-        MOCK_METHOD(void, HearMode, (const bool), (override));
-        MOCK_METHOD(void, HearOdometry, ((const cave_talk_Imu *const imu), (const cave_talk_Encoder *const encoder_wheel_0), (const cave_talk_Encoder *const encoder_wheel_1), (const cave_talk_Encoder *const encoder_wheel_2), (const cave_talk_Encoder *const encoder_wheel_3)), (override));
-        MOCK_METHOD(void, HearLog, (const char *const), (override));
-        MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk_Servo *const servo_wheel_0), (const cave_talk_Servo *const servo_wheel_1), (const cave_talk_Servo *const servo_wheel_2), (const cave_talk_Servo *const servo_wheel_3)), (override));
-        MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk_Servo *const servo_cam_pan), (const cave_talk_Servo *const servo_cam_tilt)), (override));
-        MOCK_METHOD(void, HearConfigMotor, ((const cave_talk_Motor *const motor_wheel_0), (const cave_talk_Motor *const motor_wheel_1), (const cave_talk_Motor *const motor_wheel_2), (const cave_talk_Motor *const motor_wheel_3)), (override));
-        MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk_ConfigEncoder *const encoder_wheel_0), (const cave_talk_ConfigEncoder *const encoder_wheel_1), (const cave_talk_ConfigEncoder *const encoder_wheel_2), (const cave_talk_ConfigEncoder *const encoder_wheel_3)), (override));
-
+public:
+    MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
+    MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
+    MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
+    MOCK_METHOD(void, HearLights, (const bool), (override));
+    MOCK_METHOD(void, HearArm, (const bool), (override));
+    MOCK_METHOD(void, HearOdometry, ((const cave_talk_Imu *const imu), (const cave_talk_Encoder *const encoder_wheel_0), (const cave_talk_Encoder *const encoder_wheel_1), (const cave_talk_Encoder *const encoder_wheel_2), (const cave_talk_Encoder *const encoder_wheel_3)), (override));
+    MOCK_METHOD(void, HearLog, (const char *const), (override));
+    MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk_Servo *const servo_wheel_0), (const cave_talk_Servo *const servo_wheel_1), (const cave_talk_Servo *const servo_wheel_2), (const cave_talk_Servo *const servo_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk_Servo *const servo_cam_pan), (const cave_talk_Servo *const servo_cam_tilt)), (override));
+    MOCK_METHOD(void, HearConfigMotor, ((const cave_talk_Motor *const motor_wheel_0), (const cave_talk_Motor *const motor_wheel_1), (const cave_talk_Motor *const motor_wheel_2), (const cave_talk_Motor *const motor_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk_ConfigEncoder *const encoder_wheel_0), (const cave_talk_ConfigEncoder *const encoder_wheel_1), (const cave_talk_ConfigEncoder *const encoder_wheel_2), (const cave_talk_ConfigEncoder *const encoder_wheel_3)), (override));
 };
 
 std::shared_ptr<MockListenCallbacks> mock_calls = std::make_shared<MockListenCallbacks>();
@@ -162,14 +159,14 @@ static void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radia
     return (mock_calls.get())->HearCameraMovement(pan, tilt);
 }
 
-static void HearLights(const bool headlights) 
+static void HearLights(const bool headlights)
 {
     return (mock_calls.get())->HearLights(headlights);
 }
 
-static void HearMode(const bool manual)
+static void HearArm(const bool arm)
 {
-    return (mock_calls.get())->HearMode(manual);
+    return (mock_calls.get())->HearArm(arm);
 }
 
 static void HearLog(const char *const log)
@@ -217,11 +214,11 @@ void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, con
 }
 
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
-    .hear_ooga_booga      = HearOogaBooga,
-    .hear_movement        = HearMovement,
+    .hear_ooga_booga = HearOogaBooga,
+    .hear_movement = HearMovement,
     .hear_camera_movement = HearCameraMovement,
-    .hear_lights          = HearLights,
-    .hear_mode            = HearMode,
+    .hear_lights = HearLights,
+    .hear_arm = HearArm,
     .hear_odometry = HearOdometry,
     .hear_log = HearLog,
     .hear_config_servo_wheels = HearConfigServoWheels,
@@ -232,12 +229,12 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
 
 class MockListenerCallbacks : public ListenCallbacksInterface
 {
-    public:
-        MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
-        MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
-        MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
-        MOCK_METHOD(void, HearLights, (const bool), (override));
-        MOCK_METHOD(void, HearMode, (const bool), (override));
+public:
+    MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
+    MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
+    MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
+    MOCK_METHOD(void, HearLights, (const bool), (override));
+    MOCK_METHOD(void, HearArm, (const bool), (override));
 };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
@@ -315,18 +312,18 @@ TEST(CaveTalkCTests, SpeakListenLights)
     mock_calls.reset();
 }
 
-TEST(CaveTalkCTests, SpeakListenMode)
+TEST(CaveTalkCTests, SpeakListenArm)
 {
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
-    EXPECT_CALL(*mock_calls.get(), HearMode(true)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakArm(&CaveTalk_Handle, true));
+    EXPECT_CALL(*mock_calls.get(), HearArm(true)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
-    EXPECT_CALL(*mock_calls.get(), HearMode(false)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakArm(&CaveTalk_Handle, false));
+    EXPECT_CALL(*mock_calls.get(), HearArm(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     mock_calls.reset();
@@ -341,7 +338,7 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     imu.accel.x_meters_per_second_squared = .00004;
     imu.accel.y_meters_per_second_squared = .03004;
     imu.accel.z_meters_per_second_squared = 152352.2038492;
-    
+
     imu.has_gyro = true;
     imu.gyro.pitch_radians_per_second = 17029348.57032894;
     imu.gyro.roll_radians_per_second = 123.00000000000001;
@@ -350,7 +347,6 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     cave_talk_Encoder encoder_test = cave_talk_Encoder();
     encoder_test.rate_radians_per_second = 6.1412341231;
     encoder_test.total_pulses = 999921;
-
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
     imu_odometry_saved = imu;
@@ -389,7 +385,6 @@ TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
     (servo_test_zero).min_duty_cycle_microseconds = (540);
     (servo_test_zero).max_duty_cycle_microseconds = (2560);
     (servo_test_zero).center_duty_cycle_microseconds = (1576);
-
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
     servo_configservowheels_saved_0 = servo_test_zero;

@@ -8,7 +8,7 @@ enum Id {
     ID_MOVEMENT = 2;
     ID_CAMERA_MOVEMENT = 3;
     ID_LIGHTS = 4;
-    ID_MODE = 5;
+    ID_ARM = 5;
     ID_ODOMETRY = 6;
     ID_LOG = 7;
     ID_CONFIG_SERVO_WHEELS = 8;
