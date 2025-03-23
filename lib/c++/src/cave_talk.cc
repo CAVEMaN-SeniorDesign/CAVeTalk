@@ -8,6 +8,7 @@
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 #include "config_encoder.pb.h"
+#include "config_log.pb.h"
 #include "config_motor.pb.h"
 #include "config_servo.pb.h"
 #include "ids.pb.h"
@@ -79,6 +80,9 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_CONFIG_ENCODER:
             error = HandleConfigEncoder(length);
             break;
+        case ID_CONFIG_LOG:
+            error = HandleConfigLog(length);
+            break;
         default:
             error = CAVE_TALK_ERROR_ID;
             break;
@@ -90,7 +94,6 @@ CaveTalk_Error_t Listener::Listen(void)
 
 CaveTalk_Error_t Listener::HandleOogaBooga(CaveTalk_Length_t length) const
 {
-
     OogaBooga ooga_booga_message;
 
     if (!ooga_booga_message.ParseFromArray(buffer_.data(), length))
@@ -107,7 +110,6 @@ CaveTalk_Error_t Listener::HandleOogaBooga(CaveTalk_Length_t length) const
 
 CaveTalk_Error_t Listener::HandleMovement(CaveTalk_Length_t length) const
 {
-
     Movement movement_message;
 
     if (!movement_message.ParseFromArray(buffer_.data(), length))
@@ -125,7 +127,6 @@ CaveTalk_Error_t Listener::HandleMovement(CaveTalk_Length_t length) const
 
 CaveTalk_Error_t Listener::HandleCameraMovement(CaveTalk_Length_t length) const
 {
-
     CameraMovement camera_movement_message;
 
     if (!camera_movement_message.ParseFromArray(buffer_.data(), length))
@@ -143,7 +144,6 @@ CaveTalk_Error_t Listener::HandleCameraMovement(CaveTalk_Length_t length) const
 
 CaveTalk_Error_t Listener::HandleLights(CaveTalk_Length_t length) const
 {
-
     Lights lights_message;
 
     if (!lights_message.ParseFromArray(buffer_.data(), length))
@@ -281,6 +281,22 @@ CaveTalk_Error_t Listener::HandleConfigEncoder(CaveTalk_Length_t length) const
     const ConfigEncoder encoder_wheel_3 = config_encoder_message.encoder_wheel_3();
 
     listener_callbacks_->HearConfigEncoder(encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
+CaveTalk_Error_t Listener::HandleConfigLog(CaveTalk_Length_t length) const
+{
+    ConfigLog config_log_message;
+
+    if (!config_log_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const LogLevel log_level = config_log_message.log_level();
+
+    listener_callbacks_->HearConfigLog(log_level);
 
     return CAVE_TALK_ERROR_NONE;
 }
@@ -432,6 +448,17 @@ CaveTalk_Error_t Talker::SpeakConfigEncoder(const ConfigEncoder &encoder_wheel_0
     config_encoder_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_ENCODER), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfigLog(const LogLevel log_level)
+{
+    ConfigLog config_log_message;
+    config_log_message.set_log_level(log_level);
+
+    std::size_t length = config_log_message.ByteSizeLong();
+    config_log_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_LOG), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

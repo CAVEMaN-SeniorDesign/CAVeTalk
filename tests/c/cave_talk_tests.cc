@@ -5,6 +5,7 @@
 
 #include "ooga_booga.pb.h"
 #include "config_servo.pb.h"
+#include "config_log.pb.h"
 #include "config_motor.pb.h"
 
 #include "cave_talk.h"
@@ -123,6 +124,7 @@ public:
     virtual void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt) = 0;
     virtual void HearConfigMotor(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3) = 0;
     virtual void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3) = 0;
+    virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
 };
 
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
@@ -141,6 +143,7 @@ public:
     MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk_Servo *const servo_cam_pan), (const cave_talk_Servo *const servo_cam_tilt)), (override));
     MOCK_METHOD(void, HearConfigMotor, ((const cave_talk_Motor *const motor_wheel_0), (const cave_talk_Motor *const motor_wheel_1), (const cave_talk_Motor *const motor_wheel_2), (const cave_talk_Motor *const motor_wheel_3)), (override));
     MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk_ConfigEncoder *const encoder_wheel_0), (const cave_talk_ConfigEncoder *const encoder_wheel_1), (const cave_talk_ConfigEncoder *const encoder_wheel_2), (const cave_talk_ConfigEncoder *const encoder_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
 };
 
 std::shared_ptr<MockListenCallbacks> mock_calls = std::make_shared<MockListenCallbacks>();
@@ -213,6 +216,11 @@ void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, con
     TestConfigEncoderObject(configencoder_configencoder_saved_3, *encoder_wheel_3);
 }
 
+static void HearConfigLog(const cave_talk_LogLevel log_level)
+{
+    return (mock_calls.get())->HearConfigLog(log_level);
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga = HearOogaBooga,
     .hear_movement = HearMovement,
@@ -225,17 +233,18 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_servo_cams = HearConfigServoCams,
     .hear_config_motors = HearConfigServoMotors,
     .hear_config_encoders = HearConfigEncoder,
+    .hear_config_log = HearConfigLog,
 };
 
-class MockListenerCallbacks : public ListenCallbacksInterface
-{
-public:
-    MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
-    MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
-    MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
-    MOCK_METHOD(void, HearLights, (const bool), (override));
-    MOCK_METHOD(void, HearArm, (const bool), (override));
-};
+// class MockListenerCallbacks : public ListenCallbacksInterface
+// {
+// public:
+//     MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
+//     MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
+//     MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
+//     MOCK_METHOD(void, HearLights, (const bool), (override));
+//     MOCK_METHOD(void, HearArm, (const bool), (override));
+// };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
     .link_handle = kCaveTalk_CTests_LinkHandle,
@@ -447,4 +456,45 @@ TEST(CaveTalkCTests, SpeakListenConfigEncoder)
     configencoder_configencoder_saved_2 = config_encoder_test;
     configencoder_configencoder_saved_3 = config_encoder_test;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigLog)
+{
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_ERROR));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_ERROR)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_WARNING));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_WARNING)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_INFO));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_INFO)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_DEBUG));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_DEBUG)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_VERBOSE));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_VERBOSE)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_MAX));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_MAX)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    mock_calls.reset();
 }

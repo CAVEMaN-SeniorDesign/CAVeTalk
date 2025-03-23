@@ -15,4 +15,5 @@ enum Id {
     ID_CONFIG_SERVO_CAMS = 9;
     ID_CONFIG_MOTOR = 10;
     ID_CONFIG_ENCODER = 11;
+    ID_CONFIG_LOG = 12;
 }
