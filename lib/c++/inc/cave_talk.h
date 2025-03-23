@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "config_encoder.pb.h"
+#include "config_log.pb.h"
 #include "config_motor.pb.h"
 #include "config_servo.pb.h"
 #include "log.pb.h"
@@ -34,6 +35,7 @@ class ListenerCallbacks
         virtual void HearConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)                                                                                              = 0;
         virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                                           = 0;
         virtual void HearConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3) = 0;
+        virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
 };
 
 class Listener
@@ -59,6 +61,7 @@ class Listener
         CaveTalk_Error_t HandleConfigServoCams(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigMotor(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigEncoder(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfigLog(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
@@ -83,6 +86,7 @@ class Talker
         CaveTalk_Error_t SpeakConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt);
         CaveTalk_Error_t SpeakConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3);
         CaveTalk_Error_t SpeakConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3);
+        CaveTalk_Error_t SpeakConfigLog(const LogLevel log_level);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;

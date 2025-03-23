@@ -6,6 +6,7 @@
 #include "camera_movement.pb.h"
 #include "config_encoder.pb.h"
 #include "config_motor.pb.h"
+#include "config_log.pb.h"
 #include "config_servo.pb.h"
 #include "ids.pb.h"
 #include "lights.pb.h"
@@ -30,6 +31,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigServoWheels(const CaveTalk_Handle_t
 static CaveTalk_Error_t CaveTalk_HandleConfigServoCams(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigMotor(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigEncoders(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleConfigLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
 static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg);
 
@@ -91,6 +93,9 @@ CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
                 break;
             case cave_talk_Id_ID_CONFIG_ENCODER:
                 error = CaveTalk_HandleConfigEncoders(handle, length);
+                break;
+            case cave_talk_Id_ID_CONFIG_LOG:
+                error = CaveTalk_HandleConfigLog(handle, length);
                 break;
             default:
                 error = CAVE_TALK_ERROR_ID;
@@ -509,6 +514,33 @@ CaveTalk_Error_t CaveTalk_SpeakConfigEncoders(const CaveTalk_Handle_t *const han
     return error;
 }
 
+CaveTalk_Error_t CaveTalk_SpeakConfigLog(const CaveTalk_Handle_t *const handle, const cave_talk_LogLevel log_level)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t        ostream            = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_ConfigLog config_log_message = cave_talk_ConfigLog_init_zero;
+
+        config_log_message.log_level = log_level;
+
+        if (!pb_encode(&ostream, cave_talk_ConfigLog_fields, &config_log_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_CONFIG_LOG, handle->buffer, ostream.bytes_written);
+        }
+    }
+
+    return error;
+}
+
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -793,6 +825,32 @@ static CaveTalk_Error_t CaveTalk_HandleConfigEncoders(const CaveTalk_Handle_t *c
         else if (NULL != handle->listen_callbacks.hear_config_encoders)
         {
             handle->listen_callbacks.hear_config_encoders(&config_encoder_message.encoder_wheel_0, &config_encoder_message.encoder_wheel_1, &config_encoder_message.encoder_wheel_2, &config_encoder_message.encoder_wheel_3);
+        }
+    }
+
+    return error;
+}
+
+static CaveTalk_Error_t CaveTalk_HandleConfigLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if ((NULL == handle) || (NULL == handle->buffer))
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        pb_istream_t        istream            = pb_istream_from_buffer(handle->buffer, length);
+        cave_talk_ConfigLog config_log_message = cave_talk_ConfigLog_init_zero;
+
+        if (!pb_decode(&istream, cave_talk_ConfigLog_fields, &config_log_message))
+        {
+            error = CAVE_TALK_ERROR_PARSE;
+        }
+        else if (NULL != handle->listen_callbacks.hear_config_log)
+        {
+            handle->listen_callbacks.hear_config_log(config_log_message.log_level);
         }
     }
 

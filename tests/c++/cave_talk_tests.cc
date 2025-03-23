@@ -6,8 +6,9 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
-#include "config_servo.pb.h"
+#include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_servo.pb.h"
 #include "odometry.pb.h"
 
 #include "cave_talk.h"
@@ -128,6 +129,8 @@ public:
         TestConfigEncoderObject(configencoder_configencoder_saved_2, encoder_wheel_2);
         TestConfigEncoderObject(configencoder_configencoder_saved_3, encoder_wheel_3);
     }
+
+    MOCK_METHOD(void, HearConfigLog, (const cave_talk::LogLevel), (override));
 };
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
@@ -412,5 +415,48 @@ TEST(CaveTalkCppTests, SpeakListenConfigEncoder)
     configencoder_configencoder_saved_1 = config_encoder_test;
     configencoder_configencoder_saved_2 = config_encoder_test;
     configencoder_configencoder_saved_3 = config_encoder_test;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+}
+
+TEST(CaveTalkCppTests, SpeakListenConfigLog)
+{
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();   
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_ERROR));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_ERROR)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_WARNING));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_WARNING)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_INFO));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_INFO)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_DEBUG));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_DEBUG)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_VERBOSE));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_VERBOSE)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_MAX));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_MAX)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
