@@ -236,16 +236,6 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_log = HearConfigLog,
 };
 
-// class MockListenerCallbacks : public ListenCallbacksInterface
-// {
-// public:
-//     MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
-//     MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
-//     MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
-//     MOCK_METHOD(void, HearLights, (const bool), (override));
-//     MOCK_METHOD(void, HearArm, (const bool), (override));
-// };
-
 static CaveTalk_Handle_t CaveTalk_Handle = {
     .link_handle = kCaveTalk_CTests_LinkHandle,
     .buffer = buffer,
