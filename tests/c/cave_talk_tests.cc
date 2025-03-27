@@ -74,6 +74,10 @@ void TestIMUObject(const cave_talk_Imu &a, const cave_talk_Imu &b)
     ASSERT_EQ(a.gyro.roll_radians_per_second, b.gyro.roll_radians_per_second);
     ASSERT_EQ(a.gyro.pitch_radians_per_second, b.gyro.pitch_radians_per_second);
     ASSERT_EQ(a.gyro.yaw_radians_per_second, b.gyro.yaw_radians_per_second);
+    ASSERT_EQ(a.quat.w, b.quat.w);
+    ASSERT_EQ(a.quat.x, b.quat.x);
+    ASSERT_EQ(a.quat.y, b.quat.y);
+    ASSERT_EQ(a.quat.z, b.quat.z);
 }
 
 void TestEncoderObject(const cave_talk_Encoder &a, const cave_talk_Encoder &b)
@@ -342,6 +346,12 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     imu.gyro.pitch_radians_per_second = 17029348.57032894;
     imu.gyro.roll_radians_per_second = 123.00000000000001;
     imu.gyro.yaw_radians_per_second = 82482.1111111111111;
+
+    imu.has_quat = true;
+    imu.quat.w = .2341402;
+    imu.quat.x = .00000234;
+    imu.quat.y = .6894444442;
+    imu.quat.z = 0.00527000212;
 
     cave_talk_Encoder encoder_test = cave_talk_Encoder();
     encoder_test.rate_radians_per_second = 6.1412341231;
