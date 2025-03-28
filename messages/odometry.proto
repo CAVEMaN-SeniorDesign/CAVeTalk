@@ -14,9 +14,17 @@ message Gyroscope {
     double yaw_radians_per_second = 3;
 }
 
+message Quaternion {
+    double w = 1;
+    double x = 2;
+    double y = 3;
+    double z = 4;
+}
+
 message Imu {
     Accelerometer accel = 1;
     Gyroscope gyro = 2;
+    Quaternion quat = 3;
 }
 
 message Encoder {

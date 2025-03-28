@@ -18,7 +18,7 @@ CAVEMAN controller message protocol
 | 0x03 | Camera Movement                 | Describes the Camera Pan [radians] and Tilt Servo Angles [radians]                                                         |
 | 0x04 | Lights                          | Toggles the Onboard Headlights                                                                                             |
 | 0x05 | Arm                             | Enable or disable driving and steering                                                                                     |
-| 0x06 | Odometry                        | Describes the 3 relative acceleration axes [m/s^2], 3 gyroscopic axes [rad/s], and 4 encoder values for each wheel [rad/s] |
+| 0x06 | Odometry                        | Describes the 3 relative acceleration axes [m/s^2], 3 gyroscopic axes [rad/s], 4 unit quaternion positions and 4 encoder values for each wheel [rad/s] |
 | 0x07 | Logging                         | Send String Messages Between Devices                                                                                       |
 | 0x08 | Configuration - Servos - Wheels | Send Wheel Servo Configuration Parameters Between Devices                                                                  |
 | 0x09 | Configuration - Servos - Cams   | Send Camera Servo Configuration Parameters Between Devices                                                                 |

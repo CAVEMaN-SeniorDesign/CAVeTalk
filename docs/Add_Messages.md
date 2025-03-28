@@ -129,6 +129,6 @@ Good tests have these qualities:
 - Tests foreseeable edge cases
 - Tests odd input values
 - Utilizes Mock functions where possible
-    - If values cannot be checked directly through tests, leave a comment where a breakpoint could be used to see values
+    - Use the Assert Workaround for New Protobuf-Generated Objects without operator==
 
 
