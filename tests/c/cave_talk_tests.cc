@@ -91,9 +91,9 @@ void TestServoObject(const cave_talk_Servo &a, const cave_talk_Servo &b)
     ASSERT_EQ(a.min_angle_radian, b.min_angle_radian);
     ASSERT_EQ(a.max_angle_radian, b.max_angle_radian);
     ASSERT_EQ(a.center_angle_radian, b.center_angle_radian);
-    ASSERT_EQ(a.min_duty_cycle_microseconds, b.min_duty_cycle_microseconds);
-    ASSERT_EQ(a.max_duty_cycle_microseconds, b.max_duty_cycle_microseconds);
-    ASSERT_EQ(a.center_duty_cycle_microseconds, b.center_duty_cycle_microseconds);
+    ASSERT_EQ(a.min_duty_cycle_percentage, b.min_duty_cycle_percentage);
+    ASSERT_EQ(a.max_duty_cycle_percentage, b.max_duty_cycle_percentage);
+    ASSERT_EQ(a.center_duty_cycle_percentage, b.center_duty_cycle_percentage);
 }
 
 void TestMotorObject(const cave_talk_Motor &a, const cave_talk_Motor &b)
@@ -391,9 +391,9 @@ TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
     (servo_test_zero).min_angle_radian = (0.2);
     (servo_test_zero).max_angle_radian = (180.5);
     (servo_test_zero).center_angle_radian = (94.3);
-    (servo_test_zero).min_duty_cycle_microseconds = (540);
-    (servo_test_zero).max_duty_cycle_microseconds = (2560);
-    (servo_test_zero).center_duty_cycle_microseconds = (1576);
+    (servo_test_zero).min_duty_cycle_percentage = (540);
+    (servo_test_zero).max_duty_cycle_percentage = (2560);
+    (servo_test_zero).center_duty_cycle_percentage = (1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
     servo_configservowheels_saved_0 = servo_test_zero;
@@ -411,9 +411,9 @@ TEST(CaveTalkCTests, SpeakListenConfigServoCams)
     (servo_test_zero).min_angle_radian = (0.2);
     (servo_test_zero).max_angle_radian = (180.5);
     (servo_test_zero).center_angle_radian = (94.3);
-    (servo_test_zero).min_duty_cycle_microseconds = (540);
-    (servo_test_zero).max_duty_cycle_microseconds = (2560);
-    (servo_test_zero).center_duty_cycle_microseconds = (1576);
+    (servo_test_zero).min_duty_cycle_percentage = (540);
+    (servo_test_zero).max_duty_cycle_percentage = (2560);
+    (servo_test_zero).center_duty_cycle_percentage = (1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
     servo_configservocams_saved_pan = servo_test_zero;
