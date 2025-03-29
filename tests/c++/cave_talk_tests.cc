@@ -63,9 +63,9 @@ void TestServoObject(const cave_talk::Servo &a, const cave_talk::Servo &b)
     ASSERT_EQ(a.min_angle_radian(), b.min_angle_radian());
     ASSERT_EQ(a.max_angle_radian(), b.max_angle_radian());
     ASSERT_EQ(a.center_angle_radian(), b.center_angle_radian());
-    ASSERT_EQ(a.min_duty_cycle_microseconds(), b.min_duty_cycle_microseconds());
-    ASSERT_EQ(a.max_duty_cycle_microseconds(), b.max_duty_cycle_microseconds());
-    ASSERT_EQ(a.center_duty_cycle_microseconds(), b.center_duty_cycle_microseconds());
+    ASSERT_EQ(a.min_duty_cycle_percentage(), b.min_duty_cycle_percentage());
+    ASSERT_EQ(a.max_duty_cycle_percentage(), b.max_duty_cycle_percentage());
+    ASSERT_EQ(a.center_duty_cycle_percentage(), b.center_duty_cycle_percentage());
 }
 
 void TestMotorObject(const cave_talk::Motor &a, const cave_talk::Motor &b)
@@ -350,9 +350,9 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoWheels)
     servo_test_zero.set_min_angle_radian(0.2);
     servo_test_zero.set_max_angle_radian(180.5);
     servo_test_zero.set_center_angle_radian(94.3);
-    servo_test_zero.set_min_duty_cycle_microseconds(540);
-    servo_test_zero.set_max_duty_cycle_microseconds(2560);
-    servo_test_zero.set_center_duty_cycle_microseconds(1576);
+    servo_test_zero.set_min_duty_cycle_percentage(540);
+    servo_test_zero.set_max_duty_cycle_percentage(2560);
+    servo_test_zero.set_center_duty_cycle_percentage(1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoWheels(servo_test_zero, servo_test_zero, servo_test_zero, servo_test_zero));
     servo_configservowheels_saved_0 = servo_test_zero;
@@ -374,9 +374,9 @@ TEST(CaveTalkCppTests, SpeakListenConfigServoCams)
     servo_test_zero.set_min_angle_radian(0.2);
     servo_test_zero.set_max_angle_radian(180.5);
     servo_test_zero.set_center_angle_radian(94.3);
-    servo_test_zero.set_min_duty_cycle_microseconds(540);
-    servo_test_zero.set_max_duty_cycle_microseconds(2560);
-    servo_test_zero.set_center_duty_cycle_microseconds(1576);
+    servo_test_zero.set_min_duty_cycle_percentage(540);
+    servo_test_zero.set_max_duty_cycle_percentage(2560);
+    servo_test_zero.set_center_duty_cycle_percentage(1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigServoCams(servo_test_zero, servo_test_zero));
     servo_configservocams_saved_pan = servo_test_zero;
@@ -435,7 +435,7 @@ TEST(CaveTalkCppTests, SpeakListenConfigLog)
     cave_talk::Talker roverMouth(Send);
     cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
 
-    ring_buffer.Clear();   
+    ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_ERROR));
     EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_ERROR)).Times(1);

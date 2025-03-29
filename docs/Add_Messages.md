@@ -29,9 +29,9 @@ Use the other files as reference but here are the minimum requirements:
         double min_angle_radian = 1;
         double max_angle_radian = 2;
         double center_angle_radian = 3;
-        double min_duty_cycle_microseconds = 4;
-        double max_duty_cycle_microseconds = 5;
-        double center_duty_cycle_microseconds = 6;
+        double min_duty_cycle_percentage = 4;
+        double max_duty_cycle_percentage = 5;
+        double center_duty_cycle_percentage = 6;
     }
 
     message ConfigServoWheels {
