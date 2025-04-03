@@ -9,6 +9,7 @@
 #include "config_encoder.pb.h"
 #include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_pid.pb.h"
 #include "config_servo.pb.h"
 #include "log.pb.h"
 #include "odometry.pb.h"
@@ -36,6 +37,9 @@ class ListenerCallbacks
         virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                                           = 0;
         virtual void HearConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3) = 0;
         virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
+        virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params)                                   = 0;
+        virtual void HearConfigSteeringControl(const PID &turn_rate_params)                                                                                                                    = 0;
+
 };
 
 class Listener
@@ -62,6 +66,8 @@ class Listener
         CaveTalk_Error_t HandleConfigMotor(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigEncoder(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigLog(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfigWheelSpeedControl(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleConfigSteeringControl(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
@@ -87,6 +93,8 @@ class Talker
         CaveTalk_Error_t SpeakConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3);
         CaveTalk_Error_t SpeakConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3);
         CaveTalk_Error_t SpeakConfigLog(const LogLevel log_level);
+        CaveTalk_Error_t SpeakConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params);
+        CaveTalk_Error_t SpeakConfigSteeringControl(const PID &turn_rate_params);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
