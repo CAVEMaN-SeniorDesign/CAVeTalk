@@ -38,7 +38,7 @@ class ListenerCallbacks
         virtual void HearConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3) = 0;
         virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
         virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params)                                   = 0;
-        virtual void HearConfigSteeringControl(const PID &turn_rate_params)                                   = 0;
+        virtual void HearConfigSteeringControl(const PID &turn_rate_params)                                                                                                                    = 0;
 
 };
 

@@ -43,20 +43,20 @@ typedef struct
 } CaveTalk_Handle_t;
 
 static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
-    .hear_ooga_booga          = NULL,
-    .hear_movement            = NULL,
-    .hear_camera_movement     = NULL,
-    .hear_lights              = NULL,
-    .hear_arm                 = NULL,
-    .hear_odometry            = NULL,
-    .hear_log                 = NULL,
-    .hear_config_servo_wheels = NULL,
-    .hear_config_servo_cams   = NULL,
-    .hear_config_motors       = NULL,
-    .hear_config_encoders     = NULL,
-    .hear_config_log          = NULL,
+    .hear_ooga_booga                 = NULL,
+    .hear_movement                   = NULL,
+    .hear_camera_movement            = NULL,
+    .hear_lights                     = NULL,
+    .hear_arm                        = NULL,
+    .hear_odometry                   = NULL,
+    .hear_log                        = NULL,
+    .hear_config_servo_wheels        = NULL,
+    .hear_config_servo_cams          = NULL,
+    .hear_config_motors              = NULL,
+    .hear_config_encoders            = NULL,
+    .hear_config_log                 = NULL,
     .hear_config_wheel_speed_control = NULL,
-    .hear_config_steering_control = NULL,
+    .hear_config_steering_control    = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {

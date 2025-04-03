@@ -560,7 +560,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *
     else
     {
 
-        pb_ostream_t          ostream               = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_ostream_t                      ostream            = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
         cave_talk_ConfigWheelSpeedControl config_wsc_message = cave_talk_ConfigWheelSpeedControl_init_zero;
 
         if (wheel_0_params != NULL)
@@ -609,7 +609,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *co
     else
     {
 
-        pb_ostream_t          ostream               = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        pb_ostream_t                    ostream           = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
         cave_talk_ConfigSteeringControl config_sc_message = cave_talk_ConfigSteeringControl_init_zero;
 
         if (turn_rate_params != NULL)
@@ -956,7 +956,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Ha
     }
     else
     {
-        pb_istream_t          istream              = pb_istream_from_buffer(handle->buffer, length);
+        pb_istream_t                      istream            = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_ConfigWheelSpeedControl config_wsc_message = cave_talk_ConfigWheelSpeedControl_init_zero;
 
         if (!pb_decode(&istream, cave_talk_ConfigWheelSpeedControl_fields, &config_wsc_message))
@@ -983,7 +983,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Hand
     }
     else
     {
-        pb_istream_t          istream              = pb_istream_from_buffer(handle->buffer, length);
+        pb_istream_t                    istream           = pb_istream_from_buffer(handle->buffer, length);
         cave_talk_ConfigSteeringControl config_sc_message = cave_talk_ConfigSteeringControl_init_zero;
 
         if (!pb_decode(&istream, cave_talk_ConfigSteeringControl_fields, &config_sc_message))
