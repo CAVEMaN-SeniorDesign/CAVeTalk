@@ -10,6 +10,7 @@
 #include "config_encoder.pb.h"
 #include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_pid.pb.h"
 #include "config_servo.pb.h"
 #include "ids.pb.h"
 #include "lights.pb.h"
@@ -82,6 +83,12 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_CONFIG_LOG:
             error = HandleConfigLog(length);
+            break;
+        case ID_CONFIG_WHEEL_SPEED_CONTROL:
+            error = HandleConfigWheelSpeedControl(length);
+            break;
+        case ID_CONFIG_STEERING_CONTROL:
+            error = HandleConfigSteeringControl(length);
             break;
         default:
             error = CAVE_TALK_ERROR_ID;
@@ -301,6 +308,41 @@ CaveTalk_Error_t Listener::HandleConfigLog(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleConfigWheelSpeedControl(CaveTalk_Length_t length) const
+{
+    ConfigWheelSpeedControl config_wsc_message;
+
+    if (!config_wsc_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const PID wheel_0_params = config_wsc_message.wheel_0_params();
+    const PID wheel_1_params = config_wsc_message.wheel_1_params();
+    const PID wheel_2_params = config_wsc_message.wheel_2_params();
+    const PID wheel_3_params = config_wsc_message.wheel_3_params();
+
+    listener_callbacks_->HearConfigWheelSpeedControl(wheel_0_params, wheel_1_params, wheel_2_params, wheel_3_params);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
+CaveTalk_Error_t Listener::HandleConfigSteeringControl(CaveTalk_Length_t length) const
+{
+    ConfigSteeringControl config_sc_message;
+
+    if (!config_sc_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const PID turn_rate_params = config_sc_message.turn_rate_params();
+
+    listener_callbacks_->HearConfigSteeringControl(turn_rate_params);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_         = kCaveTalk_LinkHandleNull;
@@ -459,6 +501,33 @@ CaveTalk_Error_t Talker::SpeakConfigLog(const LogLevel log_level)
     config_log_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_LOG), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params)
+{
+    ConfigWheelSpeedControl config_wsc_message;
+
+    config_wsc_message.mutable_wheel_0_params()->CopyFrom(wheel_0_params);
+    config_wsc_message.mutable_wheel_1_params()->CopyFrom(wheel_1_params);
+    config_wsc_message.mutable_wheel_2_params()->CopyFrom(wheel_2_params);
+    config_wsc_message.mutable_wheel_3_params()->CopyFrom(wheel_3_params);
+
+    std::size_t length = config_wsc_message.ByteSizeLong();
+    config_wsc_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_WHEEL_SPEED_CONTROL), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakConfigSteeringControl(const PID &turn_rate_params)
+{
+    ConfigSteeringControl config_sc_message;
+
+    config_sc_message.mutable_turn_rate_params()->CopyFrom(turn_rate_params);
+
+    std::size_t length = config_sc_message.ByteSizeLong();
+    config_sc_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_STEERING_CONTROL), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

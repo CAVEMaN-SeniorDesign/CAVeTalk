@@ -4,9 +4,11 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
-#include "config_servo.pb.h"
+#include "config_encoder.pb.h"
 #include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_pid.pb.h"
+#include "config_servo.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
@@ -65,6 +67,11 @@ cave_talk_ConfigEncoder configencoder_configencoder_saved_0;
 cave_talk_ConfigEncoder configencoder_configencoder_saved_1;
 cave_talk_ConfigEncoder configencoder_configencoder_saved_2;
 cave_talk_ConfigEncoder configencoder_configencoder_saved_3;
+cave_talk_PID pid_wsc_saved_0;
+cave_talk_PID pid_wsc_saved_1;
+cave_talk_PID pid_wsc_saved_2;
+cave_talk_PID pid_wsc_saved_3;
+cave_talk_PID pid_sc_saved_trp;
 
 void TestIMUObject(const cave_talk_Imu &a, const cave_talk_Imu &b)
 {
@@ -113,6 +120,13 @@ void TestConfigEncoderObject(const cave_talk_ConfigEncoder &a, const cave_talk_C
     ASSERT_EQ(a.mode, b.mode);
 }
 
+void TestPIDObject(const cave_talk_PID &a, const cave_talk_PID &b)
+{
+    ASSERT_EQ(a.Kp, b.Kp);
+    ASSERT_EQ(a.Ki, b.Ki);
+    ASSERT_EQ(a.Kd, b.Kd);
+}
+
 class ListenCallbacksInterface
 {
 public:
@@ -129,6 +143,9 @@ public:
     virtual void HearConfigMotor(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3) = 0;
     virtual void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3) = 0;
     virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
+    virtual void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params) = 0;
+    virtual void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params) = 0;
+
 };
 
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
@@ -148,6 +165,9 @@ public:
     MOCK_METHOD(void, HearConfigMotor, ((const cave_talk_Motor *const motor_wheel_0), (const cave_talk_Motor *const motor_wheel_1), (const cave_talk_Motor *const motor_wheel_2), (const cave_talk_Motor *const motor_wheel_3)), (override));
     MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk_ConfigEncoder *const encoder_wheel_0), (const cave_talk_ConfigEncoder *const encoder_wheel_1), (const cave_talk_ConfigEncoder *const encoder_wheel_2), (const cave_talk_ConfigEncoder *const encoder_wheel_3)), (override));
     MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
+    MOCK_METHOD(void, HearConfigWheelSpeedControl, ((const cave_talk_PID *const wheel_0_params), (const cave_talk_PID *const wheel_1_params), (const cave_talk_PID *const wheel_2_params), (const cave_talk_PID *const wheel_3_params)), (override));
+    MOCK_METHOD(void, HearConfigSteeringControl, (const cave_talk_PID *const turn_rate_params), (override));
+
 };
 
 std::shared_ptr<MockListenCallbacks> mock_calls = std::make_shared<MockListenCallbacks>();
@@ -204,7 +224,7 @@ void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_
     TestServoObject(servo_configservocams_saved_tilt, *servo_cam_tilt);
 }
 
-void HearConfigServoMotors(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3)
+void HearConfigMotors(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3)
 {
     TestMotorObject(motor_configmotor_saved_0, *motor_wheel_0);
     TestMotorObject(motor_configmotor_saved_1, *motor_wheel_1);
@@ -225,6 +245,19 @@ static void HearConfigLog(const cave_talk_LogLevel log_level)
     return (mock_calls.get())->HearConfigLog(log_level);
 }
 
+void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params)
+{
+    TestPIDObject(pid_wsc_saved_0, *wheel_0_params);
+    TestPIDObject(pid_wsc_saved_1, *wheel_1_params);
+    TestPIDObject(pid_wsc_saved_2, *wheel_2_params);
+    TestPIDObject(pid_wsc_saved_3, *wheel_3_params);
+}
+
+void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params)
+{
+    TestPIDObject(pid_sc_saved_trp, *turn_rate_params);
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga = HearOogaBooga,
     .hear_movement = HearMovement,
@@ -235,9 +268,11 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_log = HearLog,
     .hear_config_servo_wheels = HearConfigServoWheels,
     .hear_config_servo_cams = HearConfigServoCams,
-    .hear_config_motors = HearConfigServoMotors,
+    .hear_config_motors = HearConfigMotors,
     .hear_config_encoders = HearConfigEncoder,
     .hear_config_log = HearConfigLog,
+    .hear_config_wheel_speed_control = HearConfigWheelSpeedControl,
+    .hear_config_steering_control = HearConfigSteeringControl,
 };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
@@ -497,4 +532,35 @@ TEST(CaveTalkCTests, SpeakListenConfigLog)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     mock_calls.reset();
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigWheelSpeedControl)
+{
+    ring_buffer.Clear();
+
+    cave_talk_PID wheel_spd_ctrl = cave_talk_PID();
+    wheel_spd_ctrl.Kd = 10000000.1;
+    wheel_spd_ctrl.Ki = .00000015;
+    wheel_spd_ctrl.Kp = 1.2983723;
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigWheelSpeedControl(&CaveTalk_Handle, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl));
+    pid_wsc_saved_0 = wheel_spd_ctrl;
+    pid_wsc_saved_1 = wheel_spd_ctrl;
+    pid_wsc_saved_2 = wheel_spd_ctrl;
+    pid_wsc_saved_3 = wheel_spd_ctrl;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigSteeringControl)
+{
+    ring_buffer.Clear();
+
+    cave_talk_PID steer_ctl = cave_talk_PID();
+    steer_ctl.Kd = 10000000.1;
+    steer_ctl.Ki = .00000015;
+    steer_ctl.Kp = 1.2983723;
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigSteeringControl(&CaveTalk_Handle, &steer_ctl));
+    pid_sc_saved_trp = steer_ctl;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 }

@@ -6,8 +6,10 @@
 #include <gmock/gmock.h>
 
 #include "ooga_booga.pb.h"
+#include "config_encoder.pb.h"
 #include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_pid.pb.h"
 #include "config_servo.pb.h"
 #include "odometry.pb.h"
 
@@ -37,6 +39,11 @@ cave_talk::ConfigEncoder configencoder_configencoder_saved_0;
 cave_talk::ConfigEncoder configencoder_configencoder_saved_1;
 cave_talk::ConfigEncoder configencoder_configencoder_saved_2;
 cave_talk::ConfigEncoder configencoder_configencoder_saved_3;
+cave_talk::PID pid_wsc_saved_0;
+cave_talk::PID pid_wsc_saved_1;
+cave_talk::PID pid_wsc_saved_2;
+cave_talk::PID pid_wsc_saved_3;
+cave_talk::PID pid_sc_saved_trp;
 
 void TestIMUObject(const cave_talk::Imu &a, const cave_talk::Imu &b)
 {
@@ -83,6 +90,13 @@ void TestConfigEncoderObject(const cave_talk::ConfigEncoder &a, const cave_talk:
     ASSERT_EQ(a.radians_per_pulse(), b.radians_per_pulse());
     ASSERT_EQ(a.pulses_per_period(), b.pulses_per_period());
     ASSERT_EQ(a.mode(), b.mode());
+}
+
+void TestPIDObject(const cave_talk::PID &a, const cave_talk::PID &b)
+{
+    ASSERT_EQ(a.kp(), b.kp());
+    ASSERT_EQ(a.ki(), b.ki());
+    ASSERT_EQ(a.kd(), b.kd());
 }
 
 class MockListenerCallbacks : public cave_talk::ListenerCallbacks
@@ -135,6 +149,19 @@ public:
     }
 
     MOCK_METHOD(void, HearConfigLog, (const cave_talk::LogLevel), (override));
+
+    void HearConfigWheelSpeedControl(const cave_talk::PID &wheel_0_params, const cave_talk::PID &wheel_1_params, const cave_talk::PID &wheel_2_params, const cave_talk::PID &wheel_3_params)
+    {
+        TestPIDObject(pid_wsc_saved_0, wheel_0_params);
+        TestPIDObject(pid_wsc_saved_1, wheel_1_params);
+        TestPIDObject(pid_wsc_saved_2, wheel_2_params);
+        TestPIDObject(pid_wsc_saved_3, wheel_3_params);
+    }
+
+    void HearConfigSteeringControl(const cave_talk::PID &turn_rate_params)
+    {
+        TestPIDObject(pid_sc_saved_trp, turn_rate_params);
+    }
 };
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
@@ -469,5 +496,44 @@ TEST(CaveTalkCppTests, SpeakListenConfigLog)
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_MAX));
     EXPECT_CALL(*mock_listen_callbacks.get(), HearConfigLog(cave_talk::LogLevel::BSP_LOGGER_LEVEL_MAX)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+}
+
+TEST(CaveTalkCppTests, SpeakListenConfigWheelSpeedControl)
+{
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    cave_talk::PID wheel_params;
+    wheel_params.set_kp(1.03789);
+    wheel_params.set_ki(.00000453);
+    wheel_params.set_kd(1034798);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigWheelSpeedControl(wheel_params, wheel_params, wheel_params, wheel_params));
+    pid_wsc_saved_0 = wheel_params;
+    pid_wsc_saved_1 = wheel_params;
+    pid_wsc_saved_2 = wheel_params;
+    pid_wsc_saved_3 = wheel_params;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+}
+
+TEST(CaveTalkCppTests, SpeakListenConfigSteeringControl)
+{
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    cave_talk::PID wheel_params;
+    wheel_params.set_kp(1.03789);
+    wheel_params.set_ki(.00000453);
+    wheel_params.set_kd(1034798);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params));
+    pid_sc_saved_trp = wheel_params;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
