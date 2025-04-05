@@ -13,8 +13,10 @@ message ConfigWheelSpeedControl {
     PID wheel_1_params = 2;
     PID wheel_2_params = 3;
     PID wheel_3_params = 4;
+    bool enabled = 5;
 }
 
 message ConfigSteeringControl {
     PID turn_rate_params = 1;
+    bool enabled = 2;
 }
