@@ -29,8 +29,8 @@ typedef struct
     void (*hear_config_motors)(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
     void (*hear_config_encoders)(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3);
     void (*hear_config_log)(const cave_talk_LogLevel log_level);
-    void (*hear_config_wheel_speed_control)(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params);
-    void (*hear_config_steering_control)(const cave_talk_PID *const turn_rate_params);
+    void (*hear_config_wheel_speed_control)(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled);
+    void (*hear_config_steering_control)(const cave_talk_PID *const turn_rate_params, const bool enabled);
 
 } CaveTalk_ListenCallbacks_t;
 
@@ -84,8 +84,8 @@ CaveTalk_Error_t CaveTalk_SpeakConfigServoCams(const CaveTalk_Handle_t *const ha
 CaveTalk_Error_t CaveTalk_SpeakConfigMotors(const CaveTalk_Handle_t *const handle, const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigEncoders(const CaveTalk_Handle_t *const handle, const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3);
 CaveTalk_Error_t CaveTalk_SpeakConfigLog(const CaveTalk_Handle_t *const handle, const cave_talk_LogLevel log_level);
-CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params);
-CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params);
+CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled);
+CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params, const bool enabled);
 
 #ifdef __cplusplus
 }

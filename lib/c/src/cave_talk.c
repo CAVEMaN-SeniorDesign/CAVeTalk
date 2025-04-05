@@ -550,7 +550,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigLog(const CaveTalk_Handle_t *const handle, 
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params)
+CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -587,6 +587,8 @@ CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *
             config_wsc_message.has_wheel_3_params = true;
         }
 
+        config_wsc_message.enabled = enabled;
+
         if (!pb_encode(&ostream, cave_talk_ConfigWheelSpeedControl_fields, &config_wsc_message))
         {
             error = CAVE_TALK_ERROR_SIZE;
@@ -599,7 +601,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params)
+CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params, const bool enabled)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -617,6 +619,8 @@ CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *co
             config_sc_message.turn_rate_params     = *turn_rate_params;
             config_sc_message.has_turn_rate_params = true;
         }
+
+        config_sc_message.enabled = enabled;
 
         if (!pb_encode(&ostream, cave_talk_ConfigSteeringControl_fields, &config_sc_message))
         {
@@ -965,7 +969,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Ha
         }
         else if (NULL != handle->listen_callbacks.hear_config_wheel_speed_control)
         {
-            handle->listen_callbacks.hear_config_wheel_speed_control(&config_wsc_message.wheel_0_params, &config_wsc_message.wheel_1_params, &config_wsc_message.wheel_2_params, &config_wsc_message.wheel_3_params);
+            handle->listen_callbacks.hear_config_wheel_speed_control(&config_wsc_message.wheel_0_params, &config_wsc_message.wheel_1_params, &config_wsc_message.wheel_2_params, &config_wsc_message.wheel_3_params, config_wsc_message.enabled);
         }
     }
 
@@ -992,7 +996,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Hand
         }
         else if (NULL != handle->listen_callbacks.hear_config_steering_control)
         {
-            handle->listen_callbacks.hear_config_steering_control(&config_sc_message.turn_rate_params);
+            handle->listen_callbacks.hear_config_steering_control(&config_sc_message.turn_rate_params, config_sc_message.enabled);
         }
     }
 

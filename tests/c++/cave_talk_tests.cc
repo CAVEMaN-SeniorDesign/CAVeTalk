@@ -43,7 +43,9 @@ cave_talk::PID pid_wsc_saved_0;
 cave_talk::PID pid_wsc_saved_1;
 cave_talk::PID pid_wsc_saved_2;
 cave_talk::PID pid_wsc_saved_3;
+bool pid_wsc_enabled;
 cave_talk::PID pid_sc_saved_trp;
+bool pid_sc_enabled;
 
 void TestIMUObject(const cave_talk::Imu &a, const cave_talk::Imu &b)
 {
@@ -150,17 +152,19 @@ public:
 
     MOCK_METHOD(void, HearConfigLog, (const cave_talk::LogLevel), (override));
 
-    void HearConfigWheelSpeedControl(const cave_talk::PID &wheel_0_params, const cave_talk::PID &wheel_1_params, const cave_talk::PID &wheel_2_params, const cave_talk::PID &wheel_3_params)
+    void HearConfigWheelSpeedControl(const cave_talk::PID &wheel_0_params, const cave_talk::PID &wheel_1_params, const cave_talk::PID &wheel_2_params, const cave_talk::PID &wheel_3_params, const bool enabled)
     {
         TestPIDObject(pid_wsc_saved_0, wheel_0_params);
         TestPIDObject(pid_wsc_saved_1, wheel_1_params);
         TestPIDObject(pid_wsc_saved_2, wheel_2_params);
         TestPIDObject(pid_wsc_saved_3, wheel_3_params);
+        ASSERT_EQ(pid_wsc_enabled, enabled);
     }
 
-    void HearConfigSteeringControl(const cave_talk::PID &turn_rate_params)
+    void HearConfigSteeringControl(const cave_talk::PID &turn_rate_params, const bool enabled)
     {
         TestPIDObject(pid_sc_saved_trp, turn_rate_params);
+        ASSERT_EQ(pid_sc_enabled, enabled);
     }
 };
 
@@ -512,11 +516,16 @@ TEST(CaveTalkCppTests, SpeakListenConfigWheelSpeedControl)
     wheel_params.set_ki(.00000453);
     wheel_params.set_kd(1034798);
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigWheelSpeedControl(wheel_params, wheel_params, wheel_params, wheel_params));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigWheelSpeedControl(wheel_params, wheel_params, wheel_params, wheel_params, true));
     pid_wsc_saved_0 = wheel_params;
     pid_wsc_saved_1 = wheel_params;
     pid_wsc_saved_2 = wheel_params;
     pid_wsc_saved_3 = wheel_params;
+    pid_wsc_enabled = true;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigWheelSpeedControl(wheel_params, wheel_params, wheel_params, wheel_params, false));
+    pid_wsc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
 
@@ -533,7 +542,12 @@ TEST(CaveTalkCppTests, SpeakListenConfigSteeringControl)
     wheel_params.set_ki(.00000453);
     wheel_params.set_kd(1034798);
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params, true));
     pid_sc_saved_trp = wheel_params;
+    pid_sc_enabled = true;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params, false));
+    pid_sc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
