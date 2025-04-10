@@ -31,7 +31,7 @@ typedef struct
     void (*hear_config_log)(const cave_talk_LogLevel log_level);
     void (*hear_config_wheel_speed_control)(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled);
     void (*hear_config_steering_control)(const cave_talk_PID *const turn_rate_params, const bool enabled);
-
+    void (*hear_reset)(const bool reset);
 } CaveTalk_ListenCallbacks_t;
 
 typedef struct
@@ -57,6 +57,7 @@ static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_config_log                 = NULL,
     .hear_config_wheel_speed_control = NULL,
     .hear_config_steering_control    = NULL,
+    .hear_reset                      = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -86,6 +87,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigEncoders(const CaveTalk_Handle_t *const han
 CaveTalk_Error_t CaveTalk_SpeakConfigLog(const CaveTalk_Handle_t *const handle, const cave_talk_LogLevel log_level);
 CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled);
 CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params, const bool enabled);
+CaveTalk_Error_t CaveTalk_SpeakReset(CaveTalk_Handle_t *const handle, const bool reset);
 
 #ifdef __cplusplus
 }

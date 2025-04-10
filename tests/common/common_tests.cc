@@ -13,7 +13,7 @@ static const std::size_t kMaxMessageLength = 255U;
 static RingBuffer<uint8_t, kMaxMessageLength> ring_buffer;
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
-{    
+{
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
     if (size > ring_buffer.Capacity() - ring_buffer.Size())
@@ -36,7 +36,7 @@ CaveTalk_Error_t Receive(void *const data, const size_t size, size_t *const byte
 }
 
 CaveTalk_Error_t SendSocketClosed(const void *const data, const size_t size)
-{    
+{
     return CAVE_TALK_ERROR_SOCKET_CLOSED;
 }
 
@@ -51,22 +51,19 @@ CaveTalk_Error_t ReceiveWrongNormal(void *const data, const size_t size, size_t 
 }
 
 static CaveTalk_LinkHandle_t LinkHandle = {
-    .send      = Send,
-    .receive   = Receive,
-    .receive_state = CAVE_TALK_LINK_STATE_RESET
-};
+    .send = Send,
+    .receive = Receive,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET};
 
 static CaveTalk_LinkHandle_t NullHandle = {
-    .send      = nullptr,
-    .receive   = nullptr,
-    .receive_state = CAVE_TALK_LINK_STATE_RESET
-};
+    .send = nullptr,
+    .receive = nullptr,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET};
 
 static CaveTalk_LinkHandle_t SocketClosedHandle = {
-    .send      = SendSocketClosed,
-    .receive   = ReceiveSocketClosed,
-    .receive_state = CAVE_TALK_LINK_STATE_RESET
-};
+    .send = SendSocketClosed,
+    .receive = ReceiveSocketClosed,
+    .receive_state = CAVE_TALK_LINK_STATE_RESET};
 
 TEST(CommonTests, SpeakAndListen)
 {
@@ -135,6 +132,21 @@ TEST(CommonTests, SizeIncompleteVersion)
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Listen(&LinkHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
+}
+
+TEST(CommonTests, Reset)
+{
+    ASSERT_EQ(CAVE_TALK_ERROR_NULL, CaveTalk_Reset(NULL, true));
+
+    uint8_t data = 0x00;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Reset(&LinkHandle, true));
+    ASSERT_TRUE(LinkHandle.speak_disabled);
+    ASSERT_EQ(CAVE_TALK_LINK_STATE_RESET, LinkHandle.receive_state);
+    ASSERT_EQ(CAVE_TALK_ERROR_SPEAK_DISABLED, CaveTalk_Speak(&LinkHandle, 0x0F, &data, sizeof(data)));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Reset(&LinkHandle, false));
+    ASSERT_FALSE(LinkHandle.speak_disabled);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&LinkHandle, 0x0F, &data, sizeof(data)));
+    ring_buffer.Clear();
 }
 
 TEST(CommonTests, CheckCRC)

@@ -48,6 +48,10 @@ CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
     if ((NULL == handle) || (NULL == handle->send) || (NULL == data))
     {
     }
+    else if (handle->speak_disabled)
+    {
+        error = CAVE_TALK_ERROR_SPEAK_DISABLED;
+    }
     else
     {
         uint8_t header[CAVE_TALK_HEADER_SIZE];
@@ -109,6 +113,27 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
         }
 
         /* TODO SD-182 drop packet on size error (flush remaining bytes to be received) */
+    }
+
+    return error;
+}
+
+CaveTalk_Error_t CaveTalk_Reset(CaveTalk_LinkHandle_t *const handle, const bool reset)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if (NULL == handle)
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        handle->speak_disabled = reset;
+
+        if (reset)
+        {
+            handle->receive_state = CAVE_TALK_LINK_STATE_RESET;
+        }
     }
 
     return error;

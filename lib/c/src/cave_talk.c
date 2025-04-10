@@ -17,6 +17,7 @@
 #include "ooga_booga.pb.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
+#include "reset.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -35,6 +36,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigEncoders(const CaveTalk_Handle_t *c
 static CaveTalk_Error_t CaveTalk_HandleConfigLog(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleReset(CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
 static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg);
 
@@ -105,6 +107,9 @@ CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
                 break;
             case cave_talk_Id_ID_CONFIG_STEERING_CONTROL:
                 error = CaveTalk_HandleConfigSteeringControl(handle, length);
+                break;
+            case cave_talk_Id_ID_RESET:
+                error = CaveTalk_HandleReset(handle, length);
                 break;
             default:
                 error = CAVE_TALK_ERROR_ID;
@@ -634,6 +639,37 @@ CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *co
     return error;
 }
 
+CaveTalk_Error_t CaveTalk_SpeakReset(CaveTalk_Handle_t *const handle, const bool reset)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t    ostream       = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_Reset reset_message = cave_talk_Reset_init_zero;
+
+        reset_message.reset = reset;
+
+        if (!pb_encode(&ostream, cave_talk_Reset_fields, &reset_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_RESET, handle->buffer, ostream.bytes_written);
+
+            /* Reset listener state machine */
+            (void)CaveTalk_Reset(&handle->link_handle, true);
+            (void)CaveTalk_Reset(&handle->link_handle, false);
+        }
+    }
+
+    return error;
+}
+
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -976,7 +1012,6 @@ static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Ha
     return error;
 }
 
-
 static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -997,6 +1032,37 @@ static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Hand
         else if (NULL != handle->listen_callbacks.hear_config_steering_control)
         {
             handle->listen_callbacks.hear_config_steering_control(&config_sc_message.turn_rate_params, config_sc_message.enabled);
+        }
+    }
+
+    return error;
+}
+
+static CaveTalk_Error_t CaveTalk_HandleReset(CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if ((NULL == handle) || (NULL == handle->buffer))
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        pb_istream_t    istream       = pb_istream_from_buffer(handle->buffer, length);
+        cave_talk_Reset reset_message = cave_talk_Reset_init_zero;
+
+        if (!pb_decode(&istream, cave_talk_Reset_fields, &reset_message))
+        {
+            error = CAVE_TALK_ERROR_PARSE;
+        }
+        else
+        {
+            error = CaveTalk_Reset(&handle->link_handle, reset_message.reset);
+
+            if (NULL != handle->listen_callbacks.hear_reset)
+            {
+                handle->listen_callbacks.hear_reset(reset_message.reset);
+            }
         }
     }
 

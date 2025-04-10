@@ -1,6 +1,7 @@
 #ifndef CAVE_TALK_LINK_H
 #define CAVE_TALK_LINK_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "cave_talk_types.h"
@@ -25,6 +26,7 @@ typedef struct
     CaveTalk_Length_t receive_length;
     CaveTalk_Crc_t crc;
     size_t bytes_received;
+    bool speak_disabled;
 } CaveTalk_LinkHandle_t;
 
 static const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
@@ -35,7 +37,7 @@ static const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
     .receive_length = 0U,
     .crc            = 0U,
     .bytes_received = 0U,
-};
+    .speak_disabled = false};
 
 #ifdef __cplusplus
 extern "C"
@@ -51,6 +53,7 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
                                  void *const data,
                                  const size_t size,
                                  CaveTalk_Length_t *const length);
+CaveTalk_Error_t CaveTalk_Reset(CaveTalk_LinkHandle_t *const handle, const bool reset);
 
 #ifdef __cplusplus
 }

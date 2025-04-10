@@ -166,6 +166,8 @@ public:
         TestPIDObject(pid_sc_saved_trp, turn_rate_params);
         ASSERT_EQ(pid_sc_enabled, enabled);
     }
+
+    MOCK_METHOD(void, HearReset, (const bool), (override));
 };
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
@@ -549,5 +551,25 @@ TEST(CaveTalkCppTests, SpeakListenConfigSteeringControl)
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params, false));
     pid_sc_enabled = false;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+}
+
+TEST(CaveTalkCppTests, SpeakListenReset)
+{
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakReset(true));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearReset(true)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
+
+    // HearReset mock called so link handle state not updated
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakReset(false));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearReset(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
 }
