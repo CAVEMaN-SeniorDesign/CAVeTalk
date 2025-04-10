@@ -26,7 +26,7 @@ typedef struct
     CaveTalk_Length_t receive_length;
     CaveTalk_Crc_t crc;
     size_t bytes_received;
-    bool send_disable;
+    bool speak_disabled;
 } CaveTalk_LinkHandle_t;
 
 static const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
@@ -37,8 +37,7 @@ static const CaveTalk_LinkHandle_t kCaveTalk_LinkHandleNull = {
     .receive_length = 0U,
     .crc            = 0U,
     .bytes_received = 0U,
-    .send_disable   = false
-};
+    .speak_disabled = false};
 
 #ifdef __cplusplus
 extern "C"

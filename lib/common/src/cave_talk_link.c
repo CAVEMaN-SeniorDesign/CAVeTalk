@@ -48,7 +48,7 @@ CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
     if ((NULL == handle) || (NULL == handle->send) || (NULL == data))
     {
     }
-    else if (handle->send_disable)
+    else if (handle->speak_disabled)
     {
         error = CAVE_TALK_ERROR_SPEAK_DISABLED;
     }
@@ -128,7 +128,7 @@ CaveTalk_Error_t CaveTalk_Reset(CaveTalk_LinkHandle_t *const handle, const bool 
     }
     else
     {
-        handle->send_disable = reset;
+        handle->speak_disabled = reset;
 
         if (reset)
         {

@@ -562,7 +562,13 @@ CaveTalk_Error_t Talker::SpeakReset(const bool reset)
     std::size_t length = reset_message.ByteSizeLong();
     reset_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
-    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_RESET), message_buffer_.data(), length);
+    CaveTalk_Error_t error = CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_RESET), message_buffer_.data(), length);
+
+    /* Reset listener state machine */
+    (void)CaveTalk_Reset(&link_handle_, true);
+    (void)CaveTalk_Reset(&link_handle_, false);
+
+    return error;
 }
 
 } // namespace cave_talk

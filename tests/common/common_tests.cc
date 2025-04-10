@@ -140,11 +140,11 @@ TEST(CommonTests, Reset)
 
     uint8_t data = 0x00;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Reset(&LinkHandle, true));
-    ASSERT_TRUE(LinkHandle.send_disable);
+    ASSERT_TRUE(LinkHandle.speak_disabled);
     ASSERT_EQ(CAVE_TALK_LINK_STATE_RESET, LinkHandle.receive_state);
     ASSERT_EQ(CAVE_TALK_ERROR_SPEAK_DISABLED, CaveTalk_Speak(&LinkHandle, 0x0F, &data, sizeof(data)));
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Reset(&LinkHandle, false));
-    ASSERT_FALSE(LinkHandle.send_disable);
+    ASSERT_FALSE(LinkHandle.speak_disabled);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Speak(&LinkHandle, 0x0F, &data, sizeof(data)));
     ring_buffer.Clear();
 }

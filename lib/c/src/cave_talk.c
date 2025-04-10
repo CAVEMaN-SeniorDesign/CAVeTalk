@@ -639,7 +639,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *co
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakReset(const CaveTalk_Handle_t *const handle, const bool reset)
+CaveTalk_Error_t CaveTalk_SpeakReset(CaveTalk_Handle_t *const handle, const bool reset)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -660,6 +660,10 @@ CaveTalk_Error_t CaveTalk_SpeakReset(const CaveTalk_Handle_t *const handle, cons
         else
         {
             error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_RESET, handle->buffer, ostream.bytes_written);
+
+            /* Reset listener state machine */
+            (void)CaveTalk_Reset(&handle->link_handle, true);
+            (void)CaveTalk_Reset(&handle->link_handle, false);
         }
     }
 

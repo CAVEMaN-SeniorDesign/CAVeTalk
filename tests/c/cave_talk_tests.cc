@@ -147,7 +147,7 @@ public:
     virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
     virtual void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled) = 0;
     virtual void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, const bool enabled) = 0;
-
+    virtual void HearReset(const bool reset) = 0;
 };
 
 ListenCallbacksInterface::~ListenCallbacksInterface() = default;
@@ -169,7 +169,7 @@ public:
     MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
     MOCK_METHOD(void, HearConfigWheelSpeedControl, ((const cave_talk_PID *const wheel_0_params), (const cave_talk_PID *const wheel_1_params), (const cave_talk_PID *const wheel_2_params), (const cave_talk_PID *const wheel_3_params), (const bool enabled)), (override));
     MOCK_METHOD(void, HearConfigSteeringControl, ((const cave_talk_PID *const turn_rate_params), (const bool enabled)), (override));
-
+    MOCK_METHOD(void, HearReset, (const bool reset), (override));
 };
 
 std::shared_ptr<MockListenCallbacks> mock_calls = std::make_shared<MockListenCallbacks>();
@@ -201,6 +201,11 @@ static void HearArm(const bool arm)
 static void HearLog(const char *const log)
 {
     return (mock_calls.get())->HearLog(log);
+}
+
+static void HearReset(const bool reset)
+{
+    return (mock_calls.get())->HearReset(reset);
 }
 
 void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
@@ -277,6 +282,7 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_log = HearConfigLog,
     .hear_config_wheel_speed_control = HearConfigWheelSpeedControl,
     .hear_config_steering_control = HearConfigSteeringControl,
+    .hear_reset = HearReset
 };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
@@ -558,7 +564,6 @@ TEST(CaveTalkCTests, SpeakListenConfigWheelSpeedControl)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigWheelSpeedControl(&CaveTalk_Handle, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, false));
     pid_wsc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
-
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigSteeringControl)
@@ -578,4 +583,23 @@ TEST(CaveTalkCTests, SpeakListenConfigSteeringControl)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigSteeringControl(&CaveTalk_Handle, &steer_ctl, false));
     pid_sc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenReset)
+{
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakReset(&CaveTalk_Handle, true));
+    EXPECT_CALL(*mock_calls.get(), HearReset(true)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_SPEAK_DISABLED, CaveTalk_SpeakReset(&CaveTalk_Handle, false));
+    CaveTalk_Handle.link_handle.speak_disabled = false;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakReset(&CaveTalk_Handle, false));
+    EXPECT_CALL(*mock_calls.get(), HearReset(false)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    mock_calls.reset();
 }

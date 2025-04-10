@@ -87,7 +87,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigEncoders(const CaveTalk_Handle_t *const han
 CaveTalk_Error_t CaveTalk_SpeakConfigLog(const CaveTalk_Handle_t *const handle, const cave_talk_LogLevel log_level);
 CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled);
 CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params, const bool enabled);
-CaveTalk_Error_t CaveTalk_SpeakReset(const CaveTalk_Handle_t *const handle, const bool reset);
+CaveTalk_Error_t CaveTalk_SpeakReset(CaveTalk_Handle_t *const handle, const bool reset);
 
 #ifdef __cplusplus
 }
