@@ -18,6 +18,7 @@
 #include "movement.pb.h"
 #include "odometry.pb.h"
 #include "ooga_booga.pb.h"
+#include "reset.pb.h"
 
 namespace cave_talk
 {
@@ -90,6 +91,9 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_CONFIG_STEERING_CONTROL:
             error = HandleConfigSteeringControl(length);
             break;
+        case ID_RESET:
+            error = HandleReset(length);
+            break;
         default:
             error = CAVE_TALK_ERROR_ID;
             break;
@@ -99,7 +103,7 @@ CaveTalk_Error_t Listener::Listen(void)
     return error;
 }
 
-CaveTalk_Error_t Listener::HandleOogaBooga(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleOogaBooga(const CaveTalk_Length_t length) const
 {
     OogaBooga ooga_booga_message;
 
@@ -115,7 +119,7 @@ CaveTalk_Error_t Listener::HandleOogaBooga(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleMovement(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleMovement(const CaveTalk_Length_t length) const
 {
     Movement movement_message;
 
@@ -132,7 +136,7 @@ CaveTalk_Error_t Listener::HandleMovement(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleCameraMovement(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleCameraMovement(const CaveTalk_Length_t length) const
 {
     CameraMovement camera_movement_message;
 
@@ -149,7 +153,7 @@ CaveTalk_Error_t Listener::HandleCameraMovement(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleLights(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleLights(const CaveTalk_Length_t length) const
 {
     Lights lights_message;
 
@@ -165,7 +169,7 @@ CaveTalk_Error_t Listener::HandleLights(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleArm(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleArm(const CaveTalk_Length_t length) const
 {
     Arm arm_message;
 
@@ -181,7 +185,7 @@ CaveTalk_Error_t Listener::HandleArm(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleLog(const CaveTalk_Length_t length) const
 {
     Log log_message;
 
@@ -197,7 +201,7 @@ CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleOdometry(const CaveTalk_Length_t length) const
 {
 
     Odometry odometry_message;
@@ -218,7 +222,7 @@ CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigServoWheels(const CaveTalk_Length_t length) const
 {
     ConfigServoWheels config_servo_wheels_message;
 
@@ -237,7 +241,7 @@ CaveTalk_Error_t Listener::HandleConfigServoWheels(CaveTalk_Length_t length) con
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigServoCams(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigServoCams(const CaveTalk_Length_t length) const
 {
     ConfigServoCams config_servo_cams_message;
 
@@ -254,7 +258,7 @@ CaveTalk_Error_t Listener::HandleConfigServoCams(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigMotor(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigMotor(const CaveTalk_Length_t length) const
 {
     ConfigMotor config_motor_message;
 
@@ -273,7 +277,7 @@ CaveTalk_Error_t Listener::HandleConfigMotor(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigEncoder(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigEncoder(const CaveTalk_Length_t length) const
 {
     ConfigEncoders config_encoder_message;
 
@@ -292,7 +296,7 @@ CaveTalk_Error_t Listener::HandleConfigEncoder(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigLog(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigLog(const CaveTalk_Length_t length) const
 {
     ConfigLog config_log_message;
 
@@ -308,7 +312,7 @@ CaveTalk_Error_t Listener::HandleConfigLog(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigWheelSpeedControl(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigWheelSpeedControl(const CaveTalk_Length_t length) const
 {
     ConfigWheelSpeedControl config_wsc_message;
 
@@ -328,7 +332,7 @@ CaveTalk_Error_t Listener::HandleConfigWheelSpeedControl(CaveTalk_Length_t lengt
     return CAVE_TALK_ERROR_NONE;
 }
 
-CaveTalk_Error_t Listener::HandleConfigSteeringControl(CaveTalk_Length_t length) const
+CaveTalk_Error_t Listener::HandleConfigSteeringControl(const CaveTalk_Length_t length) const
 {
     ConfigSteeringControl config_sc_message;
 
@@ -343,6 +347,21 @@ CaveTalk_Error_t Listener::HandleConfigSteeringControl(CaveTalk_Length_t length)
     listener_callbacks_->HearConfigSteeringControl(turn_rate_params, enabled);
 
     return CAVE_TALK_ERROR_NONE;
+}
+
+CaveTalk_Error_t Listener::HandleReset(const CaveTalk_Length_t length)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_PARSE;
+    Reset            reset_message;
+
+    if (reset_message.ParseFromArray(buffer_.data(), length))
+    {
+        error = CaveTalk_Reset(&link_handle_, reset_message.reset());
+
+        listener_callbacks_->HearReset(reset_message.reset());
+    }
+
+    return error;
 }
 
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
@@ -532,6 +551,18 @@ CaveTalk_Error_t Talker::SpeakConfigSteeringControl(const PID &turn_rate_params,
     config_sc_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_STEERING_CONTROL), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakReset(const bool reset)
+{
+    Reset reset_message;
+
+    reset_message.set_reset(reset);
+
+    std::size_t length = reset_message.ByteSizeLong();
+    reset_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_RESET), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

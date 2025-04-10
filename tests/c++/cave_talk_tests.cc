@@ -110,6 +110,7 @@ public:
     MOCK_METHOD(void, HearLights, (const bool), (override));
     MOCK_METHOD(void, HearArm, (const bool), (override));
     MOCK_METHOD(void, HearLog, (const char *const), (override));
+    MOCK_METHOD(void, HearReset, (const bool), (override));
 
     void HearOdometry(const cave_talk::Imu &IMU, const cave_talk::Encoder &encoder_wheel_0, const cave_talk::Encoder &encoder_wheel_1, const cave_talk::Encoder &encoder_wheel_2, const cave_talk::Encoder &encoder_wheel_3) override
     {
