@@ -27,6 +27,7 @@ CAVEMAN controller message protocol
 | 0x0C | Configuration - Log             | Send Log Verbosity Configuration Between Devices                                                                           |
 | 0x0D | Configuration - Wheel Speed PID | Send PID Tuning Parameters for Rover Wheel Speed                                                                           |
 | 0x0E | Configuration - Turn Rate PID   | Send PID Tuning Parameters for Rover Turn Rate                                                                             |
+| 0x0F | Reset                           | Start/Stop Reset Sequence                                                                                                  |
 
 3. Length refers to the length of the packet in bytes
 4. Payload refers to the main piece of information sent in the packet
