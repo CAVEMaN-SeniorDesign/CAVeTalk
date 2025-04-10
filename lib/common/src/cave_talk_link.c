@@ -50,7 +50,7 @@ CaveTalk_Error_t CaveTalk_Speak(const CaveTalk_LinkHandle_t *const handle,
     }
     else if (handle->send_disable)
     {
-        error = CAVE_TALK_ERROR_SEND_DISABLED;
+        error = CAVE_TALK_ERROR_SPEAK_DISABLED;
     }
     else
     {
