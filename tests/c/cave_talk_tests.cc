@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "air_quality.pb.h"
 #include "ooga_booga.pb.h"
 #include "config_encoder.pb.h"
 #include "config_log.pb.h"
@@ -147,6 +148,7 @@ public:
     virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
     virtual void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled) = 0;
     virtual void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, const bool enabled) = 0;
+    virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm) = 0;
 
 };
 
@@ -169,6 +171,7 @@ public:
     MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
     MOCK_METHOD(void, HearConfigWheelSpeedControl, ((const cave_talk_PID *const wheel_0_params), (const cave_talk_PID *const wheel_1_params), (const cave_talk_PID *const wheel_2_params), (const cave_talk_PID *const wheel_3_params), (const bool enabled)), (override));
     MOCK_METHOD(void, HearConfigSteeringControl, ((const cave_talk_PID *const turn_rate_params), (const bool enabled)), (override));
+    MOCK_METHOD(void, HearAirQuality, ((const uint32_t dust_ug_per_m3), (const uint32_t gas_ppm)), (override));
 
 };
 
@@ -262,6 +265,11 @@ void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, cons
     ASSERT_EQ(pid_sc_enabled, enabled);
 }
 
+static void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)
+{
+    return (mock_calls.get())->HearAirQuality(dust_ug_per_m3, gas_ppm);
+}
+
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_ooga_booga = HearOogaBooga,
     .hear_movement = HearMovement,
@@ -277,6 +285,7 @@ const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
     .hear_config_log = HearConfigLog,
     .hear_config_wheel_speed_control = HearConfigWheelSpeedControl,
     .hear_config_steering_control = HearConfigSteeringControl,
+    .hear_air_quality = HearAirQuality,
 };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
@@ -578,4 +587,16 @@ TEST(CaveTalkCTests, SpeakListenConfigSteeringControl)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigSteeringControl(&CaveTalk_Handle, &steer_ctl, false));
     pid_sc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenAirQuality)
+{
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakAirQuality(&CaveTalk_Handle, 52, 253));
+    EXPECT_CALL(*mock_calls.get(), HearAirQuality(52, 253)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+    mock_calls.reset();
 }

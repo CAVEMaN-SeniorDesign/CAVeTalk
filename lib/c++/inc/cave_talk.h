@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+#include "air_quality.pb.h"
 #include "config_encoder.pb.h"
 #include "config_log.pb.h"
 #include "config_motor.pb.h"
@@ -39,6 +40,7 @@ class ListenerCallbacks
         virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
         virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled)               = 0;
         virtual void HearConfigSteeringControl(const PID &turn_rate_params, const bool enabled)                                                                                                = 0;
+        virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)                                                                                                     = 0;
 
 };
 
@@ -68,6 +70,7 @@ class Listener
         CaveTalk_Error_t HandleConfigLog(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigWheelSpeedControl(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleConfigSteeringControl(const CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleAirQuality(const CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
@@ -95,6 +98,7 @@ class Talker
         CaveTalk_Error_t SpeakConfigLog(const LogLevel log_level);
         CaveTalk_Error_t SpeakConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled);
         CaveTalk_Error_t SpeakConfigSteeringControl(const PID &turn_rate_params, const bool enabled);
+        CaveTalk_Error_t SpeakAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;
