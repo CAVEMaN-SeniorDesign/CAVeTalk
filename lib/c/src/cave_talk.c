@@ -639,7 +639,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *co
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakAirQuality(const CaveTalk_Handle_t *const handle, const uint32_t dust_ug_per_m3, const double gas_ppm)
+CaveTalk_Error_t CaveTalk_SpeakAirQuality(const CaveTalk_Handle_t *const handle, const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
 
@@ -648,11 +648,11 @@ CaveTalk_Error_t CaveTalk_SpeakAirQuality(const CaveTalk_Handle_t *const handle,
     }
     else
     {
-        pb_ostream_t  ostream  = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
-        cave_talk_AirQuality aq_msg = cave_talk_AirQuality_init_zero;
+        pb_ostream_t         ostream = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_AirQuality aq_msg  = cave_talk_AirQuality_init_zero;
 
         aq_msg.dust_ug_per_m3 = dust_ug_per_m3;
-        aq_msg.gas_ppm = gas_ppm;
+        aq_msg.gas_ppm        = gas_ppm;
 
         if (!pb_encode(&ostream, cave_talk_AirQuality_fields, &aq_msg))
         {
@@ -1046,8 +1046,8 @@ static CaveTalk_Error_t CaveTalk_HandleAirQuality(const CaveTalk_Handle_t *const
     }
     else
     {
-        pb_istream_t  istream     = pb_istream_from_buffer(handle->buffer, length);
-        cave_talk_AirQuality aq_msg = cave_talk_AirQuality_init_zero;
+        pb_istream_t         istream = pb_istream_from_buffer(handle->buffer, length);
+        cave_talk_AirQuality aq_msg  = cave_talk_AirQuality_init_zero;
 
         if (!pb_decode(&istream, cave_talk_AirQuality_fields, &aq_msg))
         {

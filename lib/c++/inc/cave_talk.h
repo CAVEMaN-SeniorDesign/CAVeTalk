@@ -40,7 +40,7 @@ class ListenerCallbacks
         virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
         virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled)               = 0;
         virtual void HearConfigSteeringControl(const PID &turn_rate_params, const bool enabled)                                                                                                = 0;
-        virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const double gas_ppm) = 0;
+        virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)                                                                                                     = 0;
 
 };
 
@@ -98,7 +98,7 @@ class Talker
         CaveTalk_Error_t SpeakConfigLog(const LogLevel log_level);
         CaveTalk_Error_t SpeakConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled);
         CaveTalk_Error_t SpeakConfigSteeringControl(const PID &turn_rate_params, const bool enabled);
-        CaveTalk_Error_t SpeakAirQuality(const uint32_t dust_ug_per_m3, const double gas_ppm);
+        CaveTalk_Error_t SpeakAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;

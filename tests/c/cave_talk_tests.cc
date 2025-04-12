@@ -148,7 +148,7 @@ public:
     virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
     virtual void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled) = 0;
     virtual void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, const bool enabled) = 0;
-    virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const double gas_ppm) = 0;
+    virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm) = 0;
 
 };
 
@@ -171,7 +171,7 @@ public:
     MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
     MOCK_METHOD(void, HearConfigWheelSpeedControl, ((const cave_talk_PID *const wheel_0_params), (const cave_talk_PID *const wheel_1_params), (const cave_talk_PID *const wheel_2_params), (const cave_talk_PID *const wheel_3_params), (const bool enabled)), (override));
     MOCK_METHOD(void, HearConfigSteeringControl, ((const cave_talk_PID *const turn_rate_params), (const bool enabled)), (override));
-    MOCK_METHOD(void, HearAirQuality, ((const uint32_t dust_ug_per_m3), (const double gas_ppm)), (override));
+    MOCK_METHOD(void, HearAirQuality, ((const uint32_t dust_ug_per_m3), (const uint32_t gas_ppm)), (override));
 
 };
 
@@ -265,7 +265,7 @@ void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, cons
     ASSERT_EQ(pid_sc_enabled, enabled);
 }
 
-static void HearAirQuality(const uint32_t dust_ug_per_m3, const double gas_ppm)
+static void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)
 {
     return (mock_calls.get())->HearAirQuality(dust_ug_per_m3, gas_ppm);
 }
@@ -593,8 +593,8 @@ TEST(CaveTalkCTests, SpeakListenAirQuality)
 {
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakAirQuality(&CaveTalk_Handle, 52, 253.3453));
-    EXPECT_CALL(*mock_calls.get(), HearAirQuality(52, 253.3453)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakAirQuality(&CaveTalk_Handle, 52, 253));
+    EXPECT_CALL(*mock_calls.get(), HearAirQuality(52, 253)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
