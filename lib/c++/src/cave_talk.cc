@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 
+#include "air_quality.pb.h"
 #include "arm.pb.h"
 #include "camera_movement.pb.h"
 #include "cave_talk_link.h"
@@ -89,6 +90,9 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_CONFIG_STEERING_CONTROL:
             error = HandleConfigSteeringControl(length);
+            break;
+        case ID_AIR_QUALITY:
+            error = HandleAirQuality(length);
             break;
         default:
             error = CAVE_TALK_ERROR_ID;
@@ -345,6 +349,23 @@ CaveTalk_Error_t Listener::HandleConfigSteeringControl(CaveTalk_Length_t length)
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleAirQuality(CaveTalk_Length_t length) const
+{
+    AirQuality air_quality_message;
+
+    if (!air_quality_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const uint32_t dust_ug_per_m3 = air_quality_message.dust_ug_per_m3();
+    const double gas_ppm = air_quality_message.gas_ppm();
+
+    listener_callbacks_->HearAirQuality(dust_ug_per_m3, gas_ppm);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_         = kCaveTalk_LinkHandleNull;
@@ -532,6 +553,18 @@ CaveTalk_Error_t Talker::SpeakConfigSteeringControl(const PID &turn_rate_params,
     config_sc_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_STEERING_CONTROL), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakAirQuality(const uint32_t dust_ug_per_m3, const double gas_ppm)
+{
+    AirQuality air_quality_message;
+    air_quality_message.set_dust_ug_per_m3(dust_ug_per_m3);
+    air_quality_message.set_gas_ppm(gas_ppm);
+
+    std::size_t length = air_quality_message.ByteSizeLong();
+    air_quality_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_AIR_QUALITY), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

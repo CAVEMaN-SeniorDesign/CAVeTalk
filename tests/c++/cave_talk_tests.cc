@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "air_quality.pb.h"
 #include "ooga_booga.pb.h"
 #include "config_encoder.pb.h"
 #include "config_log.pb.h"
@@ -166,6 +167,8 @@ public:
         TestPIDObject(pid_sc_saved_trp, turn_rate_params);
         ASSERT_EQ(pid_sc_enabled, enabled);
     }
+
+    MOCK_METHOD(void, HearAirQuality, ((const uint32_t dust_ug_per_m3), (const double gas_ppm)), (override));
 };
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
@@ -550,4 +553,19 @@ TEST(CaveTalkCppTests, SpeakListenConfigSteeringControl)
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakConfigSteeringControl(wheel_params, false));
     pid_sc_enabled = false;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+}
+
+TEST(CaveTalkCppTests, SpeakListenAirQuality)
+{
+    std::shared_ptr<MockListenerCallbacks> mock_listen_callbacks = std::make_shared<MockListenerCallbacks>();
+    cave_talk::Talker roverMouth(Send);
+    cave_talk::Listener roverEars(Receive, mock_listen_callbacks);
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverMouth.SpeakAirQuality(52, 1203.475));
+    EXPECT_CALL(*mock_listen_callbacks.get(), HearAirQuality(52, 1203.475)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, roverEars.Listen());
+
+    ring_buffer.Clear();
 }
