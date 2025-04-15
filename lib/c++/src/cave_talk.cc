@@ -358,10 +358,11 @@ CaveTalk_Error_t Listener::HandleAirQuality(CaveTalk_Length_t length) const
         return CAVE_TALK_ERROR_PARSE;
     }
 
-    const uint32_t dust_ug_per_m3 = air_quality_message.dust_ug_per_m3();
-    const uint32_t gas_ppm        = air_quality_message.gas_ppm();
+    const uint32_t dust_ug_per_m3      = air_quality_message.dust_ug_per_m3();
+    const uint32_t gas_ppm             = air_quality_message.gas_ppm();
+    const double   temperature_celsius = air_quality_message.temperature_celsius();
 
-    listener_callbacks_->HearAirQuality(dust_ug_per_m3, gas_ppm);
+    listener_callbacks_->HearAirQuality(dust_ug_per_m3, gas_ppm, temperature_celsius);
 
     return CAVE_TALK_ERROR_NONE;
 }
@@ -555,11 +556,12 @@ CaveTalk_Error_t Talker::SpeakConfigSteeringControl(const PID &turn_rate_params,
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_CONFIG_STEERING_CONTROL), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm)
+CaveTalk_Error_t Talker::SpeakAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius)
 {
     AirQuality air_quality_message;
     air_quality_message.set_dust_ug_per_m3(dust_ug_per_m3);
     air_quality_message.set_gas_ppm(gas_ppm);
+    air_quality_message.set_temperature_celsius(temperature_celsius);
 
     std::size_t length = air_quality_message.ByteSizeLong();
     air_quality_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
