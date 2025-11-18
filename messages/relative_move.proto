@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package cave_talk;
+
+enum RelativeMoveType {
+    RELATIVE_MOVE_TYPE_CMD = 0;
+    RELATIVE_MOVE_TYPE_ACK = 1;
+}
+
+message RelativeMove {
+    RelativeMoveType type = 1;
+    double position_meters = 2;
+    double pose_radians = 3;
+}
