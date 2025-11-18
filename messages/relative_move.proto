@@ -5,6 +5,7 @@ package cave_talk;
 enum RelativeMoveType {
     RELATIVE_MOVE_TYPE_CMD = 0;
     RELATIVE_MOVE_TYPE_ACK = 1;
+    RELATIVE_MOVE_TYPE_NACK = 2;
 }
 
 message RelativeMove {
