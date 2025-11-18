@@ -95,6 +95,9 @@ CaveTalk_Error_t Listener::Listen(void)
         case ID_AIR_QUALITY:
             error = HandleAirQuality(length);
             break;
+        case ID_RELATIVE_MOVE:
+            error = HandleRelativeMove(length);
+            break;
         default:
             error = CAVE_TALK_ERROR_ID;
             break;
