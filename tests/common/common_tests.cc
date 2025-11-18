@@ -116,12 +116,13 @@ TEST(CommonTests, SRAClosed)
     ASSERT_EQ(CAVE_TALK_ERROR_SOCKET_CLOSED, CaveTalk_Listen(&SocketClosedHandle, &id, static_cast<void *>(data_receive), sizeof(data_receive), &length));
 }
 
-TEST(CommonTests, SizeAndIncompleteness)
+TEST(CommonTests, SizeIncompleteVersion)
 {
 
     uint8_t data_send[10U] = {0U};
     uint8_t data_receive[3U] = {0U};
     uint8_t data_rand_0[4U] = {0U};
+    uint8_t data_rand_1[4U] = {1U, 0U, 0U, 0U};
     CaveTalk_Id_t id = 0U;
     CaveTalk_Length_t length = 0U;
 

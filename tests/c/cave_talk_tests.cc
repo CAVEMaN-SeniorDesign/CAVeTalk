@@ -3,21 +3,24 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "air_quality.pb.h"
 #include "ooga_booga.pb.h"
-#include "config_servo.pb.h"
+#include "config_encoder.pb.h"
+#include "config_log.pb.h"
 #include "config_motor.pb.h"
+#include "config_pid.pb.h"
+#include "config_servo.pb.h"
 
 #include "cave_talk.h"
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
 #include "ring_buffer.h"
 
-
 static const std::size_t kMaxMessageLength = 255U;
 static RingBuffer<uint8_t, kMaxMessageLength> ring_buffer;
 
 CaveTalk_Error_t Send(const void *const data, const size_t size)
-{    
+{
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
 
     if (size > ring_buffer.Capacity() - ring_buffer.Size())
@@ -46,112 +49,243 @@ static CaveTalk_LinkHandle_t kCaveTalk_CTests_LinkHandle = {
 };
 
 uint8_t buffer[255U] = {0U};
+cave_talk_Imu imu_odometry_saved;
+cave_talk_Encoder encoder_odometry_saved_0;
+cave_talk_Encoder encoder_odometry_saved_1;
+cave_talk_Encoder encoder_odometry_saved_2;
+cave_talk_Encoder encoder_odometry_saved_3;
+cave_talk_Servo servo_configservowheels_saved_0;
+cave_talk_Servo servo_configservowheels_saved_1;
+cave_talk_Servo servo_configservowheels_saved_2;
+cave_talk_Servo servo_configservowheels_saved_3;
+cave_talk_Servo servo_configservocams_saved_pan;
+cave_talk_Servo servo_configservocams_saved_tilt;
+cave_talk_Motor motor_configmotor_saved_0;
+cave_talk_Motor motor_configmotor_saved_1;
+cave_talk_Motor motor_configmotor_saved_2;
+cave_talk_Motor motor_configmotor_saved_3;
+cave_talk_ConfigEncoder configencoder_configencoder_saved_0;
+cave_talk_ConfigEncoder configencoder_configencoder_saved_1;
+cave_talk_ConfigEncoder configencoder_configencoder_saved_2;
+cave_talk_ConfigEncoder configencoder_configencoder_saved_3;
+cave_talk_PID pid_wsc_saved_0;
+cave_talk_PID pid_wsc_saved_1;
+cave_talk_PID pid_wsc_saved_2;
+cave_talk_PID pid_wsc_saved_3;
+bool pid_wsc_enabled;
+cave_talk_PID pid_sc_saved_trp;
+bool pid_sc_enabled;
+
+void TestIMUObject(const cave_talk_Imu &a, const cave_talk_Imu &b)
+{
+    ASSERT_EQ(a.accel.x_meters_per_second_squared, b.accel.x_meters_per_second_squared);
+    ASSERT_EQ(a.accel.y_meters_per_second_squared, b.accel.y_meters_per_second_squared);
+    ASSERT_EQ(a.accel.z_meters_per_second_squared, b.accel.z_meters_per_second_squared);
+    ASSERT_EQ(a.gyro.roll_radians_per_second, b.gyro.roll_radians_per_second);
+    ASSERT_EQ(a.gyro.pitch_radians_per_second, b.gyro.pitch_radians_per_second);
+    ASSERT_EQ(a.gyro.yaw_radians_per_second, b.gyro.yaw_radians_per_second);
+    ASSERT_EQ(a.quat.w, b.quat.w);
+    ASSERT_EQ(a.quat.x, b.quat.x);
+    ASSERT_EQ(a.quat.y, b.quat.y);
+    ASSERT_EQ(a.quat.z, b.quat.z);
+}
+
+void TestEncoderObject(const cave_talk_Encoder &a, const cave_talk_Encoder &b)
+{
+    ASSERT_EQ(a.total_pulses, b.total_pulses);
+    ASSERT_EQ(a.rate_radians_per_second, b.rate_radians_per_second);
+}
+
+void TestServoObject(const cave_talk_Servo &a, const cave_talk_Servo &b)
+{
+    ASSERT_EQ(a.min_angle_radian, b.min_angle_radian);
+    ASSERT_EQ(a.max_angle_radian, b.max_angle_radian);
+    ASSERT_EQ(a.center_angle_radian, b.center_angle_radian);
+    ASSERT_EQ(a.min_duty_cycle_percentage, b.min_duty_cycle_percentage);
+    ASSERT_EQ(a.max_duty_cycle_percentage, b.max_duty_cycle_percentage);
+    ASSERT_EQ(a.center_duty_cycle_percentage, b.center_duty_cycle_percentage);
+}
+
+void TestMotorObject(const cave_talk_Motor &a, const cave_talk_Motor &b)
+{
+    ASSERT_EQ(a.pwm_carrier_freq_hz, b.pwm_carrier_freq_hz);
+    ASSERT_EQ(a.min_duty_cycle_percentage, b.min_duty_cycle_percentage);
+    ASSERT_EQ(a.max_duty_cycle_percentage, b.max_duty_cycle_percentage);
+    ASSERT_EQ(a.min_speed_loaded_meters_per_second, b.min_speed_loaded_meters_per_second);
+    ASSERT_EQ(a.max_speed_loaded_meters_per_second, b.max_speed_loaded_meters_per_second);
+}
+
+void TestConfigEncoderObject(const cave_talk_ConfigEncoder &a, const cave_talk_ConfigEncoder &b)
+{
+    ASSERT_EQ(a.smoothing_factor, b.smoothing_factor);
+    ASSERT_EQ(a.radians_per_pulse, b.radians_per_pulse);
+    ASSERT_EQ(a.pulses_per_period, b.pulses_per_period);
+    ASSERT_EQ(a.mode, b.mode);
+}
+
+void TestPIDObject(const cave_talk_PID &a, const cave_talk_PID &b)
+{
+    ASSERT_EQ(a.Kp, b.Kp);
+    ASSERT_EQ(a.Ki, b.Ki);
+    ASSERT_EQ(a.Kd, b.Kd);
+}
 
 class ListenCallbacksInterface
 {
-    public:
-        virtual ~ListenCallbacksInterface()                                                                                   = 0;
-        virtual void HearOogaBooga(const cave_talk_Say ooga_booga)                                                               = 0;
-        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate) = 0;
-        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                     = 0;
-        virtual void HearLights(const bool headlights)                                                                 = 0;
-        virtual void HearMode(const bool manual)  = 0;
+public:
+    virtual ~ListenCallbacksInterface() = 0;
+    virtual void HearOogaBooga(const cave_talk_Say ooga_booga) = 0;
+    virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate) = 0;
+    virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt) = 0;
+    virtual void HearLights(const bool headlights) = 0;
+    virtual void HearArm(const bool arm) = 0;
+    virtual void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3) = 0;
+    virtual void HearLog(const char *const log) = 0;
+    virtual void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3) = 0;
+    virtual void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt) = 0;
+    virtual void HearConfigMotor(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3) = 0;
+    virtual void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3) = 0;
+    virtual void HearConfigLog(const cave_talk_LogLevel log_level) = 0;
+    virtual void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled) = 0;
+    virtual void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, const bool enabled) = 0;
+    virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius) = 0;
+
 };
 
-void HearOogaBooga(const cave_talk_Say ooga_booga)
+ListenCallbacksInterface::~ListenCallbacksInterface() = default;
+
+class MockListenCallbacks : public ListenCallbacksInterface
 {
-    if(ooga_booga == cave_talk_Say_SAY_OOGA)
-    {
-        std::cout << "OOGA RECEIVED" << std::endl;
-    }
-    else if(ooga_booga == cave_talk_Say_SAY_BOOGA)
-    {
-        std::cout << "BOOGA RECEIVED" << std::endl;
-    }
-    else
-    {
-        std::cout << "BAD OUTPUT" << std::endl;
-    }
+public:
+    MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
+    MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
+    MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
+    MOCK_METHOD(void, HearLights, (const bool), (override));
+    MOCK_METHOD(void, HearArm, (const bool), (override));
+    MOCK_METHOD(void, HearOdometry, ((const cave_talk_Imu *const imu), (const cave_talk_Encoder *const encoder_wheel_0), (const cave_talk_Encoder *const encoder_wheel_1), (const cave_talk_Encoder *const encoder_wheel_2), (const cave_talk_Encoder *const encoder_wheel_3)), (override));
+    MOCK_METHOD(void, HearLog, (const char *const), (override));
+    MOCK_METHOD(void, HearConfigServoWheels, ((const cave_talk_Servo *const servo_wheel_0), (const cave_talk_Servo *const servo_wheel_1), (const cave_talk_Servo *const servo_wheel_2), (const cave_talk_Servo *const servo_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigServoCams, ((const cave_talk_Servo *const servo_cam_pan), (const cave_talk_Servo *const servo_cam_tilt)), (override));
+    MOCK_METHOD(void, HearConfigMotor, ((const cave_talk_Motor *const motor_wheel_0), (const cave_talk_Motor *const motor_wheel_1), (const cave_talk_Motor *const motor_wheel_2), (const cave_talk_Motor *const motor_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigEncoder, ((const cave_talk_ConfigEncoder *const encoder_wheel_0), (const cave_talk_ConfigEncoder *const encoder_wheel_1), (const cave_talk_ConfigEncoder *const encoder_wheel_2), (const cave_talk_ConfigEncoder *const encoder_wheel_3)), (override));
+    MOCK_METHOD(void, HearConfigLog, (const cave_talk_LogLevel), (override));
+    MOCK_METHOD(void, HearConfigWheelSpeedControl, ((const cave_talk_PID *const wheel_0_params), (const cave_talk_PID *const wheel_1_params), (const cave_talk_PID *const wheel_2_params), (const cave_talk_PID *const wheel_3_params), (const bool enabled)), (override));
+    MOCK_METHOD(void, HearConfigSteeringControl, ((const cave_talk_PID *const turn_rate_params), (const bool enabled)), (override));
+    MOCK_METHOD(void, HearAirQuality, ((const uint32_t dust_ug_per_m3), (const uint32_t gas_ppm), (const double temperature_celsius)), (override));
+
+};
+
+std::shared_ptr<MockListenCallbacks> mock_calls = std::make_shared<MockListenCallbacks>();
+static void HearOogaBooga(const cave_talk_Say ooga_booga)
+{
+    return (mock_calls.get())->HearOogaBooga(ooga_booga);
 }
 
-void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)
+static void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)
 {
-    std::cout << "Speed: " << speed << ", and Turn Rate: " << turn_rate << std::endl;
-    return;
+    return (mock_calls.get())->HearMovement(speed, turn_rate);
 }
 
-void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)
+static void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)
 {
-    std::cout << "Pan: " << pan << ", and Tilt: " << tilt << std::endl;
-    return;
+    return (mock_calls.get())->HearCameraMovement(pan, tilt);
 }
 
-void HearLights(const bool headlights) 
+static void HearLights(const bool headlights)
 {
-    std::cout << "Headlights: " << headlights << std::endl;
-    return;
+    return (mock_calls.get())->HearLights(headlights);
 }
 
-void HearMode(const bool manual)
+static void HearArm(const bool arm)
 {
-    std::cout << "Manual Control: " << manual << std::endl;
-    return;
+    return (mock_calls.get())->HearArm(arm);
 }
 
-void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3)
+static void HearLog(const char *const log)
 {
-    std::cout << "Just do a breakpoint here" << std::endl;
-    return;
-}
-
-void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt)
-{
-    std::cout << "Just do a breakpoint here" << std::endl;
-    return;
-}
-
-void HearConfigServoMotors(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3)
-{
-    std::cout << "Just do a breakpoint here" << std::endl;
-    return;
+    return (mock_calls.get())->HearLog(log);
 }
 
 void HearOdometry(const cave_talk_Imu *const imu, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
 {
-    std::cout << "Just do a breakpoint here" << std::endl;
-    return;
+    TestIMUObject(imu_odometry_saved, *imu);
+    TestEncoderObject(encoder_odometry_saved_0, *encoder_wheel_0);
+    TestEncoderObject(encoder_odometry_saved_1, *encoder_wheel_1);
+    TestEncoderObject(encoder_odometry_saved_2, *encoder_wheel_2);
+    TestEncoderObject(encoder_odometry_saved_3, *encoder_wheel_3);
 }
 
-void HearLog(const char *const log)
+void HearConfigServoWheels(const cave_talk_Servo *const servo_wheel_0, const cave_talk_Servo *const servo_wheel_1, const cave_talk_Servo *const servo_wheel_2, const cave_talk_Servo *const servo_wheel_3)
 {
-    std::cout << std::string(log) << std::endl;
-    return;
+    TestServoObject(servo_configservowheels_saved_0, *servo_wheel_0);
+    TestServoObject(servo_configservowheels_saved_1, *servo_wheel_1);
+    TestServoObject(servo_configservowheels_saved_2, *servo_wheel_2);
+    TestServoObject(servo_configservowheels_saved_3, *servo_wheel_3);
+}
+
+void HearConfigServoCams(const cave_talk_Servo *const servo_cam_pan, const cave_talk_Servo *const servo_cam_tilt)
+{
+    TestServoObject(servo_configservocams_saved_pan, *servo_cam_pan);
+    TestServoObject(servo_configservocams_saved_tilt, *servo_cam_tilt);
+}
+
+void HearConfigMotors(const cave_talk_Motor *const motor_wheel_0, const cave_talk_Motor *const motor_wheel_1, const cave_talk_Motor *const motor_wheel_2, const cave_talk_Motor *const motor_wheel_3)
+{
+    TestMotorObject(motor_configmotor_saved_0, *motor_wheel_0);
+    TestMotorObject(motor_configmotor_saved_1, *motor_wheel_1);
+    TestMotorObject(motor_configmotor_saved_2, *motor_wheel_2);
+    TestMotorObject(motor_configmotor_saved_3, *motor_wheel_3);
+}
+
+void HearConfigEncoder(const cave_talk_ConfigEncoder *const encoder_wheel_0, const cave_talk_ConfigEncoder *const encoder_wheel_1, const cave_talk_ConfigEncoder *const encoder_wheel_2, const cave_talk_ConfigEncoder *const encoder_wheel_3)
+{
+    TestConfigEncoderObject(configencoder_configencoder_saved_0, *encoder_wheel_0);
+    TestConfigEncoderObject(configencoder_configencoder_saved_1, *encoder_wheel_1);
+    TestConfigEncoderObject(configencoder_configencoder_saved_2, *encoder_wheel_2);
+    TestConfigEncoderObject(configencoder_configencoder_saved_3, *encoder_wheel_3);
+}
+
+static void HearConfigLog(const cave_talk_LogLevel log_level)
+{
+    return (mock_calls.get())->HearConfigLog(log_level);
+}
+
+void HearConfigWheelSpeedControl(const cave_talk_PID *const wheel_0_params, const cave_talk_PID *const wheel_1_params, const cave_talk_PID *const wheel_2_params, const cave_talk_PID *const wheel_3_params, const bool enabled)
+{
+    TestPIDObject(pid_wsc_saved_0, *wheel_0_params);
+    TestPIDObject(pid_wsc_saved_1, *wheel_1_params);
+    TestPIDObject(pid_wsc_saved_2, *wheel_2_params);
+    TestPIDObject(pid_wsc_saved_3, *wheel_3_params);
+    ASSERT_EQ(pid_wsc_enabled, enabled);
+}
+
+void HearConfigSteeringControl(const cave_talk_PID *const turn_rate_params, const bool enabled)
+{
+    TestPIDObject(pid_sc_saved_trp, *turn_rate_params);
+    ASSERT_EQ(pid_sc_enabled, enabled);
+}
+
+static void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius)
+{
+    return (mock_calls.get())->HearAirQuality(dust_ug_per_m3, gas_ppm, temperature_celsius);
 }
 
 const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksInterface = {
-    .hear_ooga_booga      = HearOogaBooga,
-    .hear_movement        = HearMovement,
+    .hear_ooga_booga = HearOogaBooga,
+    .hear_movement = HearMovement,
     .hear_camera_movement = HearCameraMovement,
-    .hear_lights          = HearLights,
-    .hear_mode            = HearMode,
+    .hear_lights = HearLights,
+    .hear_arm = HearArm,
     .hear_odometry = HearOdometry,
     .hear_log = HearLog,
     .hear_config_servo_wheels = HearConfigServoWheels,
     .hear_config_servo_cams = HearConfigServoCams,
-    .hear_config_motors = HearConfigServoMotors,
-};
-
-
-ListenCallbacksInterface::~ListenCallbacksInterface() = default;
-
-class MockListenerCallbacks : public ListenCallbacksInterface
-{
-    public:
-        MOCK_METHOD(void, HearOogaBooga, (const cave_talk_Say), (override));
-        MOCK_METHOD(void, HearMovement, ((const CaveTalk_MetersPerSecond_t), (const CaveTalk_RadiansPerSecond_t)), (override));
-        MOCK_METHOD(void, HearCameraMovement, ((const CaveTalk_Radian_t), (const CaveTalk_Radian_t)), (override));
-        MOCK_METHOD(void, HearLights, (const bool), (override));
-        MOCK_METHOD(void, HearMode, (const bool), (override));
+    .hear_config_motors = HearConfigMotors,
+    .hear_config_encoders = HearConfigEncoder,
+    .hear_config_log = HearConfigLog,
+    .hear_config_wheel_speed_control = HearConfigWheelSpeedControl,
+    .hear_config_steering_control = HearConfigSteeringControl,
+    .hear_air_quality = HearAirQuality,
 };
 
 static CaveTalk_Handle_t CaveTalk_Handle = {
@@ -161,20 +295,21 @@ static CaveTalk_Handle_t CaveTalk_Handle = {
     .listen_callbacks = kCaveTalk_ListenCallbacksInterface,
 };
 
-TEST(CaveTalkCTests, SpeakListenOogaBooga){
-
-
+TEST(CaveTalkCTests, SpeakListenOogaBooga)
+{
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_BOOGA));
+    EXPECT_CALL(*mock_calls.get(), HearOogaBooga(cave_talk_Say_SAY_BOOGA)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOogaBooga(&CaveTalk_Handle, cave_talk_Say_SAY_OOGA));
+    EXPECT_CALL(*mock_calls.get(), HearOogaBooga(cave_talk_Say_SAY_OOGA)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
-
+    mock_calls.reset();
 }
 
 TEST(CaveTalkCTests, SpeakListenMovement)
@@ -182,63 +317,71 @@ TEST(CaveTalkCTests, SpeakListenMovement)
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 2.7982, 3.14982));
+    EXPECT_CALL(*mock_calls.get(), HearMovement(2.7982, 3.14982)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMovement(&CaveTalk_Handle, 1.99923, .00784));
+    EXPECT_CALL(*mock_calls.get(), HearMovement(1.99923, .00784)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    mock_calls.reset();
 }
 
 TEST(CaveTalkCTests, SpeakListenCameraMovement)
 {
-
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 2.7982, 3.14982));
+    EXPECT_CALL(*mock_calls.get(), HearCameraMovement(2.7982, 3.14982)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakCameraMovement(&CaveTalk_Handle, 1.99923, .00784));
+    EXPECT_CALL(*mock_calls.get(), HearCameraMovement(1.99923, .00784)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    mock_calls.reset();
 }
 
 TEST(CaveTalkCTests, SpeakListenLights)
 {
-
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, true));
+    EXPECT_CALL(*mock_calls.get(), HearLights(true)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLights(&CaveTalk_Handle, false));
+    EXPECT_CALL(*mock_calls.get(), HearLights(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    mock_calls.reset();
 }
 
-TEST(CaveTalkCTests, SpeakListenMode)
+TEST(CaveTalkCTests, SpeakListenArm)
 {
-
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, true));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakArm(&CaveTalk_Handle, true));
+    EXPECT_CALL(*mock_calls.get(), HearArm(true)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
     ring_buffer.Clear();
 
-    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakMode(&CaveTalk_Handle, false));
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakArm(&CaveTalk_Handle, false));
+    EXPECT_CALL(*mock_calls.get(), HearArm(false)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    mock_calls.reset();
 }
 
 TEST(CaveTalkCTests, SpeakListenOdometry)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Imu imu = cave_talk_Imu();
@@ -246,82 +389,88 @@ TEST(CaveTalkCTests, SpeakListenOdometry)
     imu.accel.x_meters_per_second_squared = .00004;
     imu.accel.y_meters_per_second_squared = .03004;
     imu.accel.z_meters_per_second_squared = 152352.2038492;
-    
+
     imu.has_gyro = true;
     imu.gyro.pitch_radians_per_second = 17029348.57032894;
     imu.gyro.roll_radians_per_second = 123.00000000000001;
     imu.gyro.yaw_radians_per_second = 82482.1111111111111;
 
+    imu.has_quat = true;
+    imu.quat.w = .2341402;
+    imu.quat.x = .00000234;
+    imu.quat.y = .6894444442;
+    imu.quat.z = 0.00527000212;
+
     cave_talk_Encoder encoder_test = cave_talk_Encoder();
     encoder_test.rate_radians_per_second = 6.1412341231;
     encoder_test.total_pulses = 999921;
 
-
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakOdometry(&CaveTalk_Handle, &imu, &encoder_test, &encoder_test, &encoder_test, &encoder_test));
-    //You would have an EXPECT_CALL here for HearOdometry but there is no operator== for Imu & Encoder
-    // enter debug mode and you can see that it is called with the correct params
+    imu_odometry_saved = imu;
+    encoder_odometry_saved_0 = encoder_test;
+    encoder_odometry_saved_1 = encoder_test;
+    encoder_odometry_saved_2 = encoder_test;
+    encoder_odometry_saved_3 = encoder_test;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
-
 }
 
 TEST(CaveTalkCTests, SpeakListenLog)
 {
     ring_buffer.Clear();
 
-    char *const hw = "Hello World! 12401928347";
-
+    char hw[] = "Hello World! 12401928347";
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, hw));
-    //Expect Call
+    EXPECT_CALL(*mock_calls.get(), HearLog(testing::Eq(std::string(hw)))).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    char ooga_booga_msg[] = "Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga Ooga Booga!";
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakLog(&CaveTalk_Handle, ooga_booga_msg));
+    EXPECT_CALL(*mock_calls.get(), HearLog(testing::Eq(std::string(ooga_booga_msg)))).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
-
+    mock_calls.reset();
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigServoWheels)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Servo servo_test_zero = cave_talk_Servo();
     (servo_test_zero).min_angle_radian = (0.2);
     (servo_test_zero).max_angle_radian = (180.5);
     (servo_test_zero).center_angle_radian = (94.3);
-    (servo_test_zero).min_duty_cycle_microseconds = (540);
-    (servo_test_zero).max_duty_cycle_microseconds = (2560);
-    (servo_test_zero).center_duty_cycle_microseconds = (1576);
-
+    (servo_test_zero).min_duty_cycle_percentage = (540);
+    (servo_test_zero).max_duty_cycle_percentage = (2560);
+    (servo_test_zero).center_duty_cycle_percentage = (1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoWheels(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero, &servo_test_zero, &servo_test_zero));
-    //You would have an EXPECT_CALL here for HearConfigServoWheels but there is no operator== for class Servo
-    // enter debug mode and you can see that it is called with the correct params
+    servo_configservowheels_saved_0 = servo_test_zero;
+    servo_configservowheels_saved_1 = servo_test_zero;
+    servo_configservowheels_saved_2 = servo_test_zero;
+    servo_configservowheels_saved_3 = servo_test_zero;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
-
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigServoCams)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Servo servo_test_zero = cave_talk_Servo();
     (servo_test_zero).min_angle_radian = (0.2);
     (servo_test_zero).max_angle_radian = (180.5);
     (servo_test_zero).center_angle_radian = (94.3);
-    (servo_test_zero).min_duty_cycle_microseconds = (540);
-    (servo_test_zero).max_duty_cycle_microseconds = (2560);
-    (servo_test_zero).center_duty_cycle_microseconds = (1576);
+    (servo_test_zero).min_duty_cycle_percentage = (540);
+    (servo_test_zero).max_duty_cycle_percentage = (2560);
+    (servo_test_zero).center_duty_cycle_percentage = (1576);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigServoCams(&CaveTalk_Handle, &servo_test_zero, &servo_test_zero));
-    //You would have an EXPECT_CALL here for HearConfigServoCams but there is no operator== for class Servo
-    // enter debug mode and you can see that it is called with the correct params
+    servo_configservocams_saved_pan = servo_test_zero;
+    servo_configservocams_saved_tilt = servo_test_zero;
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
-
 }
 
 TEST(CaveTalkCTests, SpeakListenConfigMotors)
 {
-
     ring_buffer.Clear();
 
     cave_talk_Motor motor_test_zero = cave_talk_Motor();
@@ -332,8 +481,122 @@ TEST(CaveTalkCTests, SpeakListenConfigMotors)
     (motor_test_zero).max_duty_cycle_percentage = (2560);
 
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigMotors(&CaveTalk_Handle, &motor_test_zero, &motor_test_zero, &motor_test_zero, &motor_test_zero));
-    //You would have an EXPECT_CALL here for HearConfigMotors but there is no operator== for class Servo
-    // enter debug mode and you can see that it is called with the correct params
+    motor_configmotor_saved_0 = motor_test_zero;
+    motor_configmotor_saved_1 = motor_test_zero;
+    motor_configmotor_saved_2 = motor_test_zero;
+    motor_configmotor_saved_3 = motor_test_zero;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigEncoder)
+{
+    ring_buffer.Clear();
+
+    cave_talk_ConfigEncoder config_encoder_test = cave_talk_ConfigEncoder();
+    config_encoder_test.smoothing_factor = (.005);
+    config_encoder_test.mode = (cave_talk_EncoderMode::cave_talk_EncoderMode_BSP_ENCODER_USER_MODE_PULSES_PER_ROTATON);
+    config_encoder_test.pulses_per_period = (6.2304);
+    config_encoder_test.radians_per_pulse = (3.000000001);
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigEncoders(&CaveTalk_Handle, &config_encoder_test, &config_encoder_test, &config_encoder_test, &config_encoder_test));
+    configencoder_configencoder_saved_0 = config_encoder_test;
+    configencoder_configencoder_saved_1 = config_encoder_test;
+    configencoder_configencoder_saved_2 = config_encoder_test;
+    configencoder_configencoder_saved_3 = config_encoder_test;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigLog)
+{
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_ERROR));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_ERROR)).Times(1);
     ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
 
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_WARNING));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_WARNING)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_INFO));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_INFO)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_DEBUG));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_DEBUG)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_VERBOSE));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_VERBOSE)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigLog(&CaveTalk_Handle, cave_talk_LogLevel_BSP_LOGGER_LEVEL_MAX));
+    EXPECT_CALL(*mock_calls.get(), HearConfigLog(cave_talk_LogLevel_BSP_LOGGER_LEVEL_MAX)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    mock_calls.reset();
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigWheelSpeedControl)
+{
+    ring_buffer.Clear();
+
+    cave_talk_PID wheel_spd_ctrl = cave_talk_PID();
+    wheel_spd_ctrl.Kd = 10000000.1;
+    wheel_spd_ctrl.Ki = .00000015;
+    wheel_spd_ctrl.Kp = 1.2983723;
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigWheelSpeedControl(&CaveTalk_Handle, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, true));
+    pid_wsc_saved_0 = wheel_spd_ctrl;
+    pid_wsc_saved_1 = wheel_spd_ctrl;
+    pid_wsc_saved_2 = wheel_spd_ctrl;
+    pid_wsc_saved_3 = wheel_spd_ctrl;
+    pid_wsc_enabled = true;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigWheelSpeedControl(&CaveTalk_Handle, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, &wheel_spd_ctrl, false));
+    pid_wsc_enabled = false;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+}
+
+TEST(CaveTalkCTests, SpeakListenConfigSteeringControl)
+{
+    ring_buffer.Clear();
+
+    cave_talk_PID steer_ctl = cave_talk_PID();
+    steer_ctl.Kd = 10000000.1;
+    steer_ctl.Ki = .00000015;
+    steer_ctl.Kp = 1.2983723;
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigSteeringControl(&CaveTalk_Handle, &steer_ctl, true));
+    pid_sc_saved_trp = steer_ctl;
+    pid_sc_enabled = true;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakConfigSteeringControl(&CaveTalk_Handle, &steer_ctl, false));
+    pid_sc_enabled = false;
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+}
+
+TEST(CaveTalkCTests, SpeakListenAirQuality)
+{
+    ring_buffer.Clear();
+
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_SpeakAirQuality(&CaveTalk_Handle, 52, 253, 23.3));
+    EXPECT_CALL(*mock_calls.get(), HearAirQuality(52, 253, 23.3)).Times(1);
+    ASSERT_EQ(CAVE_TALK_ERROR_NONE, CaveTalk_Hear(&CaveTalk_Handle));
+
+    ring_buffer.Clear();
+    mock_calls.reset();
 }

@@ -29,9 +29,9 @@ Use the other files as reference but here are the minimum requirements:
         double min_angle_radian = 1;
         double max_angle_radian = 2;
         double center_angle_radian = 3;
-        double min_duty_cycle_microseconds = 4;
-        double max_duty_cycle_microseconds = 5;
-        double center_duty_cycle_microseconds = 6;
+        double min_duty_cycle_percentage = 4;
+        double max_duty_cycle_percentage = 5;
+        double center_duty_cycle_percentage = 6;
     }
 
     message ConfigServoWheels {
@@ -65,9 +65,11 @@ It'd be best to initialize the new protobuf message using the build directions i
 #### `cave_talk.h`
 ---
 
-- Add a function pointer callback to `CaveTalk_ListenCallbacks_t`
+- If the function establishes a new typedef struct, include the message's `.pb.h` header file 
+- Add a function pointer callback to `CaveTalk_ListenCallbacks_t` struct
     - Output: `void`
     - Input: `output params`
+- Add callback field for `kCaveTalk_ListenCallbacksNull`
 - Add a `CaveTalk_Speak______` function
     - Output: `CaveTalk_Error_t`
     - Input: `"handle" ptr`, `output params`
@@ -93,6 +95,7 @@ It'd be best to initialize the new protobuf message using the build directions i
 #### `cave_talk.h`
 ---
 
+- If the message adds a new Class for a message field, add the message's `.pb.h` file
 - Add ListenerCallback virtual function for message
     - Output: `void`
     - Input: `output params`
@@ -126,6 +129,6 @@ Good tests have these qualities:
 - Tests foreseeable edge cases
 - Tests odd input values
 - Utilizes Mock functions where possible
-    - If values cannot be checked directly through tests, leave a comment where a breakpoint could be used to see values
+    - Use the Assert Workaround for New Protobuf-Generated Objects without operator==
 
 
