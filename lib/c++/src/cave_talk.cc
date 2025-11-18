@@ -19,6 +19,7 @@
 #include "movement.pb.h"
 #include "odometry.pb.h"
 #include "ooga_booga.pb.h"
+#include "relative_move.pb.h"
 
 namespace cave_talk
 {
@@ -367,6 +368,24 @@ CaveTalk_Error_t Listener::HandleAirQuality(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleRelativeMove(CaveTalk_Length_t length) const
+{
+    RelativeMove relative_move_message;
+
+    if (!relative_move_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const RelativeMoveType  type     = relative_move_message.type();
+    const CaveTalk_Meter_t  position = relative_move_message.position_meters();
+    const CaveTalk_Radian_t pose     = relative_move_message.pose_radians();
+
+    listener_callbacks_->HearRelativeMove(type, position, pose);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_         = kCaveTalk_LinkHandleNull;
@@ -567,6 +586,19 @@ CaveTalk_Error_t Talker::SpeakAirQuality(const uint32_t dust_ug_per_m3, const ui
     air_quality_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_AIR_QUALITY), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakRelativeMove(const RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose)
+{
+    RelativeMove relative_move_message;
+    relative_move_message.set_type(type);
+    relative_move_message.set_position_meters(position);
+    relative_move_message.set_pose_radians(pose);
+
+    std::size_t length = relative_move_message.ByteSizeLong();
+    relative_move_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_RELATIVE_MOVE), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

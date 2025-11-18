@@ -37,6 +37,7 @@ static CaveTalk_Error_t CaveTalk_HandleConfigLog(const CaveTalk_Handle_t *const 
 static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static CaveTalk_Error_t CaveTalk_HandleAirQuality(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
+static CaveTalk_Error_t CaveTalk_HandleRelativeMove(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length);
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
 static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg);
 
@@ -110,6 +111,9 @@ CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
                 break;
             case cave_talk_Id_ID_AIR_QUALITY:
                 error = CaveTalk_HandleAirQuality(handle, length);
+                break;
+            case cave_talk_Id_ID_RELATIVE_MOVE:
+                error = CaveTalk_HandleRelativeMove(handle, length);
                 break;
             default:
                 error = CAVE_TALK_ERROR_ID;
@@ -668,6 +672,35 @@ CaveTalk_Error_t CaveTalk_SpeakAirQuality(const CaveTalk_Handle_t *const handle,
     return error;
 }
 
+CaveTalk_Error_t CaveTalk_SpeakRelativeMove(const CaveTalk_Handle_t *const handle, const cave_talk_RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if ((NULL == handle) || (NULL == handle->buffer) || (NULL == handle->link_handle.send))
+    {
+    }
+    else
+    {
+        pb_ostream_t           ostream               = pb_ostream_from_buffer(handle->buffer, handle->buffer_size);
+        cave_talk_RelativeMove relative_move_message = cave_talk_RelativeMove_init_zero;
+
+        relative_move_message.type            = type;
+        relative_move_message.position_meters = position;
+        relative_move_message.pose_radians    = pose;
+
+        if (!pb_encode(&ostream, cave_talk_RelativeMove_fields, &relative_move_message))
+        {
+            error = CAVE_TALK_ERROR_SIZE;
+        }
+        else
+        {
+            error = CaveTalk_Speak(&handle->link_handle, (CaveTalk_Id_t)cave_talk_Id_ID_RELATIVE_MOVE, handle->buffer, ostream.bytes_written);
+        }
+    }
+
+    return error;
+}
+
 static CaveTalk_Error_t CaveTalk_HandleOogaBooga(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -1010,7 +1043,6 @@ static CaveTalk_Error_t CaveTalk_HandleConfigWheelSpeedControl(const CaveTalk_Ha
     return error;
 }
 
-
 static CaveTalk_Error_t CaveTalk_HandleConfigSteeringControl(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
@@ -1057,6 +1089,32 @@ static CaveTalk_Error_t CaveTalk_HandleAirQuality(const CaveTalk_Handle_t *const
         else if (NULL != handle->listen_callbacks.hear_air_quality)
         {
             handle->listen_callbacks.hear_air_quality(aq_msg.dust_ug_per_m3, aq_msg.gas_ppm, aq_msg.temperature_celsius);
+        }
+    }
+
+    return error;
+}
+
+static CaveTalk_Error_t CaveTalk_HandleRelativeMove(const CaveTalk_Handle_t *const handle, const CaveTalk_Length_t length)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NONE;
+
+    if ((NULL == handle) || (NULL == handle->buffer))
+    {
+        error = CAVE_TALK_ERROR_NULL;
+    }
+    else
+    {
+        pb_istream_t           istream               = pb_istream_from_buffer(handle->buffer, length);
+        cave_talk_RelativeMove relative_move_message = cave_talk_RelativeMove_init_zero;
+
+        if (!pb_decode(&istream, cave_talk_RelativeMove_fields, &relative_move_message))
+        {
+            error = CAVE_TALK_ERROR_PARSE;
+        }
+        else if (NULL != handle->listen_callbacks.hear_relative_move)
+        {
+            handle->listen_callbacks.hear_relative_move(relative_move_message.type, relative_move_message.position_meters, relative_move_message.pose_radians);
         }
     }
 
