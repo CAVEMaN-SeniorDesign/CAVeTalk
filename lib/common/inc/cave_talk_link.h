@@ -51,6 +51,7 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
                                  void *const data,
                                  const size_t size,
                                  CaveTalk_Length_t *const length);
+CaveTalk_Error_t CaveTalk_ListenReset(CaveTalk_LinkHandle_t *const handle);
 
 #ifdef __cplusplus
 }

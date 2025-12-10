@@ -41,6 +41,18 @@ static CaveTalk_Error_t CaveTalk_HandleRelativeMove(const CaveTalk_Handle_t *con
 static bool CaveTalk_EncodeString(pb_ostream_t *stream, const pb_field_t *field, void *const *arg);
 static bool CaveTalk_DecodeString(pb_istream_t *stream, const pb_field_t *field, void **arg);
 
+CaveTalk_Error_t CaveTalk_Reset(CaveTalk_Handle_t *const handle)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if (NULL != handle)
+    {
+        error = CaveTalk_ListenReset(&handle->link_handle);
+    }
+
+    return error;
+}
+
 CaveTalk_Error_t CaveTalk_Hear(CaveTalk_Handle_t *const handle)
 {
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;

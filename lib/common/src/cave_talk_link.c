@@ -114,6 +114,24 @@ CaveTalk_Error_t CaveTalk_Listen(CaveTalk_LinkHandle_t *const handle,
     return error;
 }
 
+CaveTalk_Error_t CaveTalk_ListenReset(CaveTalk_LinkHandle_t *const handle)
+{
+    CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
+
+    if (NULL != handle)
+    {
+        handle->receive_state  = CAVE_TALK_LINK_STATE_RESET;
+        handle->receive_id     = CAVE_TALK_ID_NONE;
+        handle->receive_length = 0U;
+        handle->crc            = 0U;
+        handle->bytes_received = 0U;
+
+        error = CAVE_TALK_ERROR_NONE;
+    }
+
+    return error;
+}
+
 static CaveTalk_Error_t CaveTalk_Receive(CaveTalk_LinkHandle_t *const handle,
                                          CaveTalk_Id_t *const id,
                                          void *const data,
