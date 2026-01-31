@@ -32,10 +32,17 @@ message Encoder {
     double rate_radians_per_second = 2;
 }
 
+message Pose {
+    double x_meters = 1;
+    double y_meters = 2;
+    double heading_radians = 3;
+}
+
 message Odometry {
     Imu Imu = 1;
     Encoder encoder_wheel_0 = 2;
     Encoder encoder_wheel_1 = 3;
     Encoder encoder_wheel_2 = 4;
     Encoder encoder_wheel_3 = 5;
+    Pose pose = 6;
 }

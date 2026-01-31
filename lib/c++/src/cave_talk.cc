@@ -207,7 +207,6 @@ CaveTalk_Error_t Listener::HandleLog(CaveTalk_Length_t length) const
 
 CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
 {
-
     Odometry odometry_message;
 
     if (!odometry_message.ParseFromArray(buffer_.data(), length))
@@ -220,8 +219,9 @@ CaveTalk_Error_t Listener::HandleOdometry(CaveTalk_Length_t length) const
     const Encoder encoder_wheel_1 = odometry_message.encoder_wheel_1();
     const Encoder encoder_wheel_2 = odometry_message.encoder_wheel_2();
     const Encoder encoder_wheel_3 = odometry_message.encoder_wheel_3();
+    const Pose    pose            = odometry_message.pose();
 
-    listener_callbacks_->HearOdometry(IMU, encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3);
+    listener_callbacks_->HearOdometry(IMU, encoder_wheel_0, encoder_wheel_1, encoder_wheel_2, encoder_wheel_3, pose);
 
     return CAVE_TALK_ERROR_NONE;
 }
@@ -464,7 +464,7 @@ CaveTalk_Error_t Talker::SpeakLog(const char *const log)
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_LOG), message_buffer_.data(), length);
 }
 
-CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)
+CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3, const Pose &pose)
 {
     Odometry odometry_message;
     odometry_message.mutable_imu()->CopyFrom(IMU);
@@ -472,6 +472,7 @@ CaveTalk_Error_t Talker::SpeakOdometry(const Imu &IMU, const Encoder &encoder_wh
     odometry_message.mutable_encoder_wheel_1()->CopyFrom(encoder_wheel_1);
     odometry_message.mutable_encoder_wheel_2()->CopyFrom(encoder_wheel_2);
     odometry_message.mutable_encoder_wheel_3()->CopyFrom(encoder_wheel_3);
+    odometry_message.mutable_pose()->CopyFrom(pose);
 
     size_t length = odometry_message.ByteSizeLong();
     odometry_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());

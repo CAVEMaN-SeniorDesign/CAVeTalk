@@ -274,7 +274,7 @@ CaveTalk_Error_t CaveTalk_SpeakArm(const CaveTalk_Handle_t *const handle, const 
     return error;
 }
 
-CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, const cave_talk_Imu *const IMU, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3)
+CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, const cave_talk_Imu *const IMU, const cave_talk_Encoder *const encoder_wheel_0, const cave_talk_Encoder *const encoder_wheel_1, const cave_talk_Encoder *const encoder_wheel_2, const cave_talk_Encoder *const encoder_wheel_3, const cave_talk_Pose *const pose)
 {
 
     CaveTalk_Error_t error = CAVE_TALK_ERROR_NULL;
@@ -315,6 +315,12 @@ CaveTalk_Error_t CaveTalk_SpeakOdometry(const CaveTalk_Handle_t *const handle, c
         {
             odometry_message.encoder_wheel_3     = *encoder_wheel_3;
             odometry_message.has_encoder_wheel_3 = true;
+        }
+
+        if (pose != NULL)
+        {
+            odometry_message.pose     = *pose;
+            odometry_message.has_pose = true;
         }
 
         if (!pb_encode(&ostream, cave_talk_Odometry_fields, &odometry_message))
@@ -862,7 +868,7 @@ static CaveTalk_Error_t CaveTalk_HandleOdometry(const CaveTalk_Handle_t *const h
         }
         else if (NULL != handle->listen_callbacks.hear_odometry)
         {
-            handle->listen_callbacks.hear_odometry(&odometry_message.Imu, &odometry_message.encoder_wheel_0, &odometry_message.encoder_wheel_1, &odometry_message.encoder_wheel_2, &odometry_message.encoder_wheel_3);
+            handle->listen_callbacks.hear_odometry(&odometry_message.Imu, &odometry_message.encoder_wheel_0, &odometry_message.encoder_wheel_1, &odometry_message.encoder_wheel_2, &odometry_message.encoder_wheel_3, &odometry_message.pose);
         }
     }
 

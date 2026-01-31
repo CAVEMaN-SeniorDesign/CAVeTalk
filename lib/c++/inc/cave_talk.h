@@ -26,23 +26,23 @@ namespace cave_talk
 class ListenerCallbacks
 {
     public:
-        virtual ~ListenerCallbacks()                                                                                                                                                           = 0;
-        virtual void HearOogaBooga(const Say ooga_booga)                                                                                                                                       = 0;
-        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)                                                                         = 0;
-        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                                                             = 0;
-        virtual void HearLights(const bool headlights)                                                                                                                                         = 0;
-        virtual void HearArm(const bool arm)                                                                                                                                                   = 0;
-        virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3)              = 0;
-        virtual void HearLog(const char *const log)                                                                                                                                            = 0;
-        virtual void HearConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)                                     = 0;
-        virtual void HearConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)                                                                                              = 0;
-        virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                                           = 0;
-        virtual void HearConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3) = 0;
-        virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                   = 0;
-        virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled)               = 0;
-        virtual void HearConfigSteeringControl(const PID &turn_rate_params, const bool enabled)                                                                                                = 0;
-        virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius)                                                                   = 0;
-        virtual void HearRelativeMove(const RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose)                                                              = 0;
+        virtual ~ListenerCallbacks()                                                                                                                                                                = 0;
+        virtual void HearOogaBooga(const Say ooga_booga)                                                                                                                                            = 0;
+        virtual void HearMovement(const CaveTalk_MetersPerSecond_t speed, const CaveTalk_RadiansPerSecond_t turn_rate)                                                                              = 0;
+        virtual void HearCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt)                                                                                                  = 0;
+        virtual void HearLights(const bool headlights)                                                                                                                                              = 0;
+        virtual void HearArm(const bool arm)                                                                                                                                                        = 0;
+        virtual void HearOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3, const Pose &pose) = 0;
+        virtual void HearLog(const char *const log)                                                                                                                                                 = 0;
+        virtual void HearConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3)                                          = 0;
+        virtual void HearConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt)                                                                                                   = 0;
+        virtual void HearConfigMotor(const Motor &motor_wheel_0, const Motor &motor_wheel_1, const Motor &motor_wheel_2, const Motor &motor_wheel_3)                                                = 0;
+        virtual void HearConfigEncoder(const ConfigEncoder &encoder_wheel_0, const ConfigEncoder &encoder_wheel_1, const ConfigEncoder &encoder_wheel_2, const ConfigEncoder &encoder_wheel_3)      = 0;
+        virtual void HearConfigLog(const LogLevel log_level)                                                                                                                                        = 0;
+        virtual void HearConfigWheelSpeedControl(const PID &wheel_0_params, const PID &wheel_1_params, const PID &wheel_2_params, const PID &wheel_3_params, const bool enabled)                    = 0;
+        virtual void HearConfigSteeringControl(const PID &turn_rate_params, const bool enabled)                                                                                                     = 0;
+        virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius)                                                                        = 0;
+        virtual void HearRelativeMove(const RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose)                                                                   = 0;
 };
 
 class Listener
@@ -91,7 +91,7 @@ class Talker
         CaveTalk_Error_t SpeakCameraMovement(const CaveTalk_Radian_t pan, const CaveTalk_Radian_t tilt);
         CaveTalk_Error_t SpeakLights(const bool headlights);
         CaveTalk_Error_t SpeakArm(const bool arm);
-        CaveTalk_Error_t SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3);
+        CaveTalk_Error_t SpeakOdometry(const Imu &IMU, const Encoder &encoder_wheel_0, const Encoder &encoder_wheel_1, const Encoder &encoder_wheel_2, const Encoder &encoder_wheel_3, const Pose &pose);
         CaveTalk_Error_t SpeakLog(const char *const log);
         CaveTalk_Error_t SpeakConfigServoWheels(const Servo &servo_wheel_0, const Servo &servo_wheel_1, const Servo &servo_wheel_2, const Servo &servo_wheel_3);
         CaveTalk_Error_t SpeakConfigServoCams(const Servo &servo_cam_pan, const Servo &servo_cam_tilt);
