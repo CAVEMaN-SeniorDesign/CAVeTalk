@@ -20,6 +20,7 @@
 #include "odometry.pb.h"
 #include "ooga_booga.pb.h"
 #include "relative_move.pb.h"
+#include "waypoint.pb.h"
 
 namespace cave_talk
 {
@@ -97,6 +98,9 @@ CaveTalk_Error_t Listener::Listen(void)
             break;
         case ID_RELATIVE_MOVE:
             error = HandleRelativeMove(length);
+            break;
+        case ID_WAYPOINT:
+            error = HandleWaypoint(length);
             break;
         default:
             error = CAVE_TALK_ERROR_ID;
@@ -389,6 +393,25 @@ CaveTalk_Error_t Listener::HandleRelativeMove(CaveTalk_Length_t length) const
     return CAVE_TALK_ERROR_NONE;
 }
 
+CaveTalk_Error_t Listener::HandleWaypoint(CaveTalk_Length_t length) const
+{
+    Waypoint waypoint_message;
+
+    if (!waypoint_message.ParseFromArray(buffer_.data(), length))
+    {
+        return CAVE_TALK_ERROR_PARSE;
+    }
+
+    const WaypointType      type    = waypoint_message.type();
+    const CaveTalk_Meter_t  x       = waypoint_message.x_meters();
+    const CaveTalk_Meter_t  y       = waypoint_message.y_meters();
+    const CaveTalk_Radian_t heading = waypoint_message.heading_radians();
+
+    listener_callbacks_->HearWaypoint(type, x, y, heading);
+
+    return CAVE_TALK_ERROR_NONE;
+}
+
 Talker::Talker(CaveTalk_Error_t (*send)(const void *const data, const size_t size))
 {
     link_handle_         = kCaveTalk_LinkHandleNull;
@@ -603,6 +626,20 @@ CaveTalk_Error_t Talker::SpeakRelativeMove(const RelativeMoveType type, const Ca
     relative_move_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
 
     return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_RELATIVE_MOVE), message_buffer_.data(), length);
+}
+
+CaveTalk_Error_t Talker::SpeakWaypoint(const WaypointType type, const CaveTalk_Meter_t x, const CaveTalk_Meter_t y, const CaveTalk_Radian_t heading)
+{
+    Waypoint waypoint_message;
+    waypoint_message.set_type(type);
+    waypoint_message.set_x_meters(x);
+    waypoint_message.set_y_meters(y);
+    waypoint_message.set_heading_radians(heading);
+
+    std::size_t length = waypoint_message.ByteSizeLong();
+    waypoint_message.SerializeToArray(message_buffer_.data(), message_buffer_.max_size());
+
+    return CaveTalk_Speak(&link_handle_, static_cast<CaveTalk_Id_t>(ID_WAYPOINT), message_buffer_.data(), length);
 }
 
 } // namespace cave_talk

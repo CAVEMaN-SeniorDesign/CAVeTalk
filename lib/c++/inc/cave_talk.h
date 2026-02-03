@@ -16,6 +16,7 @@
 #include "odometry.pb.h"
 #include "ooga_booga.pb.h"
 #include "relative_move.pb.h"
+#include "waypoint.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -43,6 +44,7 @@ class ListenerCallbacks
         virtual void HearConfigSteeringControl(const PID &turn_rate_params, const bool enabled)                                                                                                     = 0;
         virtual void HearAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius)                                                                        = 0;
         virtual void HearRelativeMove(const RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose)                                                                   = 0;
+        virtual void HearWaypoint(const WaypointType type, const CaveTalk_Meter_t x, const CaveTalk_Meter_t y, const CaveTalk_Radian_t heading)                                                     = 0;
 };
 
 class Listener
@@ -73,6 +75,7 @@ class Listener
         CaveTalk_Error_t HandleConfigSteeringControl(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleAirQuality(const CaveTalk_Length_t length) const;
         CaveTalk_Error_t HandleRelativeMove(CaveTalk_Length_t length) const;
+        CaveTalk_Error_t HandleWaypoint(CaveTalk_Length_t length) const;
         CaveTalk_LinkHandle_t link_handle_;
         std::shared_ptr<ListenerCallbacks> listener_callbacks_;
         std::array<uint8_t, CAVE_TALK_MAX_PAYLOAD_SIZE> buffer_;
@@ -102,6 +105,7 @@ class Talker
         CaveTalk_Error_t SpeakConfigSteeringControl(const PID &turn_rate_params, const bool enabled);
         CaveTalk_Error_t SpeakAirQuality(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius);
         CaveTalk_Error_t SpeakRelativeMove(const RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose);
+        CaveTalk_Error_t SpeakWaypoint(const WaypointType type, const CaveTalk_Meter_t x, const CaveTalk_Meter_t y, const CaveTalk_Radian_t heading);
 
     private:
         CaveTalk_LinkHandle_t link_handle_;

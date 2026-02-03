@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package cave_talk;
+
+enum WaypointType {
+    WAYPOINT_TYPE_CMD = 0;
+    WAYPOINT_TYPE_ACK = 1;
+    WAYPOINT_TYPE_NACK = 2;
+}
+
+message Waypoint {
+    WaypointType type = 1;
+    double x_meters = 2;
+    double y_meters = 3;
+    double heading_radians = 4;
+}

@@ -13,6 +13,7 @@
 #include "config_pid.pb.h"
 #include "config_servo.pb.h"
 #include "relative_move.pb.h"
+#include "waypoint.pb.h"
 
 #include "cave_talk_link.h"
 #include "cave_talk_types.h"
@@ -35,6 +36,7 @@ typedef struct
     void (*hear_config_steering_control)(const cave_talk_PID *const turn_rate_params, const bool enabled);
     void (*hear_air_quality)(const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius);
     void (*hear_relative_move)(const cave_talk_RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose);
+    void (*hear_waypoint)(const cave_talk_WaypointType type, const CaveTalk_Meter_t x, const CaveTalk_Meter_t y, const CaveTalk_Radian_t heading);
 } CaveTalk_ListenCallbacks_t;
 
 typedef struct
@@ -62,6 +64,7 @@ static const CaveTalk_ListenCallbacks_t kCaveTalk_ListenCallbacksNull = {
     .hear_config_steering_control    = NULL,
     .hear_air_quality                = NULL,
     .hear_relative_move              = NULL,
+    .hear_waypoint                   = NULL,
 };
 
 static const CaveTalk_Handle_t kCaveTalk_HandleNull = {
@@ -94,6 +97,7 @@ CaveTalk_Error_t CaveTalk_SpeakConfigWheelSpeedControl(const CaveTalk_Handle_t *
 CaveTalk_Error_t CaveTalk_SpeakConfigSteeringControl(const CaveTalk_Handle_t *const handle, const cave_talk_PID *const turn_rate_params, const bool enabled);
 CaveTalk_Error_t CaveTalk_SpeakAirQuality(const CaveTalk_Handle_t *const handle, const uint32_t dust_ug_per_m3, const uint32_t gas_ppm, const double temperature_celsius);
 CaveTalk_Error_t CaveTalk_SpeakRelativeMove(const CaveTalk_Handle_t *const handle, const cave_talk_RelativeMoveType type, const CaveTalk_Meter_t position, const CaveTalk_Radian_t pose);
+CaveTalk_Error_t CaveTalk_SpeakWaypoint(const CaveTalk_Handle_t *const handle, const cave_talk_WaypointType type, const CaveTalk_Meter_t x, const CaveTalk_Meter_t y, const CaveTalk_Radian_t heading);
 
 #ifdef __cplusplus
 }
